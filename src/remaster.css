@@ -1,0 +1,14 @@
+#armorBtn{font-size:10px;padding:10px;margin-top:8px;letter-spacing:1px}
+.left-panel{max-height:calc(100vh - 285px);overflow-y:auto;scrollbar-width:thin;padding-right:7px;pointer-events:auto}.right-panel{pointer-events:auto}
+#armorLegend{display:flex;flex-wrap:wrap;gap:5px 11px;margin:9px 0;font-size:10px;padding:10px;background:#09131cd9;border:1px solid #ffffff19}
+#armorLegend small{display:block;color:#b2c1c7;line-height:1.5}
+#unlockPanel{margin-top:12px;padding:12px;background:#d1ad6812;border:1px solid #d1ad6840}
+#unlockInfo{font-size:11px;line-height:1.7;color:#e0c189;margin:0 0 7px}
+#unlockBtn{font-size:10px;padding:10px}
+#countdown{position:absolute;z-index:15;left:50%;top:27%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;text-shadow:0 2px 20px #000;pointer-events:none}
+#countdown small{font-size:13px;letter-spacing:5px;color:#ebd5a9}#countdown b{font-size:108px;font-weight:500;line-height:1.25;color:#fff2d4}#countdown span{font-size:12px;letter-spacing:1px;color:#d7e0df}
+#penetrationDot{position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:50%;background:#dbe2dc;transform:translate(-50%,-50%);box-shadow:0 0 9px #dbe2dc;border:1px solid #0007}
+#penetrationLabel{position:absolute;left:50%;top:112px;width:280px;transform:translateX(-50%);text-align:center;font-size:10px;letter-spacing:1px;text-shadow:0 1px 5px #000}
+.reticle:before{width:24px}.reticle:after{height:24px}.reticle{border-color:#d9e6d477}.right-panel{max-height:calc(100vh - 190px);overflow-y:auto;scrollbar-width:thin;padding-right:5px}.operation{margin-top:14px;padding-top:14px}.operation .muted{font-size:11px}.map-preview{padding:10px;margin:8px 0}.tank-card em{font-size:8px}
+@media(max-height:780px){.left-panel .stat{margin:8px 0}.tank-heading p{font-size:11px;margin-bottom:10px}.right-panel{max-height:calc(100vh - 160px)}.left-panel nav{margin-bottom:12px}#armorLegend{font-size:8px;padding:7px}.map-preview{display:none}}
+@media(max-width:800px){.operation #modeSelect{display:inline-block}.operation{display:flex;gap:5px;flex-wrap:wrap}.operation select{width:calc(50% - 3px)}.operation .primary{width:100%;float:none;margin-top:4px}.right-panel{overflow:visible}.left-panel #armorBtn{width:150px}.left-panel #armorLegend{max-width:180px}}

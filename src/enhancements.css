@@ -1,0 +1,10 @@
+.operation select+label{margin-top:10px}
+.lan-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lan-code{font-size:34px;letter-spacing:8px;text-align:center;color:#e7c787;padding:17px;border:1px dashed #d8bb7660;background:#0b171d}
+.lan-status{padding:12px;margin:13px 0;background:#ffffff08;border-left:3px solid #d7bd81;color:#becbd0}
+.lan-address{user-select:text;word-break:break-all;color:#e4c88c}
+#scopeVignette{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .16s;background:radial-gradient(circle at center,transparent 0 29%,#02060730 36%,#020607e8 62%)}
+#hud.aiming #scopeVignette{opacity:1}
+#hud.aiming #crosshair{transform:translate(-50%,-50%) scale(.82)}
+#hud.aiming .combat-bottom{opacity:.52}
+@media(max-width:800px){.operation #modeSelect{display:none}.lan-actions{grid-template-columns:1fr}}
