@@ -70,7 +70,29 @@ function selectTank(id){save.selected=id;save.nation=chosen().n;persist();world.
 function updateMapCard(){const m=D.maps[save.map];$('mapPreview').innerHTML=`<span>0${Object.keys(D.maps).indexOf(save.map)+1}</span><div>${m.name.toUpperCase()}<small>${m.subtitle}</small></div>`;$('mapPreview').style.backgroundColor=save.map==='desert'?'#796341':save.map==='winter'?'#506a77':'#334333';updateModeCard();}
 function updateModeCard(){const lan=$('modeSelect').value==='lan';$('modeName').textContent=lan?'◈ ЛОКАЛЬНАЯ СЕТЬ':'◈ КОМАНДНЫЙ БОЙ';$('modeSize').textContent=lan?'1 × 1':'3 × 3';$('modeDescription').textContent=lan?'Создайте лобби или войдите по коду через Radmin VPN.':'Уничтожьте противника или удержите центральную базу.';$('modeNote').textContent=lan?'НУЖЕН ЗАПУСК ЧЕРЕЗ PLAY.CMD НА КОМПЬЮТЕРЕ-ХОСТЕ':'ОДИНОЧНАЯ ИГРА • СОЮЗНИКИ И ВРАГИ — БОТЫ';$('battleBtn').innerHTML=lan?'ЛОББИ <span>→</span>':'В БОЙ <span>→</span>';}
 
-function height(x,z){if(!arena)return 0;if(arena===D.maps.winter)return .2*Math.sin(x*.06)*Math.sin(z*.04);const outer=Math.min(1,Math.max(0,(Math.abs(x)-18)/30));return (.8*Math.sin(x*.065)*Math.sin(z*.051)+1.6*Math.sin(z*.028+x*.024))*outer+(arena===D.maps.desert?1.6*Math.sin(x*.05)*Math.sin(z*.04)*outer:0);}
+// Общая высота ландшафта. Центр оставляем проходимым для базы, а за его пределами
+// смешиваем крупные холмы, поперечные гряды и мелкую неровность поверхности.
+function height(x,z){
+ if(!arena)return 0;
+ const edge=Math.min(1,Math.max(0,(Math.max(Math.abs(x),Math.abs(z))-22)/42));
+ const center=Math.max(.35,edge);
+ const broad=Math.sin(x*.018+Math.sin(z*.011)*.8)*Math.cos(z*.015-x*.006);
+ const ridges=Math.sin((x+z)*.032+Math.sin(x*.009)*1.5)+.55*Math.cos((x-z)*.047);
+ const detail=Math.sin(x*.11+z*.07)*Math.cos(z*.095-x*.04);
+ let h;
+ if(arena===D.maps.desert){
+  const dunes=Math.sin(x*.031+z*.012)+.55*Math.sin(z*.052-x*.018);
+  h=(broad*5.2+ridges*3.4+dunes*2.4+detail*.7)*center;
+ }else if(arena===D.maps.winter){
+  const snowRidges=Math.sin(z*.026+x*.014)*Math.cos(x*.021)+.5*Math.sin((x-z)*.041);
+  h=(broad*4.8+snowRidges*3.8+detail*.55)*center;
+ }else{
+  h=(broad*5.5+ridges*3.8+detail*.8)*center;
+ }
+ // Лёгкие впадины вокруг центрального поля дают естественный силуэт, но не мешают старту.
+ const basin=Math.max(0,1-Math.hypot(x,z)/85);
+ return h*(1-basin*.38);
+}
 function obstacle(obj,x,z,r){obstacles.push({x,z,r,object:obj});obj.updateMatrixWorld(true);obj.traverse(o=>{if(o.isMesh)solidMeshes.push(o);});}
 function building(x,z,w,d,h,industrial=false){const g=new THREE.Group();g.position.set(x,height(x,z),z);world.add(g);box(g,w,h,d,0,h/2,0,industrial?0x6a7779:arena===D.maps.desert?0xc2ae86:0xa0a391);box(g,w+.3,.25,d+.3,0,h,0,0x515c5d);
  if(!industrial){const rw=w/2+.4,rd=d/2+.4;const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute([-rw,0,-rd,rw,0,-rd,0,2.1,-rd,-rw,0,rd,rw,0,rd,0,2.1,rd],3));geo.setIndex([0,2,1,3,4,5,0,3,5,0,5,2,1,2,5,1,5,4,0,1,4,0,4,3]);geo.computeVertexNormals();mesh(geo,mat(arena===D.maps.winter?0xc6d2d2:0x626957),g,0,h,0);}
@@ -87,7 +109,7 @@ function buildBackdrop(){const size=arena.size,isWinter=arena===D.maps.winter,is
 function scatterProps(){const isWinter=arena===D.maps.winter,isDesert=arena===D.maps.desert;for(let i=0;i<26;i++){const x=(rand()-.5)*(arena.size-30),z=(rand()-.5)*(arena.size-30);if(Math.abs(x)<15||obstacles.some(o=>Math.hypot(o.x-x,o.z-z)<o.r+3))continue;const g=new THREE.Group();g.position.set(x,height(x,z),z);world.add(g);if(i%3===0){for(let k=0;k<3;k++){const b=cyl(g,.32,.32,.8,(k-1)*.7,.4,0,isDesert?0x756241:0x5c6868,12);b.rotation.z=k===2?Math.PI/2:0;}}else if(i%3===1){box(g,2.2,.85,1.2,0,.43,0,isWinter?0x6b7675:0x746d50);box(g,1.9,.12,1.25,0,.9,0,0x424b44);}else{for(let k=-2;k<=2;k++)box(g,.12,1.4,.12,k*.65,.7,0,0x545a50);box(g,3.1,.12,.12,0,.9,0,0x545a50);}}
 }
 function buildMap(){
- rand=D.rng(arena.seed);const size=arena.size;const geo=new THREE.PlaneGeometry(size,size,180,180);geo.rotateX(-Math.PI/2);const pos=geo.attributes.position, colors=[];for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i);pos.setY(i,height(x,z));const c=new THREE.Color(arena.ground);let tint=.9+rand()*.16;if(Math.abs(x)<5||Math.abs(z)<4)tint*=.87;c.multiplyScalar(tint);colors.push(c.r,c.g,c.b);}geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));geo.computeVertexNormals();ground=mesh(geo,Remaster.terrainMaterial(arena===D.maps.winter?'winter':arena===D.maps.desert?'desert':'training',size),world);ground.receiveShadow=true;ground.castShadow=false;
+ rand=D.rng(arena.seed);const size=arena.size;const geo=new THREE.PlaneGeometry(size,size,220,220);geo.rotateX(-Math.PI/2);const pos=geo.attributes.position, colors=[];for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i);pos.setY(i,height(x,z));const c=new THREE.Color(arena.ground);let tint=.9+rand()*.16;if(Math.abs(x)<5||Math.abs(z)<4)tint*=.87;c.multiplyScalar(tint);colors.push(c.r,c.g,c.b);}geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));geo.computeVertexNormals();ground=mesh(geo,Remaster.terrainMaterial(arena===D.maps.winter?'winter':arena===D.maps.desert?'desert':'training',size),world);ground.receiveShadow=true;ground.castShadow=false;
  const isWinter=arena===D.maps.winter;
  const positions=isWinter?[[-28,-45,13,16,9],[26,-32,12,19,10],[-31,28,17,12,9],[29,45,16,13,10],[-63,0,12,18,8],[65,-4,14,18,9]]:[[-28,-30,9,11,6],[27,30,10,12,6],[-40,24,9,9,5],[38,-25,11,8,6]];
  for(const p of positions)building(...p,isWinter);
