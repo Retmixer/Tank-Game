@@ -44,7 +44,7 @@ for(const spec of GameData.tanks){
  assert.ok(wreckRay.intersectObjects(model.hitMeshes,false).length,'Destroyed vehicle still blocks shells');
  console.log(spec.name+': '+model.group.userData.design+', '+model.wheels.length+' road wheels');
 }
-assert.equal(silhouettes.size,9,'All nine vehicles need different geometry');
+assert.equal(silhouettes.size,12,'All twelve vehicles need different geometry');
 const a={width:3,length:6,yaw:0,group:{position:{x:0,z:0}}},b={...a,group:{position:{x:0,z:5.5}}};
 assert.ok(Remaster.overlaps(a,0,0,b),'Long hull ends collide');
 b.group.position={x:4.1,z:0};assert.ok(!Remaster.overlaps(a,0,0,b),'Parallel tanks fit side by side');

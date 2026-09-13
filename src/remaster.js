@@ -57,6 +57,11 @@
   '2-1':{w:2.95,l:5.65,h:.46,slope:.22,wheels:6,skirts:2,gun:3.9,z:-.25,shape:'bustle'},
   '2-2':{w:3.45,l:6.9,h:.7,slope:.09,wheels:8,skirts:6,gun:3.45,z:.48,shape:'fortress'}
  };
+ Object.assign(designs,{
+  '0-3':{w:3.2,l:6.5,h:.5,slope:.3,wheels:6,skirts:0,gun:4.8,z:.3,shape:'assault'},
+  '1-3':{w:3.05,l:6.2,h:.48,slope:.2,wheels:8,skirts:3,gun:5.2,z:-.3,shape:'howitzer'},
+  '2-3':{w:2.9,l:5.9,h:.4,slope:.35,wheels:5,skirts:0,gun:4.6,z:-.6,shape:'artillery'}
+ });
  function tank(spec,team=0){
   const group=new T.Group(),turret=new T.Group(),gunPivot=new T.Group(),wheels=[],hitMeshes=[],trackBelts=[];
   const design=designs[spec.id]||designs[`${spec.n}-${spec.c}`],width=design.w,length=design.l,paint=material(spec.color,'paint'),dark=material(0x303839),steel=material(0x69716a),rubber=material(0x252927,'rubber'),rust=material(0x70614a,'paint'),glass=new T.MeshStandardMaterial({color:0x284650,metalness:.75,roughness:.13});
@@ -86,6 +91,9 @@
   turret.position.set(0,1.77,design.z);group.add(turret);cylinder(turret,width*.32,width*.33,.16,0,0,0,dark,48);
   let shell;
   switch(design.shape){
+   case 'assault': shell=plate(turret,2.65,1.1,3.1,0,.42,-.25,paint,.35);shell.rotation.x=-.08;for(const s of [-1,1]){plate(turret,.12,.8,2.4,s*1.3,.35,-.25,paint,.06);const drum=cylinder(group,.3,.3,1.4,s*1.35,1.75,-2.3,rust);drum.rotation.x=Math.PI/2;}break;
+   case 'howitzer': shell=plate(turret,2.35,1.35,2.3,0,.5,-.7,paint,.12);for(const s of [-1,1]){plate(turret,.12,1.3,2.5,s*1.2,.55,-.7,paint,.06);for(let j=0;j<5;j++){cylinder(turret,.08,.09,.65,s*.9,.9,-1.4+j*.22,rust,12);}}break;
+   case 'artillery': shell=plate(turret,2.2,1.05,2.8,0,.52,-.65,paint,.4);for(const s of [-1,1]){const recoil=cylinder(turret,.11,.11,1.7,s*.35,.5,1.2,steel,16);recoil.rotation.x=Math.PI/2;plate(group,.6,.16,1.4,s*1.1,1.5,-2.5,steel,.04);}break;
    case 'scout': shell=cylinder(turret,.61,.85,.82,0,.4,0,paint,12);break;
    case 'cast': shell=mesh(new T.SphereGeometry(1,40,22),paint,turret,0,.35,-.12);shell.scale.set(width*.37,.55,1.25);break;
    case 'pike': shell=mesh(new T.SphereGeometry(1,40,22),paint,turret,0,.27,-.18);shell.scale.set(1.46,.58,1.34);for(const s of [-1,1]){const cheek=plate(group,width*.45,.14,1.55,s*width*.225,1.54,length*.335,paint,.08);cheek.rotation.set(.27,s*.2,s*.04);cheek.userData.zone='hull';}break;
@@ -96,6 +104,17 @@
    case 'bustle': shell=plate(turret,2.05,.72,2.2,0,.44,.02,paint,.35);plate(turret,1.85,.68,1.45,0,.52,-1.35,paint,.16).userData.zone='turret';break;
    case 'fortress': shell=cylinder(turret,1.1,1.4,1.05,0,.5,-.1,paint,10);plate(turret,2.25,.5,1.1,0,.37,-1.25,paint,.12).userData.zone='turret';break;
   }shell.userData.zone='turret';
+  if(spec.c===3){
+   const roofY=design.shape==='howitzer'?1.23:1.03;
+   cylinder(turret,.32,.35,.1,-.48,roofY,-.65,paint,32);
+   box(turret,.23,.08,.07,-.48,roofY+.09,-.65,steel);
+   for(const side of [-1,1]){
+    for(let j=0;j<7;j++){const bolt=mesh(boltGeo,steel,turret,side*1.12,.85,-1.45+j*.35);bolt.rotation.z=Math.PI/2;}
+    const rail=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3([new V(side*1.16,.72,-1.2),new V(side*1.28,.85,-.9),new V(side*1.28,.85,.3),new V(side*1.16,.72,.55)]),16,.025,6,false),steel);turret.add(rail);
+    for(let j=0;j<3;j++)box(turret,.14,.3,.23,side*1.19,.3,-1+j*.29,dark);
+   }
+   const collar=cylinder(turret,.33,.4,.35,0,.45,1.35,steel,32);collar.rotation.x=Math.PI/2;
+  }
   const roof=plate(turret,width*.49,.08,length*.26,0,.84,-.14,paint,.14);roof.userData.zone='roof';
   cylinder(turret,.31,.34,.13,-.35,.93,-.29,paint,40);cylinder(turret,.23,.23,.07,-.35,1.03,-.29,steel,32);box(turret,.21,.04,.035,-.35,1.09,-.29,dark);
   for(let j=0;j<5;j++){const a=j*Math.PI*2/5;box(turret,.1,.06,.07,-.35+Math.sin(a)*.25,1.04,-.29+Math.cos(a)*.25,glass);}
@@ -213,6 +232,7 @@
     const deformation=T.MathUtils.clamp(groundLocal(belt.x,z),-.52,.52);
     y+=deformation*(y<.66?1:.35);
     if(y<.69)a=-Math.atan2(groundLocal(belt.x,z+.22)-groundLocal(belt.x,z-.22),.44);
+    if(t.trackTime>0&&belt.side===t.brokenSide){y=.1+groundLocal(belt.x,z);a=0;z=(i/belt.links.count-.5)*total*.72;}
     dummy.position.set(belt.x,y,z);dummy.rotation.set(a,0,0);dummy.updateMatrix();belt.links.setMatrixAt(i,dummy.matrix);
     dummy.position.y+=.055*Math.cos(a);dummy.position.z+=.055*Math.sin(a);dummy.updateMatrix();belt.cleats.setMatrixAt(i,dummy.matrix);
    }

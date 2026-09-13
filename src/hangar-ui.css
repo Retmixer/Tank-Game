@@ -53,3 +53,18 @@
 #garage .vehicle-passport{height:calc(77 * var(--u));margin-top:calc(13 * var(--u))}
 /* Portrait retains usable controls; the reference layout is intended for landscape. */
 @media(orientation:portrait){#garage{--u:.13vw;overflow:auto}#garage .left-panel,#garage .right-panel{top:15%;width:45%;height:53%}#garage .left-panel{left:2%}#garage .right-panel{right:2%}#garage .garage-mode-tabs{top:10%;left:2%;width:96%;height:4%}#garage .brand{font-size:calc(18 * var(--u))}#garage .vehicle-shelf{left:2%!important;right:2%!important;bottom:4%!important;height:13%!important}#garage .operation{bottom:18%;right:2%;width:45%;height:12%}#garage .preview-caption{display:none}}
+/* Owned collection scrolls in acquisition order; research keeps the full roster. */
+#garage #tankCards{display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#bd9956 #17201b;scroll-snap-type:x mandatory;padding:3px 3px 8px}
+#garage #tankCards .tank-card{flex:0 0 31%;min-width:155px;scroll-snap-align:start}
+#garage #researchView{overflow:auto}
+#garage #researchTree{display:grid;grid-template-columns:repeat(3,minmax(190px,1fr));grid-template-rows:auto auto;gap:28px 38px;min-width:700px;padding:14px 16px 30px}
+#researchTree .research-node{min-height:230px;position:relative;padding:15px;background:linear-gradient(145deg,#23322c,#0c1513);border:1px solid #626855;border-radius:4px}
+#researchTree .research-node[data-class="0"]{grid-column:1;grid-row:1}
+#researchTree .research-node[data-class="1"]{grid-column:2;grid-row:1}
+#researchTree .research-node[data-class="2"]{grid-column:3;grid-row:1}
+#researchTree .research-node[data-class="3"]{grid-column:2;grid-row:2;border-color:#ad9058}
+#researchTree .research-node:after{display:none}
+#researchTree .research-node[data-class="0"]:after,#researchTree .research-node[data-class="1"]:after{display:block;content:'➜';position:absolute;left:100%;top:45%;width:38px;text-align:center;color:#dcbd79;font-size:25px}
+#researchTree .research-node[data-class="3"]:before{content:'↓';position:absolute;bottom:100%;left:48%;height:28px;color:#dcbd79;font-size:25px}
+#researchTree .research-silhouette{height:90px}#researchTree .tank-render{height:90px;max-width:100%;object-fit:contain}
+#researchTree .research-node.owned{border-color:#8cae80}#researchTree .research-tier{font-size:10px;letter-spacing:1px;color:#d9c18c}
