@@ -171,8 +171,10 @@
   const targetPitch=T.MathUtils.clamp(-Math.atan2(front-back,2*half)+acceleration*.008,-.55,.55);
   const targetRoll=T.MathUtils.clamp(Math.atan2(right-left,t.width)-(t.speed||0)*dyaw/step*.006,-.45,.45);
   function spring(key,target){const velocity='v'+key,offset=state[key]-target,k=state[velocity]+omega*offset,decay=Math.exp(-omega*step);state[key]=target+(offset+k*step)*decay;state[velocity]=(state[velocity]-omega*k*step)*decay;}
-  spring('y',targetY);spring('pitch',targetPitch);spring('roll',targetRoll);
-  p.y=Math.max(state.y,Math.max(...samples)-.4);t.group.rotation.order='YXZ';t.group.rotation.set(state.pitch,yaw,state.roll);t.group.updateMatrixWorld(true);
+  GameData.verticalStep(state,targetY,mass,step);
+  if(state.grounded){spring('pitch',targetPitch);spring('roll',targetRoll);}
+  else{state.pitch=T.MathUtils.clamp(state.pitch+state.vpitch*step,-.7,.7);state.roll=T.MathUtils.clamp(state.roll+state.vroll*step,-.6,.6);state.vpitch*=Math.exp(-step*.2);state.vroll*=Math.exp(-step*.2);}
+  p.y=state.y;t.group.rotation.order='YXZ';t.group.rotation.set(state.pitch,yaw,state.roll);t.group.updateMatrixWorld(true);
   const inverse=t.group.matrixWorld.clone().invert();
   const localGround=(x,z)=>new V(p.x+c*x+s*z,h(x,z),p.z-s*x+c*z).applyMatrix4(inverse).y;
   for(const w of t.wheels){const radius=w.userData.radius||.44,target=.13+radius+T.MathUtils.clamp(localGround(w.position.x,w.position.z),-.32,.32);w.position.y=T.MathUtils.lerp(w.position.y,target,1-Math.exp(-step*22));const side=Math.sign(w.position.x);w.rotation.x+=(distance+side*dyaw*t.width/2)/radius;}

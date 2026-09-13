@@ -11,20 +11,37 @@
  // Original vehicle specifications: tonnes, horsepower and forward/reverse km/h.
  const mobility=[[14,320,35,14],[32,520,29,11],[49,620,24,8],[17,340,35,12],[38,600,29,10],[61,700,24,7],[12,290,35,16],[29,540,29,13],[54,650,24,8]];
  tanks.forEach((t,i)=>{const [mass,power,speed,reverse]=mobility[i];Object.assign(t,{mass,power,speed:speed/3.6,reverse:reverse/3.6});});
- function driveSpeed(spec,speed,throttle,slope,dt,turn=0,damaged=false){
+ const gravity=9.81;
+ const surfaces={earth:{static:.72,kinetic:.55,rolling:.025},sand:{static:.58,kinetic:.46,rolling:.065},snow:{static:.35,kinetic:.24,rolling:.04}};
+ // Acceleration along a slope with Coulomb friction and static sticking.
+ function frictionSpeed(speed,slope,dt,mu){const angle=Math.atan(slope),pull=-gravity*Math.sin(angle),friction=mu*gravity*Math.cos(angle);if(Math.abs(speed)<.001&&Math.abs(pull)<=friction)return 0;const sign=Math.sign(speed)||Math.sign(pull),next=speed+(pull-sign*friction)*dt;if(next*sign<0&&Math.abs(pull)<=friction)return 0;return next;}
+ // Unilateral spring contact: terrain can push upwards but never pull a body down.
+ function verticalStep(body,support,mass,dt){
+  const steps=Math.max(1,Math.ceil(dt*120)),h=dt/steps,k=3200000/(mass*1000),damping=1.5*Math.sqrt(k);body.impact=0;
+  for(let i=0;i<steps;i++){
+   const contact=body.y<=support+.18;
+   const normal=contact?Math.max(0,gravity+k*(support-body.y)-damping*body.vy):0;
+   if(contact&&!body.grounded&&body.vy<0)body.impact=Math.max(body.impact,-body.vy);
+   const acceleration=normal-gravity;body.y+=body.vy*h+.5*acceleration*h*h;body.vy+=acceleration*h;body.grounded=normal>0;
+   if(body.y<support-.3){body.impact=Math.max(body.impact,-body.vy);body.y=support-.3;body.vy=Math.max(0,body.vy)*.1;body.grounded=true;}
+   body.normalForce=normal*mass*1000;
+  }
+  return body;
+ }
+ function driveSpeed(spec,speed,throttle,slope,dt,turn=0,damaged=false,surface=surfaces.earth){
   dt=Math.max(0,Math.min(dt,.1));throttle=Math.max(-1,Math.min(1,throttle));
   const cap=(throttle<0?spec.reverse:spec.speed)*(damaged?.5:1),target=throttle*cap;
   // Opposite input brakes to a stop before engaging reverse. No input holds brakes.
   const braking=!throttle||speed*throttle<0||Math.abs(speed)>Math.abs(target)+.15;
-  const brake=3.2*Math.sqrt(32/spec.mass);
-  if(braking){const delta=brake*dt;return Math.abs(speed)<=delta?0:speed-Math.sign(speed)*delta;}
+  const brake=Math.min(surface.static,3.2*Math.sqrt(32/spec.mass)/gravity);
+  if(braking)return Math.max(-spec.reverse,Math.min(spec.speed,frictionSpeed(speed,slope,dt,Math.abs(speed)<.001?surface.static:brake)));
   const mass=spec.mass*1000,power=spec.power*735.5*.72;
-  const traction=Math.min(2.3,power/(mass*Math.max(3,Math.abs(speed))));
-  const resistance=.12+.0025*speed*speed+Math.abs(turn)*.32;
-  const force=Math.sign(throttle)*Math.max(0,traction-resistance)-9.81*Math.sin(Math.atan(slope));
+  const traction=Math.min(2.3,surface.kinetic*gravity/Math.sqrt(1+slope*slope),power/(mass*Math.max(3,Math.abs(speed))));
+  const resistance=surface.rolling*gravity+.0025*speed*speed+Math.abs(turn)*.32;
+  const force=Math.sign(throttle)*Math.max(0,traction-resistance)-gravity*Math.sin(Math.atan(slope));
   let next=speed+force*dt;
-  // Automatic brake holds the tank if engine torque cannot overcome the slope.
-  if(next*throttle<0)next=0;
+  // Static grip can hold a stalled vehicle only below the friction angle.
+  if(next*throttle<0&&Math.abs(slope)<=surface.static)next=0;
   return Math.max(-spec.reverse*(damaged?.5:1),Math.min(spec.speed*(damaged?.5:1),throttle>0?Math.min(target,next):Math.max(target,next)));
  }
  function defaults(){return {version:2,owned:{'0-1':true},updated:0,selected:'0-1',nation:0,silver:0,xp:0,levels:Object.fromEntries(tanks.map(t=>[t.id,1])),battles:0,wins:0,tutorial:false,settings:{volume:.45,quality:'high',difficulty:'normal',sensitivity:1},map:'training'};}
@@ -51,6 +68,6 @@
  function armorThickness(tank,zone){const profile=armorProfiles[tank.id]||armorProfiles[`${tank.n}-${tank.c}`];const index=armorZones.indexOf(zone);return Math.round(profile[index<0?0:index]*(1+(Math.max(1,tank.level||1)-1)*.025));}
  function armorColor(mm){return mm<30?'#70e899':mm<60?'#add66a':mm<95?'#f2cd61':mm<135?'#ed9454':mm<170?'#ed6256':'#ba4268';}
  function penetration(attacker,defender,zone='front',cosine=1,distance=0){const armor=armorThickness(defender,zone),effective=armor/Math.max(.2,Math.abs(cosine)),power=([98,125,164][attacker.c]+((attacker.level||1)-1)*5)*Math.max(.76,1-distance/2200),chance=Math.max(0,Math.min(1,(power/effective-.75)/.5));return {armor,effective,power,chance,color:chance>=.75?'#70e899':chance>=.25?'#ffbb55':'#ff6262'};}
- root.GameData={price,unlock,penetration,armorZones,armorThickness,armorColor,driveSpeed,nations,classes,tanks,costs,maps,stats,defaults,clean,upgrade,reward,segmentCircle,rng};
+ root.GameData={price,unlock,penetration,armorZones,armorThickness,armorColor,gravity,surfaces,frictionSpeed,verticalStep,driveSpeed,nations,classes,tanks,costs,maps,stats,defaults,clean,upgrade,reward,segmentCircle,rng};
  if(typeof module!=='undefined')module.exports=root.GameData;
 })(typeof window!=='undefined'?window:globalThis);
