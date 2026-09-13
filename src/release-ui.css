@@ -1,0 +1,102 @@
+/* Release interface pass: restrained military panels, readable hierarchy and a real research screen. */
+:root{--ui-bg:#0b1217;--ui-panel:rgba(12,21,27,.93);--ui-line:rgba(204,218,211,.18);--ui-gold:#c9a96a;--ui-green:#8fbea6;--ui-red:#ce7564;--ui-text:#edf1ed;--ui-muted:#8f9da0}
+
+/* Garage shell */
+#garage{background:linear-gradient(90deg,rgba(7,12,16,.97) 0,rgba(7,12,16,.78) 24%,transparent 45%,transparent 63%,rgba(7,12,16,.9) 100%),linear-gradient(0deg,rgba(7,12,16,.98),transparent 38%,transparent 78%,rgba(7,12,16,.9));}
+#garage header{height:78px;margin:0 32px;border-color:var(--ui-line);background:linear-gradient(90deg,transparent,rgba(255,255,255,.015),transparent)}
+#garage .brand-icon{color:var(--ui-gold);filter:drop-shadow(0 0 10px rgba(201,169,106,.25))}
+#garage .left-panel,#garage .right-panel{top:142px;padding:20px;background:linear-gradient(145deg,rgba(10,18,23,.92),rgba(13,23,29,.72));border:1px solid var(--ui-line);box-shadow:0 18px 55px rgba(0,0,0,.3);backdrop-filter:blur(9px)}
+#garage .left-panel{left:32px;width:286px;border-left:3px solid var(--ui-gold)}
+#garage .right-panel{right:32px;width:274px;border-right:3px solid var(--ui-gold)}
+#garage .tank-heading h1{font-size:31px;font-weight:650;letter-spacing:.4px}
+#garage .tank-heading p{color:#aab4b3}
+#garage nav button.active{background:linear-gradient(0deg,rgba(201,169,106,.14),transparent);border-color:var(--ui-gold);color:#ead29f}
+#garage .stat-track{height:4px;background:#02060999;border:1px solid rgba(255,255,255,.06)}
+#garage .stat-track i{background:linear-gradient(90deg,#876f46,#d2b677)}
+#garage .secondary{border-color:rgba(201,169,106,.4);background:rgba(201,169,106,.08)}
+#garage .primary{background:linear-gradient(180deg,#d3b474,#b58d4f);color:#151b1d;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+#garage .vehicle-shelf{left:32px;right:338px;bottom:50px}
+#garage .tank-card{height:96px;background:linear-gradient(145deg,rgba(18,31,38,.96),rgba(10,18,23,.96));border-color:var(--ui-line)}
+#garage .tank-card.selected{border-color:var(--ui-gold);box-shadow:inset 0 -3px var(--ui-gold),0 9px 28px rgba(0,0,0,.25)}
+#garage .empty-shelf{height:88px;display:flex;align-items:center;padding:0 22px;border:1px dashed var(--ui-line);color:var(--ui-muted);background:rgba(8,15,19,.8)}
+
+.garage-mode-tabs{position:absolute;top:91px;left:50%;transform:translateX(-50%);display:flex;z-index:8;pointer-events:auto;background:rgba(7,13,17,.86);border:1px solid var(--ui-line);box-shadow:0 7px 24px #0005}
+.garage-mode-tabs button{min-width:160px;padding:11px 24px;background:transparent;color:#879397;font-size:10px;font-weight:700;letter-spacing:1.8px;border-bottom:2px solid transparent}
+.garage-mode-tabs button:hover{color:#d9dfdc;background:#ffffff08}
+.garage-mode-tabs button.active{color:#f0d59d;border-bottom-color:var(--ui-gold);background:rgba(201,169,106,.08)}
+
+/* Technology tree */
+#researchView{position:absolute;z-index:7;top:126px;left:32px;right:32px;bottom:48px;padding:28px 34px;background:linear-gradient(135deg,rgba(8,15,20,.985),rgba(15,25,31,.97));border:1px solid rgba(201,169,106,.28);box-shadow:0 25px 80px #000a;pointer-events:auto;overflow:auto}
+.research-open .left-panel,.research-open .right-panel,.research-open .preview-caption,.research-open .vehicle-shelf{visibility:hidden;pointer-events:none}
+.research-heading{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--ui-line);padding-bottom:18px}
+.research-heading span{font-size:9px;letter-spacing:2.4px;color:var(--ui-gold)}
+.research-heading h2{font-size:28px;letter-spacing:1.2px;margin:5px 0 4px;font-weight:600}
+.research-heading p{margin:0;color:var(--ui-muted);font-size:12px}
+.research-heading .icon-btn{border-radius:0}
+#researchNations{display:flex;gap:8px;margin:22px 0 26px}
+#researchNations button{padding:10px 28px;background:#111d23;border:1px solid var(--ui-line);color:#98a5a7;font-size:11px;letter-spacing:1px}
+#researchNations button.active{color:#f0d9a9;border-color:var(--ui-gold);background:rgba(201,169,106,.1)}
+#researchTree{display:grid;grid-template-columns:repeat(3,minmax(210px,1fr));gap:42px;position:relative;max-width:1120px;margin:0 auto}
+.research-node{position:relative;min-height:350px;padding:18px;background:linear-gradient(155deg,#16242b,#0d171c);border:1px solid var(--ui-line);box-shadow:0 14px 35px #0005;display:flex;flex-direction:column}
+.research-node:not(:last-child):after{content:'›';position:absolute;right:-31px;top:135px;color:#6e7776;font-size:42px;font-weight:200}
+.research-node.owned{border-color:rgba(143,190,166,.46)}
+.research-node.selected{box-shadow:inset 0 -3px var(--ui-gold),0 14px 35px #0007;border-color:var(--ui-gold)}
+.research-node.locked{filter:saturate(.72)}
+.research-tier{font-size:9px;color:#8e9b9d;letter-spacing:1.4px}
+.research-silhouette{height:112px;display:flex;align-items:center;justify-content:center;margin:8px -5px;background:radial-gradient(ellipse,rgba(201,169,106,.11),transparent 68%)}
+.research-silhouette svg{width:185px;height:86px;fill:#899790;filter:drop-shadow(0 8px 5px #0008);transform:scale(var(--tank-scale,1))}
+.research-silhouette.class-0{--tank-scale:.82}.research-silhouette.class-2{--tank-scale:1.12}.research-node.owned .research-silhouette svg{fill:#b9b09a}
+.research-node h3{font-size:20px;margin:5px 0 6px;font-weight:600}
+.research-node p{font-size:11px;line-height:1.5;color:#8f9c9e;min-height:48px;margin:0 0 12px}
+.research-spec{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:auto}
+.research-spec span{padding:8px 5px;background:#091116;border:1px solid #ffffff0c;text-align:center;font-size:7px;color:#758588}
+.research-spec b{display:block;font-size:12px;color:#cbd3ce;margin-top:3px}
+.research-price{display:flex;justify-content:space-between;color:#dcc181;padding:12px 2px 7px;font-size:11px}
+.research-action{margin-top:10px;padding:12px 9px;background:linear-gradient(180deg,#c7a666,#a9864e);color:#111719;font-size:10px;font-weight:750;letter-spacing:.6px}
+.research-action.owned-action{background:#172a2d;color:#acd6c3;border:1px solid #6ca98e77}
+.research-action:disabled{background:#151d20;color:#697477;border:1px solid #ffffff12}
+
+/* Combat HUD */
+#hud{font-family:Local,'Segoe UI',sans-serif;color:var(--ui-text);cursor:none}
+#hud:before{background:linear-gradient(180deg,rgba(3,8,11,.42),transparent 18%,transparent 72%,rgba(3,8,11,.52)),radial-gradient(ellipse at 50% 48%,transparent 46%,rgba(3,8,11,.22));}
+#hud .match-top{top:14px;min-width:310px;padding:7px 18px;gap:18px;border:0;border-top:2px solid var(--ui-gold);border-radius:0;background:linear-gradient(180deg,rgba(8,15,20,.94),rgba(8,15,20,.74));clip-path:polygon(12px 0,calc(100% - 12px) 0,100% 100%,0 100%);box-shadow:0 8px 25px #0007}
+#hud .match-top>span{font-size:24px;text-shadow:none}
+#hud .match-top b{letter-spacing:2.4px;color:#899699}
+#hud .match-top small{font-size:20px;color:#f3f0e6}
+#hud .objective{top:82px;padding:0;background:transparent;border:0;box-shadow:none;color:#e0e5df}
+#hud .objective>div{width:230px;height:3px;margin-top:7px;border:0;background:#050a0d99}
+#hud #pauseBtn{top:15px;right:18px;width:38px;height:38px;border-radius:2px;background:rgba(8,15,20,.9);border:1px solid var(--ui-line);color:#d4d9d5}
+#hud .combat-bottom{left:18px;right:18px;bottom:16px}
+#hud .player-panel{width:300px;padding:14px 17px;border:0;border-left:3px solid var(--ui-green);border-radius:0;background:linear-gradient(100deg,rgba(7,14,19,.96),rgba(12,23,28,.88));box-shadow:0 10px 32px #0008;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%)}
+#hud .player-panel>small{color:#d8ded9;font-size:10px;letter-spacing:1.6px}
+#hud .health-text{margin:8px 0 7px}
+#hud .health-text b{font-size:23px}
+#hud .health-text span{padding:4px 7px;background:#13252a;color:#9bcdbb}
+#hud .health-bar{height:6px;border:0;background:#03080a}
+#hud .health-bar i{background:linear-gradient(90deg,#568d71,#9dc29b);box-shadow:none}
+#hud .reload-line{margin:9px 0 5px;font-size:8px}
+#hud .reload-bar{height:2px}
+#hud .minimap-wrap{padding:7px;border:0;border-top:2px solid var(--ui-gold);border-radius:0;background:rgba(7,14,19,.93);box-shadow:0 10px 32px #0008}
+#hud .minimap-wrap canvas{width:160px;height:160px;border:1px solid var(--ui-line)}
+#hud .key-guide{position:absolute;left:50%;bottom:0;transform:translateX(-50%);gap:1px;padding:0}
+#hud .key-guide span{padding:6px 8px;border:0;border-top:1px solid var(--ui-line);border-radius:0;background:rgba(6,12,16,.75);color:#8d999a}
+#hud .key-guide kbd{border:0;background:transparent;color:#d9c28f;padding:0 3px}
+#hud #killfeed div{border-right-color:var(--ui-gold);background:linear-gradient(90deg,transparent,rgba(7,14,18,.9))}
+
+/* The normal camera gets only a tiny center marker. The full optic exists only while Shift is held. */
+#hud #crosshair{width:26px;height:26px;transition:width .16s,height .16s}
+#hud #crosshair:before{width:5px;height:5px;left:50%;top:50%;border:1px solid rgba(235,239,226,.9);background:rgba(8,14,17,.65);box-shadow:0 0 0 2px rgba(0,0,0,.25);border-radius:50%}
+#hud #crosshair:after{display:none}
+#hud .reticle,#hud #range,#hud #penetrationLabel{opacity:0;visibility:hidden;transition:opacity .15s}
+#hud:not(.aiming) #penetrationDot{width:3px;height:3px;border:0;box-shadow:none!important}
+#hud.aiming #crosshair{width:190px;height:190px}
+#hud.aiming .reticle,#hud.aiming #range,#hud.aiming #penetrationLabel{opacity:1;visibility:visible}
+#hud.aiming .reticle{inset:10px;border:1px solid rgba(224,230,211,.55);border-radius:50%;transform:none;box-shadow:inset 0 0 0 32px rgba(0,0,0,.03),0 0 0 1px rgba(0,0,0,.4)}
+#hud.aiming .reticle:before{width:210px;height:1px;background:linear-gradient(90deg,transparent 0,transparent 20%,#e5ead6 20%,#e5ead6 46%,transparent 46%,transparent 54%,#e5ead6 54%,#e5ead6 80%,transparent 80%);box-shadow:none}
+#hud.aiming .reticle:after{width:1px;height:210px;background:linear-gradient(transparent 0,transparent 20%,#e5ead6 20%,#e5ead6 46%,transparent 46%,transparent 54%,#e5ead6 54%,#e5ead6 80%,transparent 80%);box-shadow:none}
+#hud.aiming #range{top:202px;width:220px;left:-15px;color:#e6e9dc;font-size:9px;letter-spacing:1.3px}
+#hud.aiming #penetrationLabel{top:222px;font-size:9px;letter-spacing:1.2px}
+#hud.aiming #penetrationDot{width:8px;height:8px;border:1px solid #0a0d0c}
+
+@media(max-width:900px){.garage-mode-tabs{top:76px}.garage-mode-tabs button{min-width:115px;padding:9px 12px}.garage-mode-tabs{z-index:12}#researchView{top:112px;left:14px;right:14px;padding:20px;bottom:44px}#researchTree{grid-template-columns:1fr;gap:16px}.research-node{min-height:260px}.research-node:not(:last-child):after{display:none}.research-silhouette{height:70px}.research-silhouette svg{height:60px}.research-heading h2{font-size:21px}#garage .left-panel{left:14px}#garage .right-panel{right:14px}#hud .key-guide{display:none}#hud .player-panel{width:205px}#hud .minimap-wrap canvas{width:118px;height:118px}}
+@media(max-height:800px) and (min-width:901px){#garage .left-panel,#garage .right-panel{top:132px;padding:14px;max-height:calc(100vh - 240px);overflow-y:auto;scrollbar-width:thin}#garage .tank-heading h1{font-size:27px;margin:7px 0}#garage .tank-heading p,#garage .left-panel #detailsBtn{display:none}#garage nav{margin:8px 0 14px}#garage .stat{margin:7px 0}#garage .vehicle-shelf{bottom:44px}#researchView{top:126px;padding-top:20px}.research-heading{padding-bottom:13px}.research-heading h2{font-size:24px}#researchNations{margin:15px 0 17px}.research-node{min-height:305px;padding:14px}.research-silhouette{height:82px}.research-silhouette svg{height:70px}.research-node p{min-height:38px;margin-bottom:8px}.research-action{padding:9px;margin-top:7px}.research-price{padding-top:8px}}
