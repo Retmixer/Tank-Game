@@ -37,12 +37,32 @@ function setupScene(kind){
  const hemi=new THREE.HemisphereLight(kind==='garage'?0xc4e8ef:0xe2eeff,kind==='garage'?0x364237:0x655c43,kind==='garage'?1.8:1.15);scene.add(hemi);
  const sun=new THREE.DirectionalLight(kind==='garage'?0xffd9a0:0xffecc9,kind==='garage'?3.4:2.6);sun.position.set(-35,65,40);sun.castShadow=true;sun.shadow.mapSize.set(4096,4096);sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;sun.shadow.camera.far=400;sun.shadow.bias=-.0006;sun.shadow.normalBias=.08;scene.add(sun);scene.userData.sun=sun;scene.add(sun.target);if(kind!=='garage')Remaster.sky(scene,kind);const rim=new THREE.DirectionalLight(0xb0d6ff,.65);rim.position.set(40,18,-30);scene.add(rim);
 }
+function buildHangarSet(){
+ const steel=0x4a5b60,dark=0x18252b,warning=0xd0a95e,concrete=0x35444a,orange=0xb8663f;
+ // Maintenance gantry above the display platform.
+ for(const x of [-14,14]){box(world,.5,9,.5,x,4,1,steel);box(world,1.4,.3,1.4,x,8.6,1,warning);box(world,28,.35,.55,0,8.4,1,steel);box(world,28,.12,.75,0,8.05,1,dark);}
+ for(let x=-11;x<=11;x+=5.5){box(world,.08,.08,4,x,8.15,1,warning);const lamp=cyl(world,.12,.12,.1,x,7.96,1,0xc9e2d9,16);lamp.rotation.x=Math.PI/2;}
+ // Tool benches and parts racks along the walls.
+ for(const side of [-1,1]){
+  const x=side*22;box(world,4,.18,13,x,1.05,-9,concrete);box(world,4,2.2,.22,x,2.1,-15,steel);box(world,4,2.2,.22,x,2.1,-3,steel);
+  for(const z of [-13,-9,-5]){box(world,3.5,.08,.08,x,2.9,z,warning);for(let j=0;j<4;j++){const tool=cyl(world,.045,.045,.9,x+(j-1.5)*.55,1.7,z,orange,8);tool.rotation.z=Math.PI/2;}}
+  for(const z of [-13,-9,-5]){for(let j=0;j<3;j++){const crate=box(world,.8,.55,.8,x+(j-1)*1.05,.55,z,0x5e5545);box(world,.67,.04,.07,x+(j-1)*1.05,.84,z,warning);}}
+ }
+ // Diagnostic consoles, cables and floor service markings.
+ for(const x of [-9,9]){box(world,2.4,1.3,.7,x,.72,10,steel);box(world,1.9,.75,.08,x,1.25,9.62,0x182d32);for(let i=-2;i<=2;i++)cyl(world,.04,.04,.3,x+i*.28,1.42,9.52,0x8fdbe0,8).rotation.x=Math.PI/2;}
+ for(let z=-15;z<=15;z+=5){box(world,.12,.015,3.2,-10,.105,z,warning);box(world,.12,.015,3.2,10,.105,z,warning);}
+ // Hydraulic lift arms and wheel chocks near the main pad.
+ for(const side of [-1,1]){box(world,.32,1.5,.45,side*5.8,.75,3.8,steel);box(world,1.4,.15,.7,side*5.8,1.52,3.8,warning);box(world,.7,.22,.45,side*5.8,.18,4.8,orange);}
+ // Ceiling lamps cast a warm industrial pool over the selected tank.
+ for(const x of [-10,0,10]){const fixture=box(world,2.2,.12,.65,x,11.2,-2,0x263b40);const lamp=new THREE.PointLight(0xffd49a,18,18);lamp.position.set(x,10.9,-2);scene.add(lamp);fixture.receiveShadow=false;}
+}
 function hangar(){
  state='garage';paused=false;aiming=false;viewPitch=0;viewYaw=0;countdown=0;countdownClock=null;aimHit=null;Platform.gameplay(false);$('hud').hidden=true;$('garage').hidden=false;$('modal').hidden=true;$('scoreboard').hidden=true;document.exitPointerLock?.();markers.clear();$('markers').innerHTML='';setupScene('garage');
  const floor=box(world,160,.4,160,0,-.4,0,0x28343a);floor.receiveShadow=true;
  const pad=cyl(world,7.5,7.6,.2,0,-.03,0,0x39464a,64);const ring=mesh(new THREE.TorusGeometry(7.25,.025,4,80),mat(0xc0ae7e),world,0,.09,0);ring.rotation.x=Math.PI/2;
  const grid=new THREE.GridHelper(100,40,0x516267,0x37474d);grid.position.y=-.18;world.add(grid);
  for(let i=-3;i<=3;i++){box(world,.04,.02,12,i*2,.08,0,0x556368);}
+ buildHangarSet();
  for(const x of [-18,18]){for(let z=-30;z<35;z+=10){box(world,.8,14,.8,x,6,z,0x313f45);box(world,1.1,.3,8,x,13,z,0x72827d);box(world,.12,6,.14,x+.5,3,z+.5,0xbcae73);}}
  for(let z=-30;z<35;z+=10)box(world,36,.6,.7,0,13,z,0x36474d);
  box(world,40,15,.6,0,6,-28,0x26383e);
