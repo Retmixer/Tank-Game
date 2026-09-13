@@ -137,8 +137,33 @@
   hitMeshes.push(...collisionMeshes);
   return {group,turret,gunPivot,barrelLength,wheels,hitMeshes,collisionMeshes,width,length,holes:[],effectClock:0,markClock:0};
  }
- function zone(hit,t){if(['turret','roof','tracks'].includes(hit.object.userData.zone))return hit.object.userData.zone;const p=t.group.worldToLocal(hit.point.clone());return p.y>1.8?'turret':Math.abs(p.x)>t.width*.39?'side':p.z<-.4?'rear':'front';}
- function armorMask(model,enabled,spec){model.hitMeshes.forEach(o=>{if(o.userData.collisionOnly)return;if(!enabled){o.material=o.userData.originalMaterial;return;}const z=o.userData.zone||'side',color=z==='turret'?0xea6256:z==='roof'?0x6dce8a:z==='tracks'?0x77cb84:z==='hull'?0xe6aa5b:0x92c078;o.material=maskMaterial(color);});}
+ function zone(hit,t){
+  const tag=hit.object.userData.zone;if(tag==='tracks'||tag==='roof')return tag;
+  let inTurret=tag==='turret';for(let p=hit.object.parent;p;p=p.parent)if(p===t.turret)inTurret=true;
+  const frame=inTurret?t.turret:t.group;
+  const n=hit.face.normal.clone().transformDirection(hit.object.matrixWorld).transformDirection(frame.matrixWorld.clone().invert());
+  if(Math.abs(n.y)>.65)return 'roof';
+  if(Math.abs(n.x)>Math.abs(n.z))return inTurret?'turretSide':'side';
+  if(n.z<0)return inTurret?'turretRear':'rear';
+  return inTurret?'turret':t.group.worldToLocal(hit.point.clone()).y<1.15?'lower':'front';
+ }
+ const armorDisplay=new T.MeshStandardMaterial({vertexColors:true,roughness:.7,metalness:.05});
+ function armorMask(model,enabled,spec){
+  model.group.updateMatrixWorld(true);
+  model.hitMeshes.forEach(o=>{
+   if(o.userData.collisionOnly)return;
+   if(!enabled){o.material=o.userData.originalMaterial;if(o.userData.unmaskedGeometry){o.geometry.dispose();o.geometry=o.userData.unmaskedGeometry;delete o.userData.unmaskedGeometry;}return;}
+   if(!o.userData.unmaskedGeometry){o.userData.unmaskedGeometry=o.geometry;o.geometry=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();}
+   const g=o.geometry,p=g.attributes.position,colors=new Float32Array(p.count*3);
+   for(let i=0;i<p.count;i+=3){
+    const a=new V().fromBufferAttribute(p,i),b=new V().fromBufferAttribute(p,i+1),c=new V().fromBufferAttribute(p,i+2),normal=b.clone().sub(a).cross(c.clone().sub(a)).normalize();
+    const point=a.add(b).add(c).multiplyScalar(1/3).applyMatrix4(o.matrixWorld);
+    const z=zone({object:o,point,face:{normal}},model),color=new T.Color(GameData.armorColor(GameData.armorThickness(spec,z)));
+    for(let j=0;j<3;j++)color.toArray(colors,(i+j)*3);
+   }
+   g.setAttribute('color',new T.Float32BufferAttribute(colors,3));o.material=armorDisplay;
+  });
+ }
  const maskCache=new Map();function maskMaterial(c){if(!maskCache.has(c))maskCache.set(c,new T.MeshStandardMaterial({color:c,roughness:.55,metalness:.1,emissive:c,emissiveIntensity:.18}));return maskCache.get(c);}
  function terrainMaterial(kind,size){const m=new T.MeshStandardMaterial({color:kind==='winter'?0xcad5db:kind==='desert'?0xc5ad80:0x879473,roughness:.97});m.onBeforeCompile=shader=>{shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 terrainPosition;').replace('#include <begin_vertex>','#include <begin_vertex>\nterrainPosition=position;');shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
  varying vec3 terrainPosition;

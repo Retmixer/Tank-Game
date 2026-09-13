@@ -16,7 +16,22 @@
  function rng(seed){return ()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
  function price(id){const t=tanks.find(t=>t.id===id);return t?{xp:[350,850,1500][t.c]+t.n*150,silver:[1200,2800,4800][t.c]+t.n*400}:null;}
  function unlock(save,id){const p=price(id);if(!p||save.owned?.[id]||save.xp<p.xp||save.silver<p.silver)return false;save.xp-=p.xp;save.silver-=p.silver;(save.owned??={})[id]=true;return true;}
- function penetration(attacker,defender,zone='front',cosine=1,distance=0){const base=[52,78,112][defender.c]+defender.armor*.9,armor=base*({front:1,side:.62,rear:.42,roof:.25,turret:1.18,tracks:.4}[zone]||1),effective=armor/Math.max(.2,Math.abs(cosine)),power=([98,125,164][attacker.c]+(attacker.level-1)*5)*Math.max(.76,1-distance/2200),chance=Math.max(0,Math.min(1,(power/effective-.75)/.5));return {armor,effective,power,chance,color:chance>=.75?'#70e899':chance>=.25?'#ffbb55':'#ff6262'};}
- root.GameData={price,unlock,penetration,nations,classes,tanks,costs,maps,stats,defaults,clean,upgrade,reward,segmentCircle,rng};
+ // Millimetres at level I. Each vehicle has a different distribution of armor.
+ const armorZones=['front','lower','side','rear','turret','turretSide','turretRear','roof','tracks'];
+ const armorProfiles={
+  '0-0':[48,28,24,18,58,30,22,12,18],
+  '0-1':[95,55,55,38,125,75,48,22,30],
+  '0-2':[150,88,92,60,185,120,75,30,45],
+  '1-0':[65,42,20,16,48,25,20,10,16],
+  '1-1':[125,65,42,30,100,58,38,18,26],
+  '1-2':[165,125,100,82,155,110,90,35,50],
+  '2-0':[38,22,18,14,72,24,18,9,14],
+  '2-1':[78,45,36,25,140,48,30,16,22],
+  '2-2':[135,95,115,70,175,85,55,28,42]
+ };
+ function armorThickness(tank,zone){const profile=armorProfiles[tank.id]||armorProfiles[`${tank.n}-${tank.c}`];const index=armorZones.indexOf(zone);return Math.round(profile[index<0?0:index]*(1+(Math.max(1,tank.level||1)-1)*.025));}
+ function armorColor(mm){return mm<30?'#70e899':mm<60?'#add66a':mm<95?'#f2cd61':mm<135?'#ed9454':mm<170?'#ed6256':'#ba4268';}
+ function penetration(attacker,defender,zone='front',cosine=1,distance=0){const armor=armorThickness(defender,zone),effective=armor/Math.max(.2,Math.abs(cosine)),power=([98,125,164][attacker.c]+((attacker.level||1)-1)*5)*Math.max(.76,1-distance/2200),chance=Math.max(0,Math.min(1,(power/effective-.75)/.5));return {armor,effective,power,chance,color:chance>=.75?'#70e899':chance>=.25?'#ffbb55':'#ff6262'};}
+ root.GameData={price,unlock,penetration,armorZones,armorThickness,armorColor,nations,classes,tanks,costs,maps,stats,defaults,clean,upgrade,reward,segmentCircle,rng};
  if(typeof module!=='undefined')module.exports=root.GameData;
 })(typeof window!=='undefined'?window:globalThis);
