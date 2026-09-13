@@ -12,8 +12,10 @@ for(const yaw of [0,Math.PI/2,Math.PI,-Math.PI/2]){
  assert.ok(up.dot(new THREE.Vector3(-.1,1,-.15).normalize())>.995,'Body follows terrain normal');
 }
 const t=tank(0);
+const flatMatrices=t.trackBelts.map(b=>Array.from(b.links.instanceMatrix.array));
 for(let i=0;i<90;i++)Remaster.suspension(t,(x,z)=>x>0?.2*Math.sin(z*2):0,1/60);
 assert.ok(Math.max(...t.wheels.map(w=>w.position.y))-Math.min(...t.wheels.map(w=>w.position.y))>.05,'Independent wheel travel');
+assert.ok(t.trackBelts.some((b,i)=>Array.from(b.links.instanceMatrix.array).some((v,j)=>Math.abs(v-flatMatrices[i][j])>.025)),'Track links articulate to uneven ground');
 const phases=t.trackBelts.map(b=>b.phase);Remaster.suspension(t,()=>0,1/60,0);
 assert.deepEqual(t.trackBelts.map(b=>b.phase),phases,'Stationary tracks do not scroll');
 t.yaw=.1;Remaster.suspension(t,()=>0,1/60,0);

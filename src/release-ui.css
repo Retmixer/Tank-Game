@@ -87,11 +87,11 @@
 #hud #crosshair{width:26px;height:26px;transition:width .16s,height .16s}
 #hud #crosshair:before{width:5px;height:5px;left:50%;top:50%;border:1px solid rgba(235,239,226,.9);background:rgba(8,14,17,.65);box-shadow:0 0 0 2px rgba(0,0,0,.25);border-radius:50%}
 #hud #crosshair:after{display:none}
-#hud .reticle,#hud #range,#hud #penetrationLabel{opacity:0;visibility:hidden;transition:opacity .15s}
+#hud .reticle,#hud #range,#hud #penetrationLabel{display:none;opacity:0;visibility:hidden;transition:opacity .15s}
 #hud:not(.aiming) #penetrationDot{width:3px;height:3px;border:0;box-shadow:none!important}
 #hud.aiming #crosshair{width:190px;height:190px}
-#hud.aiming .reticle,#hud.aiming #range,#hud.aiming #penetrationLabel{opacity:1;visibility:visible}
-#hud.aiming .reticle{inset:10px;border:1px solid rgba(224,230,211,.55);border-radius:50%;transform:none;box-shadow:inset 0 0 0 32px rgba(0,0,0,.03),0 0 0 1px rgba(0,0,0,.4)}
+#hud.aiming .reticle,#hud.aiming #range,#hud.aiming #penetrationLabel{display:block;opacity:1;visibility:visible}
+#hud.aiming .reticle{inset:10px;border:1px solid rgba(224,230,211,.72);border-radius:50%;transform-origin:50% 50%;transition:transform .09s linear,opacity .15s;box-shadow:inset 0 0 0 32px rgba(0,0,0,.03),0 0 0 1px rgba(0,0,0,.55),0 0 15px rgba(220,230,205,.12)}
 #hud.aiming .reticle:before{width:210px;height:1px;background:linear-gradient(90deg,transparent 0,transparent 20%,#e5ead6 20%,#e5ead6 46%,transparent 46%,transparent 54%,#e5ead6 54%,#e5ead6 80%,transparent 80%);box-shadow:none}
 #hud.aiming .reticle:after{width:1px;height:210px;background:linear-gradient(transparent 0,transparent 20%,#e5ead6 20%,#e5ead6 46%,transparent 46%,transparent 54%,#e5ead6 54%,#e5ead6 80%,transparent 80%);box-shadow:none}
 #hud.aiming #range{top:202px;width:220px;left:-15px;color:#e6e9dc;font-size:9px;letter-spacing:1.3px}

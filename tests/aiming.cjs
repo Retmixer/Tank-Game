@@ -1,0 +1,13 @@
+'use strict';
+const assert=require('node:assert/strict'),D=require('../src/data.js');
+let circle=1;
+for(let i=0;i<120;i++)circle=D.aimStep(circle,true,0,1.1,1/60);
+assert.ok(circle<.23,'Stationary aimed gun must fully settle');
+const moving=D.aimStep(circle,true,1,1.1,.5);
+assert.ok(moving>circle,'Movement must bloom the aiming circle');
+const relaxed=D.aimStep(circle,false,0,1.1,.5);
+assert.ok(relaxed>circle,'Leaving optics must expand dispersion');
+assert.ok(D.shellDrop(500)<2,'High-velocity shell must not plunge over normal combat range');
+assert.ok(D.detectionRange({view:150},{camo:.25})>D.detectionRange({view:105},{camo:.25}),'View range must depend on observer optics');
+assert.ok(D.detectionRange({view:120},{camo:.25},false,true)>D.detectionRange({view:120},{camo:.25}),'Firing must reveal a tank farther away');
+console.log('PASS: convergence, movement bloom, flat ballistics and per-tank spotting range.');

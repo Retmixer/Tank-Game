@@ -12,6 +12,15 @@
  const mobility=[[14,320,35,14],[32,520,29,11],[49,620,24,8],[17,340,35,12],[38,600,29,10],[61,700,24,7],[12,290,35,16],[29,540,29,13],[54,650,24,8]];
  tanks.forEach((t,i)=>{const [mass,power,speed,reverse]=mobility[i];Object.assign(t,{mass,power,speed:speed/3.6,reverse:reverse/3.6});});
  const gravity=9.81;
+ const shellSpeed=285,shellGravity=.1;
+ // Normalized dispersion: 1 is a cold/moving gun, 0.18 is fully aimed.
+ function aimStep(value,aiming,motion,aimTime,dt){
+  const movement=Math.max(0,Math.min(1,Math.abs(motion))),target=aiming?Math.min(1,.18+movement*.72):Math.min(1,.72+movement*.28);
+  const rate=aiming?Math.max(.12,aimTime):.32;
+  return Math.max(.18,Math.min(1,value+(target-value)*(1-Math.exp(-Math.max(0,dt)*4/rate))));
+ }
+ function shellDrop(distance,speed=shellSpeed,gravityScale=shellGravity){const time=Math.max(0,distance)/Math.max(1,speed);return .5*gravity*Math.max(0,gravityScale)*time*time;}
+ function detectionRange(observer,target,moving=false,fired=false){const concealment=Math.max(0,Math.min(.55,(target?.camo||0)+(moving?-.05:0)+(fired?-.22:0)));return Math.max(45,(observer?.view||100)*(1-concealment*.72));}
  const surfaces={earth:{static:.72,kinetic:.55,rolling:.025},sand:{static:.58,kinetic:.46,rolling:.065},snow:{static:.35,kinetic:.24,rolling:.04}};
  // Acceleration along a slope with Coulomb friction and static sticking.
  function frictionSpeed(speed,slope,dt,mu){const angle=Math.atan(slope),pull=-gravity*Math.sin(angle),friction=mu*gravity*Math.cos(angle);if(Math.abs(speed)<.001&&Math.abs(pull)<=friction)return 0;const sign=Math.sign(speed)||Math.sign(pull),next=speed+(pull-sign*friction)*dt;if(next*sign<0&&Math.abs(pull)<=friction)return 0;return next;}
@@ -69,6 +78,6 @@
  function armorColor(mm){return mm<30?'#70e899':mm<60?'#add66a':mm<95?'#f2cd61':mm<135?'#ed9454':mm<170?'#ed6256':'#ba4268';}
  function penetration(attacker,defender,zone='front',cosine=1,distance=0){const armor=armorThickness(defender,zone),effective=armor/Math.max(.2,Math.abs(cosine)),power=([98,125,164][attacker.c]+((attacker.level||1)-1)*5)*Math.max(.76,1-distance/2200),chance=Math.max(0,Math.min(1,(power/effective-.75)/.5));return {armor,effective,power,chance,color:chance>=.75?'#70e899':chance>=.25?'#ffbb55':'#ff6262'};}
  function ricochetVelocity(velocity,normal,incidence,bounces=0){if(!velocity||!normal||incidence>=.44||bounces>=2)return null;const speed=Math.hypot(velocity.x,velocity.y,velocity.z);if(speed<=48)return null;const dot=velocity.x*normal.x+velocity.y*normal.y+velocity.z*normal.z,retention=.48+incidence*.22;return {x:(velocity.x-2*dot*normal.x)*retention,y:(velocity.y-2*dot*normal.y)*retention,z:(velocity.z-2*dot*normal.z)*retention};}
- root.GameData={price,unlock,penetration,ricochetVelocity,armorZones,armorThickness,armorColor,gravity,surfaces,frictionSpeed,verticalStep,driveSpeed,nations,classes,tanks,costs,maps,stats,defaults,clean,upgrade,reward,segmentCircle,rng};
+ root.GameData={price,unlock,penetration,ricochetVelocity,armorZones,armorThickness,armorColor,gravity,shellSpeed,shellGravity,aimStep,shellDrop,detectionRange,surfaces,frictionSpeed,verticalStep,driveSpeed,nations,classes,tanks,costs,maps,stats,defaults,clean,upgrade,reward,segmentCircle,rng};
  if(typeof module!=='undefined')module.exports=root.GameData;
 })(typeof window!=='undefined'?window:globalThis);
