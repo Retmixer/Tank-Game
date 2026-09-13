@@ -34,7 +34,7 @@
   '2-2':{w:3.45,l:6.9,h:.7,slope:.09,wheels:8,skirts:6,gun:3.45,z:.48,shape:'fortress'}
  };
  function tank(spec,team=0){
-  const group=new T.Group(),turret=new T.Group(),gunPivot=new T.Group(),wheels=[],hitMeshes=[];
+  const group=new T.Group(),turret=new T.Group(),gunPivot=new T.Group(),wheels=[],hitMeshes=[],trackBelts=[];
   const design=designs[spec.id]||designs[`${spec.n}-${spec.c}`],width=design.w,length=design.l,paint=material(spec.color),dark=material(0x303839),steel=material(0x69716a),rubber=material(0x252927,'rubber'),rust=material(0x70614a),glass=new T.MeshStandardMaterial({color:0x284650,metalness:.75,roughness:.13});
   const hull=plate(group,width,.69,length,0,1.01,0,paint,.24);hull.userData.zone='hull';
   const upper=plate(group,width*.91,design.h,length*.77,0,1.5,-.15,paint,design.shape==='box'?.06:.27);upper.rotation.x=-design.slope;upper.userData.zone='hull';
@@ -42,9 +42,11 @@
   const belly=box(group,width*.88,.35,.16,0,.85,length*.5,paint);belly.rotation.x=-.32;belly.userData.zone='hull';
   for(const s of [-1,1]){
    const sx=s*width*.5;
-   for(let j=0;j<design.wheels;j++){const z=-length*.39+j*length*.78/(design.wheels-1),wheel=new T.Group();wheel.position.set(s*(width*.5+.05),.64,z);group.add(wheel);const radius=design.wheels<=5?.49:design.wheels>=8?.38:.44;const tyre=cylinder(wheel,radius,radius,.49,0,0,0,rubber);tyre.rotation.z=Math.PI/2;const rim=cylinder(wheel,radius*.75,radius*.75,.52,0,0,0,paint);rim.rotation.z=Math.PI/2;const hub=cylinder(wheel,.105,.105,.57,0,0,0,steel);hub.rotation.z=Math.PI/2;for(let n=0;n<6;n++){const a=n*Math.PI/3,b=mesh(boltGeo,steel,wheel,s*.29,Math.sin(a)*.23,Math.cos(a)*.23);b.rotation.z=Math.PI/2;}batch(wheel);wheels.push(wheel);}
-   const trackPath=[];for(let j=0;j<22;j++)trackPath.push({y:.13,z:-length*.41+j*length*.82/21,a:0});for(let j=0;j<10;j++){const a=-Math.PI/2+j*Math.PI/9;trackPath.push({y:.65+Math.sin(a)*.52,z:length*.41+Math.cos(a)*.52,a:-a-Math.PI/2});}for(let j=0;j<22;j++)trackPath.push({y:1.17,z:length*.41-j*length*.82/21,a:0});for(let j=0;j<10;j++){const a=Math.PI/2+j*Math.PI/9;trackPath.push({y:.65+Math.sin(a)*.52,z:-length*.41+Math.cos(a)*.52,a:-a-Math.PI/2});}
-   for(const p of trackPath){const link=box(group,.68,.095,.22,sx,p.y,p.z,dark);link.rotation.x=p.a;const cleat=box(group,.53,.03,.06,sx,p.y+.045,p.z,steel);cleat.rotation.x=p.a;}
+   for(let j=0;j<design.wheels;j++){const z=-length*.39+j*length*.78/(design.wheels-1),wheel=new T.Group();wheel.position.set(s*(width*.5+.05),.64,z);group.add(wheel);const radius=design.wheels<=5?.49:design.wheels>=8?.38:.44;wheel.userData.radius=radius;const tyre=cylinder(wheel,radius,radius,.49,0,0,0,rubber);tyre.rotation.z=Math.PI/2;const rim=cylinder(wheel,radius*.75,radius*.75,.52,0,0,0,paint);rim.rotation.z=Math.PI/2;const hub=cylinder(wheel,.105,.105,.57,0,0,0,steel);hub.rotation.z=Math.PI/2;for(let n=0;n<6;n++){const a=n*Math.PI/3,b=mesh(boltGeo,steel,wheel,s*.29,Math.sin(a)*.23,Math.cos(a)*.23);b.rotation.z=Math.PI/2;}batch(wheel);wheels.push(wheel);}
+   const beltGroup=new T.Group();group.add(beltGroup);
+   const links=new T.InstancedMesh(new T.BoxGeometry(.68,.095,.22),dark,72),cleats=new T.InstancedMesh(new T.BoxGeometry(.53,.03,.06),steel,72);
+   for(const o of [links,cleats]){o.castShadow=o.receiveShadow=true;o.frustumCulled=false;o.userData.zone='tracks';beltGroup.add(o);}
+   trackBelts.push({side:s,x:sx,phase:0,links,cleats});
    plate(group,.87,.1,length+.42,sx,1.3,0,paint,.06);
    for(let j=0;j<design.skirts;j++){const z=-length*.4+(j+.5)*length*.8/design.skirts,skirt=plate(group,.08,design.shape==='fortress'?.85:.48,length*.76/design.skirts,s*(width*.5+.43),1.08,z,paint,.015);skirt.userData.zone='tracks';for(let k of [-.28,.28]){const b=mesh(boltGeo,steel,group,s*(width*.5+.49),1.25,z+k);b.rotation.z=Math.PI/2;}}
    for(let j=0;j<3;j++)plate(group,.5,.28,.63,sx,1.5,-length*.26+j*.72,paint,.035);
@@ -135,7 +137,47 @@
   // Reuse the closed primary turret shell exactly, rather than an oversized box.
   const turretSolid=new T.Mesh(shell.geometry,collisionMaterial);turretSolid.position.copy(shell.position);turretSolid.rotation.copy(shell.rotation);turretSolid.scale.copy(shell.scale);turretSolid.userData={zone:'turret',collisionOnly:true};turret.add(turretSolid);collisionMeshes.push(turretSolid);
   hitMeshes.push(...collisionMeshes);
-  return {group,turret,gunPivot,barrelLength,wheels,hitMeshes,collisionMeshes,width,length,holes:[],effectClock:0,markClock:0};
+  const model={group,turret,gunPivot,barrelLength,wheels,hitMeshes,collisionMeshes,trackBelts,width,length,holes:[],effectClock:0,markClock:0};
+  updateBelts(model,()=>0);return model;
+ }
+ function updateBelts(t,groundLocal){
+  const straight=t.length*.82,r=.52,total=2*straight+2*Math.PI*r,dummy=new T.Object3D();
+  for(const belt of t.trackBelts){
+   for(let i=0;i<belt.links.count;i++){
+    let q=((i/belt.links.count*total+belt.phase)%total+total)%total,z,y,a;
+    if(q<straight){z=-straight/2+q;y=.13;a=0;}
+    else if((q-=straight)<Math.PI*r){const angle=q/r;z=straight/2+r*Math.sin(angle);y=.65-r*Math.cos(angle);a=-angle;}
+    else if((q-=Math.PI*r)<straight){z=straight/2-q;y=1.17;a=-Math.PI;}
+    else{q-=straight;const angle=q/r;z=-straight/2-r*Math.sin(angle);y=.65+r*Math.cos(angle);a=-Math.PI-angle;}
+    const deformation=T.MathUtils.clamp(groundLocal(belt.x,z),-.32,.32);
+    y+=deformation*(y<.66?1:.35);
+    if(y<.65)a=-Math.atan2(groundLocal(belt.x,z+.1)-groundLocal(belt.x,z-.1),.2);
+    dummy.position.set(belt.x,y,z);dummy.rotation.set(a,0,0);dummy.updateMatrix();belt.links.setMatrixAt(i,dummy.matrix);
+    dummy.position.y+=.055*Math.cos(a);dummy.position.z+=.055*Math.sin(a);dummy.updateMatrix();belt.cleats.setMatrixAt(i,dummy.matrix);
+   }
+   belt.links.instanceMatrix.needsUpdate=belt.cleats.instanceMatrix.needsUpdate=true;
+  }
+ }
+ function suspension(t,height,dt,distance=0){
+  const p=t.group.position,yaw=t.yaw||0,c=Math.cos(yaw),s=Math.sin(yaw),h=(x,z)=>height(p.x+c*x+s*z,p.z-s*x+c*z);
+  const samples=t.wheels.map(w=>h(w.position.x,w.position.z));
+  const mean=samples.reduce((a,b)=>a+b,0)/samples.length;
+  const targetY=Math.max(mean,Math.max(...samples)-.32);
+  const half=t.length*.39,front=(h(-t.width/2,half)+h(t.width/2,half))/2,back=(h(-t.width/2,-half)+h(t.width/2,-half))/2;
+  const right=(h(t.width/2,half)+h(t.width/2,-half))/2,left=(h(-t.width/2,half)+h(-t.width/2,-half))/2;
+  if(!t.suspension)t.suspension={y:targetY,pitch:-Math.atan2(front-back,2*half),roll:Math.atan2(right-left,t.width),vy:0,vpitch:0,vroll:0,speed:t.speed||0,yaw};
+  const state=t.suspension,step=Math.max(.001,Math.min(dt,.05)),mass=t.spec?.mass||32,omega=10*Math.sqrt(32/mass);
+  const acceleration=T.MathUtils.clamp(((t.speed||0)-state.speed)/step,-4,4),dyaw=Math.atan2(Math.sin(yaw-state.yaw),Math.cos(yaw-state.yaw));
+  const targetPitch=T.MathUtils.clamp(-Math.atan2(front-back,2*half)+acceleration*.008,-.55,.55);
+  const targetRoll=T.MathUtils.clamp(Math.atan2(right-left,t.width)-(t.speed||0)*dyaw/step*.006,-.45,.45);
+  function spring(key,target){const velocity='v'+key,offset=state[key]-target,k=state[velocity]+omega*offset,decay=Math.exp(-omega*step);state[key]=target+(offset+k*step)*decay;state[velocity]=(state[velocity]-omega*k*step)*decay;}
+  spring('y',targetY);spring('pitch',targetPitch);spring('roll',targetRoll);
+  p.y=Math.max(state.y,Math.max(...samples)-.4);t.group.rotation.order='YXZ';t.group.rotation.set(state.pitch,yaw,state.roll);t.group.updateMatrixWorld(true);
+  const inverse=t.group.matrixWorld.clone().invert();
+  const localGround=(x,z)=>new V(p.x+c*x+s*z,h(x,z),p.z-s*x+c*z).applyMatrix4(inverse).y;
+  for(const w of t.wheels){const radius=w.userData.radius||.44,target=.13+radius+T.MathUtils.clamp(localGround(w.position.x,w.position.z),-.32,.32);w.position.y=T.MathUtils.lerp(w.position.y,target,1-Math.exp(-step*22));const side=Math.sign(w.position.x);w.rotation.x+=(distance+side*dyaw*t.width/2)/radius;}
+  for(const belt of t.trackBelts)belt.phase-=distance+belt.side*dyaw*t.width/2;
+  updateBelts(t,localGround);state.speed=t.speed||0;state.yaw=yaw;
  }
  function zone(hit,t){
   const tag=hit.object.userData.zone;if(tag==='tracks'||tag==='roof')return tag;
@@ -214,5 +256,5 @@
   const ah=[a.width/2+.44,a.length/2+.28],bh=[b.width/2+.44,b.length/2+.28],dx=b.group.position.x-x,dz=b.group.position.z-z;
   return [...aa,...bb].every(axis=>{const dot=v=>Math.abs(v.x*axis.x+v.z*axis.z);return Math.abs(dx*axis.x+dz*axis.z)<ah[0]*dot(aa[0])+ah[1]*dot(aa[1])+bh[0]*dot(bb[0])+bh[1]*dot(bb[1]);});
  }
- window.Remaster={tank,zone,armorMask,overlaps,terrainMaterial,sky,environment,material,batch,lighting,render,building};
+ window.Remaster={tank,suspension,zone,armorMask,overlaps,terrainMaterial,sky,environment,material,batch,lighting,render,building};
 })();
