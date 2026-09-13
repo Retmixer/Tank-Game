@@ -18,7 +18,7 @@ let saved,loop;global.Platform={load:()=>D.defaults(),save:d=>{saved=structuredC
 THREE.WebGLRenderer=class {constructor(){this.shadowMap={};this.info={render:{calls:0}};}setSize(){}setPixelRatio(){}setAnimationLoop(f){loop=f;}render(scene){scene.updateMatrixWorld(true);}};
 require('../src/remaster.js');
 require('../src/game.js');
-assert.equal(gameStatus().state,'garage');assert.equal(el('upgradeBtn').disabled,true);
+assert.equal(gameStatus().state,'garage');assert.equal(gameStatus().silver,99999);assert.equal(el('upgradeBtn').disabled,false);
 el('battleBtn').onclick();assert.equal(gameStatus().teams.length,6);
 let now=0;const advance=seconds=>{for(let i=0;i<seconds*30;i++){now+=1000/30;loop(now);}};
 const startZ=gameStatus().player.z;windowEvents.keydown({code:'KeyW'});windowEvents.keydown({code:'Space',preventDefault(){}});advance(4);assert.equal(gameStatus().player.z,startZ,'Countdown blocks movement');assert.equal(gameStatus().elapsed,0,'Countdown does not consume battle time');assert.ok(gameStatus().countdown>.9);assert.ok(Math.abs(gameStatus().teams[0].z-gameStatus().teams[3].z)>400,'Teams spawn over 400m apart');advance(1.2);windowEvents.keyup({code:'Space'});windowEvents.keydown({code:'KeyW'});advance(3);windowEvents.keyup({code:'KeyW'});assert.ok(gameStatus().player.z>startZ+3&&gameStatus().player.z<startZ+20,'W accelerates progressively during the first three seconds');

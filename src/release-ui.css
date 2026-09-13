@@ -46,6 +46,10 @@
 .research-silhouette{height:112px;display:flex;align-items:center;justify-content:center;margin:8px -5px;background:radial-gradient(ellipse,rgba(201,169,106,.11),transparent 68%)}
 .research-silhouette svg{width:185px;height:86px;fill:#899790;filter:drop-shadow(0 8px 5px #0008);transform:scale(var(--tank-scale,1))}
 .research-silhouette.class-0{--tank-scale:.82}.research-silhouette.class-2{--tank-scale:1.12}.research-node.owned .research-silhouette svg{fill:#b9b09a}
+.research-silhouette .tank-render{width:100%;height:112px;object-fit:contain;filter:drop-shadow(0 10px 7px #0009);transform:scale(var(--tank-scale,1))}
+.research-node.locked .tank-render{filter:grayscale(.75) brightness(.58) drop-shadow(0 8px 6px #0009)}
+.tank-card .tank-render{position:absolute;right:-3px;bottom:-4px;width:142px;height:82px;object-fit:contain;filter:drop-shadow(0 8px 6px #000b);opacity:.82;pointer-events:none}
+.tank-card.selected .tank-render{opacity:1;filter:drop-shadow(0 9px 7px #000c) saturate(1.08)}
 .research-node h3{font-size:20px;margin:5px 0 6px;font-weight:600}
 .research-node p{font-size:11px;line-height:1.5;color:#8f9c9e;min-height:48px;margin:0 0 12px}
 .research-spec{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:auto}
