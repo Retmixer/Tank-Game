@@ -25,11 +25,17 @@
    x.fillStyle='rgba(112,156,177,.3)';x.fillRect(0,0,512,512);
    for(let i=0;i<24;i++){let a=r()*512,b=r()*512;x.strokeStyle='rgba(246,253,255,.55)';x.lineWidth=1+r();x.beginPath();x.moveTo(a,b);for(let j=0;j<5;j++){a+=(r()-.45)*70;b+=(r()-.35)*70;x.lineTo(a,b);}x.stroke();}
   }
+  // Broad wear under the fine grain keeps materials legible at gameplay distance.
+  for(let i=0;i<90;i++){const px=r()*512,py=r()*512,radius=8+r()*55;x.fillStyle=`rgba(${kind==='paint'?'64,57,40':'55,54,46'},${.02+r()*.07})`;x.beginPath();x.ellipse(px,py,radius,radius*.45,r()*6,0,Math.PI*2);x.fill();}
+  if(kind==='wood'){for(let i=0;i<130;i++){const px=r()*512;x.strokeStyle=`rgba(42,35,26,${.1+r()*.3})`;x.lineWidth=.6+r()*3;x.beginPath();x.moveTo(px,0);x.bezierCurveTo(px+14,170,px-12,330,px,512);x.stroke();}}
+  if(kind==='rock'){for(let i=0;i<45;i++){x.strokeStyle='rgba(44,43,37,.22)';x.lineWidth=.7+r()*2;x.beginPath();const a=r()*512,b=r()*512;x.moveTo(a,b);x.lineTo(a+18+r()*70,b+20);x.lineTo(a+60,b+70+r()*50);x.stroke();}}
+  if(kind==='rubber'){x.strokeStyle='#3e423c';x.lineWidth=3;for(let y=0;y<512;y+=18){x.beginPath();x.moveTo(0,y);x.lineTo(512,y+7);x.stroke();}}
   const t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;t.colorSpace=T.SRGBColorSpace;t.anisotropy=8;textures.set(kind,t);return t;
  }
  function material(color,kind='steel'){
   const key=color+kind;if(cache.has(key))return cache.get(key);
-  const map=texture(kind),m=new T.MeshStandardMaterial({color,map,bumpMap:map,bumpScale:kind==='brick'?.07:kind==='rock'?.14:kind==='paint'?.055:.026,roughness:kind==='rubber'?.96:kind==='steel'?.43:kind==='paint'?.62:.88,metalness:kind==='steel'?.42:kind==='paint'?.16:.03,envMapIntensity:kind==='paint'?1.05:.9,transparent:false,opacity:1,depthWrite:true,depthTest:true});cache.set(key,m);return m;
+  const map=texture(kind),relief=map.clone();relief.colorSpace=T.NoColorSpace;
+  const m=new T.MeshStandardMaterial({color,map,bumpMap:relief,roughnessMap:relief,bumpScale:kind==='brick'?.09:kind==='rock'?.2:kind==='wood'?.09:kind==='paint'?.018:.026,roughness:kind==='rubber'?1:kind==='steel'?.72:kind==='paint'?.92:1,metalness:kind==='steel'?.65:kind==='paint'?.08:.01,envMapIntensity:.55,transparent:false,opacity:1,depthWrite:true,depthTest:true});cache.set(key,m);return m;
  }
  const cube=new T.BoxGeometry(1,1,1),boltGeo=new T.CylinderGeometry(.035,.035,.025,6);
  function mesh(g,m,p,x=0,y=0,z=0){const o=new T.Mesh(g,m);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;p.add(o);return o;}
@@ -264,13 +270,17 @@
   });
  }
  const maskCache=new Map();function maskMaterial(c){if(!maskCache.has(c))maskCache.set(c,new T.MeshStandardMaterial({color:c,roughness:.55,metalness:.1,emissive:c,emissiveIntensity:.18}));return maskCache.get(c);}
- function terrainMaterial(kind,size){const m=new T.MeshStandardMaterial({color:kind==='winter'?0xcad5db:kind==='desert'?0xc5ad80:0x879473,roughness:.97});m.onBeforeCompile=shader=>{shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 terrainPosition;').replace('#include <begin_vertex>','#include <begin_vertex>\nterrainPosition=position;');shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
+ function terrainMaterial(kind,size){const m=new T.MeshStandardMaterial({color:kind==='winter'?0xcad5db:kind==='desert'?0xbca57a:0x6d8054,roughness:.97});m.onBeforeCompile=shader=>{shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 terrainPosition;').replace('#include <begin_vertex>','#include <begin_vertex>\nterrainPosition=position;');shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
  varying vec3 terrainPosition;
  float hashT(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
  float noiseT(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hashT(i),hashT(i+vec2(1,0)),f.x),mix(hashT(i+vec2(0,1)),hashT(i+vec2(1)),f.x),f.y);}
  `).replace('#include <color_fragment>',`#include <color_fragment>
  vec2 tp=terrainPosition.xz;
  float broad=noiseT(tp*.035),fine=noiseT(tp*2.7),grain=noiseT(tp*18.);
+ float dirt=smoothstep(.43,.7,noiseT(tp*.085));
+ float road=1.-smoothstep(3.0,6.5,min(abs(tp.x),abs(tp.y)));
+ vec3 earth=${kind==='desert'?'vec3(.64,.48,.29)':kind==='winter'?'vec3(.46,.48,.44)':'vec3(.35,.29,.18)'};
+ diffuseColor.rgb=mix(diffuseColor.rgb,earth,clamp(road*.6+dirt*.22,0.,.7));
  diffuseColor.rgb*=.72+broad*.42+fine*.15+grain*.065;
  diffuseColor.rgb*=.94+noiseT(tp*.11)*.1;
  ${kind==='training'?`float patches=smoothstep(.35,.68,noiseT(tp*.047));
@@ -280,10 +290,34 @@
  diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.33,.43,.5),ice*.45);`}
  `);};m.customProgramCacheKey=()=>`terrain-${kind}`;return m;}
  function sky(scene,kind){const geo=new T.SphereGeometry(1800,32,20),mat=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color(kind==='desert'?0x6d9cb3:kind==='winter'?0x687f97:0x487f9f)},bottom:{value:new T.Color(kind==='desert'?0xe6ceb1:0xd9e2df)}},vertexShader:'varying vec3 p;void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec3 p;uniform vec3 top;uniform vec3 bottom;void main(){float h=pow(max(normalize(p).y,0.),.48);vec3 c=mix(bottom,top,h);float clouds=sin(p.x*.009+sin(p.z*.007))*sin(p.z*.005+p.x*.003);c=mix(c,vec3(.94,.94,.91),smoothstep(.55,.9,clouds)*smoothstep(.05,.25,h)*.26);gl_FragColor=vec4(c,1.);}'});scene.add(new T.Mesh(geo,mat));}
+ function vegetation(world,arena,height,obstacles,quality='high'){
+  const winter=arena===GameData.maps.winter,desert=arena===GameData.maps.desert,r=GameData.rng(arena.seed+8401),high=quality==='high';
+  function atlas(kind){const key='plant-'+kind;if(textures.has(key))return textures.get(key);const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d'),random=GameData.rng(927+kind.length);
+   if(kind==='grass'){for(let i=0;i<65;i++){const a=random()*256,b=20+random()*180;x.strokeStyle=['#82964d','#667c39','#9eaa66','#b1ab71'][i%4];x.lineWidth=1+random()*3;x.beginPath();x.moveTo(a,256);x.quadraticCurveTo(a-12,180,a+(random()-.5)*90,b);x.stroke();}}
+   else {for(let i=0;i<190;i++){const a=random()*256,b=random()*256;if(((a-128)/125)**2+((b-128)/120)**2>1)continue;x.fillStyle=['#4f6b34','#6c8441','#849951','#a0aa66'][i%4];x.beginPath();x.ellipse(a,b,4+random()*12,2+random()*6,random()*6,0,Math.PI*2);x.fill();x.strokeStyle='#b0b87b66';x.lineWidth=.7;x.beginPath();x.moveTo(a-4,b);x.lineTo(a+5,b);x.stroke();}}
+   const map=new T.CanvasTexture(c);map.colorSpace=T.SRGBColorSpace;map.anisotropy=4;textures.set(key,map);return map;}
+  const grassMat=new T.MeshStandardMaterial({map:atlas('grass'),color:desert?0xc2ad72:winter?0x969889:0xb5bd91,alphaTest:.4,side:T.DoubleSide,roughness:1,metalness:0});
+  const leafMat=new T.MeshStandardMaterial({map:atlas('leaf'),color:winter?0x94a69a:desert?0x9b9a64:0xc1c598,alphaTest:.45,side:T.DoubleSide,roughness:1});
+  const grass=[],leaves=[],trunks=[],dummy=new T.Object3D();
+  const free=(x,z,pad)=>Math.abs(x)>7&&Math.abs(z)>6&&Math.hypot(x,z)>18&&!obstacles.some(o=>Math.hypot(x-o.x,z-o.z)<o.r+pad);
+  const record=(list,x,y,z,sx,sy,sz,yaw)=>{dummy.position.set(x,y,z);dummy.rotation.set(0,yaw,0);dummy.scale.set(sx,sy,sz);dummy.updateMatrix();list.push(dummy.matrix.clone());};
+  // Seeded groves and scrub patches leave roads, the objective and hard cover clear.
+  for(let i=0;i<(high?620:240);i++){
+   const x=(r()-.5)*(arena.size-18),z=(r()-.5)*(arena.size-18);if(!free(x,z,3))continue;
+   const bush=i%3===0,h=bush?.65+r()*1.2:4.5+r()*5.5;
+   if(!bush&&(desert||i%2))continue;
+   const y=height(x,z),radius=bush?1+r():1.6+r()*1.5;
+   if(!bush)record(trunks,x,y+h*.4,z,.18+r()*.14,h*.8,.18+r()*.14,r()*6);
+   for(let j=0;j<(bush?9:26);j++){const a=r()*Math.PI*2,d=r()*radius,cy=bush?y+h*.55:y+h*.65+r()*h*.3;record(leaves,x+Math.cos(a)*d,cy,z+Math.sin(a)*d,bush?2:3.8,bush?1.6:3.2,1,r()*Math.PI);}
+  }
+  for(let i=0;i<(high?2100:650);i++){const x=(r()-.5)*(arena.size-12),z=(r()-.5)*(arena.size-12);if(!free(x,z,1)||r()<(desert?.72:winter?.55:.05))continue;
+   const density=8+Math.floor(r()*10);for(let j=0;j<density;j++){const gx=x+(r()-.5)*9,gz=z+(r()-.5)*9;if(!free(gx,gz,.5))continue;const h=(desert?.25:.35)+r()*.6;record(grass,gx,height(gx,gz)+h*.45,gz,1+r(),h,1,r()*Math.PI);}}
+  function instances(list,geometry,mat,name){if(!list.length)return;const o=new T.InstancedMesh(geometry,mat,list.length);list.forEach((m,i)=>o.setMatrixAt(i,m));o.instanceMatrix.needsUpdate=true;o.name=name;o.receiveShadow=true;o.castShadow=name!=='grass';o.computeBoundingSphere();world.add(o);}
+  instances(grass,new T.PlaneGeometry(1,1),grassMat,'grass');instances(leaves,new T.PlaneGeometry(1,1),leafMat,'bushes-and-tree-canopies');instances(trunks,new T.CylinderGeometry(.7,1,1,7),material(0x6f6651,'wood'),'tree-trunks');
+ }
  function environment(world,arena,height,rand,quality='high'){
   const kind=arena===GameData.maps.winter?'winter':arena===GameData.maps.desert?'desert':'training',stone=material(kind==='desert'?0xa68d68:0x7a8585,'rock'),wood=material(0x65533c,'wood'),foliage=material(kind==='winter'?0x6b847f:0x3a5845,'rock');
-  world.traverse(o=>{if(!o.isMesh||o.material.vertexColors||o.material.customProgramCacheKey?.().startsWith('terrain'))return;const old=o.material;if(old.type==='MeshStandardMaterial'&&!old.map){const c=old.color.getHex(),isRock=['DodecahedronGeometry','IcosahedronGeometry'].includes(o.geometry.type),isWood=c===0x535147;o.material=material(c,isRock?'rock':isWood?'wood':'brick');}});
-  // Keep random dressing outside the authored combat lanes and factory courtyards.
+  world.traverse(o=>{if(!o.isMesh||o.material.vertexColors||o.material.customProgramCacheKey?.().startsWith('terrain'))return;const old=o.material;if(old.type==='MeshStandardMaterial'&&!old.map){const c=old.color.getHex(),isRock=['DodecahedronGeometry','IcosahedronGeometry'].includes(o.geometry.type),isWood=[0x535147,0x545a50,0x746d50,0x716c50,0x696050].includes(c),isMetal=[0x5c6868,0x677b82,0x434b43,0xb4b7a3,0x515c5d].includes(c),isLeaf=[0x4a6350,0x768e86,0x405c49,0x3a5845].includes(c);o.material=material(c,isRock?'rock':isWood?'wood':isMetal?'steel':isLeaf?'leaf':'brick');}});
   const rockCount=0,treeCount=quality==='high'?230:92;
   for(let i=0;i<rockCount;i++){const x=(rand()-.5)*(arena.size-24),z=(rand()-.5)*(arena.size-24);if(Math.abs(x)<24||Math.abs(z)>arena.size*.35)continue;const r=1+rand()*3,g=new T.IcosahedronGeometry(r,quality==='high'?2:1),pos=g.attributes.position;for(let j=0;j<pos.count;j++){const px=pos.getX(j),py=pos.getY(j),pz=pos.getZ(j),f=.88+.17*Math.sin(px*3+pz*2)*Math.cos(py*4);pos.setXYZ(j,px*f,py*f,pz*f);}g.computeVertexNormals();const rock=mesh(g,stone,world,x,height(x,z)-r*.35,z);rock.scale.set(1.3,.75,1);}
   if(kind!=='desert')for(let i=0;i<treeCount;i++){const x=(rand()-.5)*arena.size*1.4,z=(rand()-.5)*arena.size*1.4;if(Math.abs(x)<arena.size*.37||Math.abs(z)<16)continue;const h=5+rand()*8,g=new T.Group();g.position.set(x,height(x,z),z);world.add(g);cylinder(g,.08,.25,h,0,h/2,0,wood,quality==='high'?10:7);for(let j=0;j<(quality==='high'?7:4);j++){const y=h*.33+j*h*.095,r=(1-j/8)*2.4,b=mesh(new T.ConeGeometry(r,h*.35,quality==='high'?14:8,1),foliage,g,0,y,0);b.rotation.y=j*.9;if(kind==='winter')mesh(new T.ConeGeometry(r*.78,h*.25,quality==='high'?14:8),material(0xc8d4d8,'rock'),g,0,y+h*.09,0);}batch(g);}
@@ -300,7 +334,7 @@
    float viewDepth(vec2 uv){float d=texture2D(depthMap,uv).x;return (nearPlane*farPlane)/(farPlane+(nearPlane-farPlane)*d);}
    void main(){vec2 uv=screenUV,px=1./resolution;vec3 color=texture2D(colorMap,uv).rgb;float d=viewDepth(uv),ao=0.;vec3 glow=vec3(0.);float radius=clamp(35./max(d,1.),1.5,6.);
     for(int i=0;i<8;i++){float a=float(i)*.785398;vec2 offset=vec2(cos(a),sin(a))*px*radius;float nd=viewDepth(uv+offset),delta=d-nd;ao+=smoothstep(.035,.32,delta)*(1.-smoothstep(.65,2.2,delta));vec3 tap=texture2D(colorMap,uv+offset*2.).rgb;glow+=max(tap-vec3(1.3),vec3(0.));}
-    color*=1.-ao*.034;color+=glow*.018;float lum=dot(color,vec3(.2126,.7152,.0722));color=mix(vec3(lum),color,1.065);float edge=dot(uv-.5,uv-.5);color*=1.-edge*.22;gl_FragColor=vec4(color,1.);
+    color*=1.-ao*.034;color+=glow*.018;float lum=dot(color,vec3(.2126,.7152,.0722));color=mix(vec3(lum),color,.98);float edge=dot(uv-.5,uv-.5);color*=1.-edge*.10;gl_FragColor=vec4(color,1.);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
    }`});scene2.add(new T.Mesh(new T.PlaneGeometry(2,2),m));post={target,scene:scene2,camera:camera2,material:m,width:0,height:0};}
@@ -318,5 +352,5 @@
   const ah=[a.width/2+.44,a.length/2+.28],bh=[b.width/2+.44,b.length/2+.28],dx=b.group.position.x-x,dz=b.group.position.z-z;
   return [...aa,...bb].every(axis=>{const dot=v=>Math.abs(v.x*axis.x+v.z*axis.z);return Math.abs(dx*axis.x+dz*axis.z)<ah[0]*dot(aa[0])+ah[1]*dot(aa[1])+bh[0]*dot(bb[0])+bh[1]*dot(bb[1]);});
  }
- window.Remaster={tank,suspension,zone,armorMask,overlaps,terrainMaterial,sky,environment,material,batch,lighting,render,building};
+ window.Remaster={vegetation,tank,suspension,zone,armorMask,overlaps,terrainMaterial,sky,environment,material,batch,lighting,render,building};
 })();
