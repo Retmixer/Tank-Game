@@ -38,7 +38,7 @@ function setupScene(kind){
  const sun=new THREE.DirectionalLight(kind==='garage'?0xffd9a0:0xffecc9,kind==='garage'?3.4:2.6);sun.position.set(-35,65,40);sun.castShadow=true;sun.shadow.mapSize.set(4096,4096);sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;sun.shadow.camera.far=400;sun.shadow.bias=-.0006;sun.shadow.normalBias=.08;scene.add(sun);scene.userData.sun=sun;scene.add(sun.target);if(kind!=='garage')Remaster.sky(scene,kind);const rim=new THREE.DirectionalLight(0xb0d6ff,.65);rim.position.set(40,18,-30);scene.add(rim);
 }
 function hangar(){
- state='garage';paused=false;Platform.gameplay(false);$('hud').hidden=true;$('garage').hidden=false;$('modal').hidden=true;$('scoreboard').hidden=true;document.exitPointerLock?.();markers.clear();$('markers').innerHTML='';setupScene('garage');
+ state='garage';paused=false;aiming=false;viewPitch=0;viewYaw=0;countdown=0;countdownClock=null;aimHit=null;Platform.gameplay(false);$('hud').hidden=true;$('garage').hidden=false;$('modal').hidden=true;$('scoreboard').hidden=true;document.exitPointerLock?.();markers.clear();$('markers').innerHTML='';setupScene('garage');
  const floor=box(world,160,.4,160,0,-.4,0,0x28343a);floor.receiveShadow=true;
  const pad=cyl(world,7.5,7.6,.2,0,-.03,0,0x39464a,64);const ring=mesh(new THREE.TorusGeometry(7.25,.025,4,80),mat(0xc0ae7e),world,0,.09,0);ring.rotation.x=Math.PI/2;
  const grid=new THREE.GridHelper(100,40,0x516267,0x37474d);grid.position.y=-.18;world.add(grid);
@@ -49,6 +49,9 @@ function hangar(){
  for(let x=-15;x<=15;x+=6){box(world,4.7,3,.15,x,9,-27.6,0x9ba8a3);box(world,4.7,.08,.18,x,9,-27.4,0x2e4249);}
  const r=D.rng(81);for(let i=0;i<22;i++){let x=(r()-.5)*33,z=-9-r()*16;box(world,1.2+r(),.8+r(),1.2,x,.5,z,0x4d574b);}
  const light=new THREE.PointLight(0x8fdbe0,45,25);light.position.set(6,7,-4);scene.add(light);preview=buildTank(D.stats(chosen(),save.levels[save.selected]));world.add(preview.group);preview.group.rotation.y=-.45;
+ // Reset the battle lens after an aimed shot. Otherwise the garage inherits the
+ // low FOV and close camera distance from the previous match.
+ camera.fov=45;camera.zoom=1;camera.near=.15;camera.far=2400;camera.updateProjectionMatrix();
  camera.position.set(10.8,6.8,13.2);camera.lookAt(0,1.2,0);renderGarage();Remaster.armorMask(preview,armorView,chosen());
  if(engineGain)engineGain.gain.value=0;
 }
@@ -211,5 +214,5 @@ function animate(now){const dt=Math.min(.045,(now-lastTime)/1000||.016);lastTime
 try{renderer=new THREE.WebGLRenderer({canvas:$('world'),antialias:true,powerPreference:'high-performance'});renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.04;camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.15,2400);applyQuality();bind();hangar();renderer.render(scene,camera);$('loading').hidden=true;Platform.markReady();renderer.setAnimationLoop(animate);Platform.init((cloud,started)=>{if(state==='garage'&&save.updated<started&&cloud.updated>save.updated){save=cloud;hangar();toast('Облачный прогресс восстановлен');}},pause);}
 catch(error){console.error(error);$('loading').innerHTML='<h1>Не удалось запустить 3D</h1><p>Включите аппаратное ускорение в браузере и обновите драйвер видеокарты.</p><p>'+String(error.message).replace(/[<>]/g,'')+'</p>';}
 // Read-only inspection, useful for support and acceptance tests.
-window.gameStatus=()=>({state,paused,countdown,armorView,owned:{...save.owned},map:save.map,tank:save.selected,mode:matchMode,network:net?{role:net.role,code:net.code,players:net.players?.length||0}:null,silver:save.silver,levels:{...save.levels},elapsed,player:player?{team:player.team,hp:player.hp,x:player.group.position.x,z:player.group.position.z,reload:player.reload,zoom:player.spec.zoom}:null,teams:tanks.map(t=>({team:t.team,hp:t.hp,alive:t.alive,x:t.group.position.x,z:t.group.position.z})),drawCalls:renderer?.info.render.calls});
+window.gameStatus=()=>({state,paused,countdown,armorView,owned:{...save.owned},map:save.map,tank:save.selected,mode:matchMode,network:net?{role:net.role,code:net.code,players:net.players?.length||0}:null,silver:save.silver,levels:{...save.levels},elapsed,camera:{fov:camera?.fov,zoom:camera?.zoom,aiming},player:player?{team:player.team,hp:player.hp,x:player.group.position.x,z:player.group.position.z,reload:player.reload,zoom:player.spec.zoom}:null,teams:tanks.map(t=>({team:t.team,hp:t.hp,alive:t.alive,x:t.group.position.x,z:t.group.position.z})),drawCalls:renderer?.info.render.calls});
 })();
