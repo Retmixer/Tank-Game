@@ -89,12 +89,56 @@
   if(design.shape==='oscillating'){for(const s of [-1,1])plate(turret,.46,.48,1.25,s*.52,.66,-1.12,paint,.18);}
   if(design.shape==='bustle'){for(let j=0;j<6;j++)box(turret,.045,.5,.04,-.88+j*.35,.78,-2.08,steel);box(turret,1.85,.04,.55,0,.52,-1.85,steel);}
   if(design.shape==='fortress'){plate(group,1.55,.5,1.2,0,2,-length*.33,paint,.2);for(const s of [-1,1])box(group,.32,.35,length*.65,s*width*.45,1.74,0,steel);}
+  // Service fittings, suspension and armor seams, batched with the main model.
+  for(const s of [-1,1]){
+   for(let j=0;j<design.wheels;j++){
+    const z=-length*.39+j*length*.78/(design.wheels-1);
+    const arm=box(group,.1,.14,.54,s*width*.47,.65,z,steel);arm.rotation.x=s*.42;
+    const spring=cylinder(group,.085,.085,.48,s*width*.45,.94,z,dark,10);spring.rotation.x=.35;
+   }
+   for(let j=0;j<3;j++){
+    const z=-length*.25+j*.52;
+    box(group,.035,.025,.4,s*width*.455,1.8,z,steel);
+    box(group,.16,.055,.055,s*width*.37,1.85,z,rust);
+   }
+   // Lifting eyes and front towing shackles.
+   for(const z of [-.65,.55]){const eye=mesh(new T.TorusGeometry(.09,.022,6,12),steel,turret,s*width*.24,.88,z);eye.rotation.x=Math.PI/2;}
+   const shackle=mesh(new T.TorusGeometry(.15,.045,8,16),rust,group,s*width*.32,.7,length*.51);shackle.rotation.y=.2*s;
+   const guard=box(group,.04,.27,.3,s*width*.34,1.67,length*.4,steel);
+   box(group,.25,.035,.3,guard.position.x,1.81,guard.position.z,steel);
+  }
+  const deckY=1.5+design.h/2;
+  for(const s of [-1,1]){
+   plate(group,width*.25,.04,.85,s*width*.17,deckY+.05,-length*.29,paint,.03);
+   for(let j=0;j<8;j++)box(group,width*.22,.035,.035,s*width*.17,deckY+.085,-length*.35+j*.095,dark);
+  }
+  // Spare track links and their mounting clamps vary with the vehicle.
+  for(let j=0;j<3+spec.c;j++){
+   const x=(j-(2+spec.c)/2)*.31;
+   box(group,.27,.09,.42,x,1.65,length*.3,dark);
+   box(group,.21,.04,.07,x,1.71,length*.3,steel);
+  }
+  const hatch=plate(turret,.55,.055,.5,.38,.94,-.22,paint,.07);hatch.userData.zone='roof';
+  for(const x of [.2,.55])box(turret,.12,.06,.07,x,1,-.45,steel);
+  box(turret,.22,.065,.05,.38,1.01,-.12,steel);
+  const sight=plate(turret,.27,.14,.18,.36,1.03,.37,dark,.025);sight.userData.zone='roof';
+  box(turret,.19,.07,.012,.36,1.06,.465,glass);
+  if(spec.c===2){const mount=cylinder(turret,.055,.09,.4,.62,1.2,-.3,steel,12);const mg=box(turret,.13,.15,.42,.62,1.43,-.23,dark);const tube=cylinder(turret,.025,.035,.75,.62,1.45,.33,steel,12);tube.rotation.x=Math.PI/2;box(turret,.25,.2,.2,.82,1.42,-.25,rust);}
   group.userData.design=design.shape;
   batch(group,wheels);batch(turret);batch(gunPivot);group.traverse(o=>{if(o.isMesh&&!o.material.transparent){hitMeshes.push(o);o.userData.originalMaterial=o.material;}});
-  return {group,turret,gunPivot,barrelLength,wheels,hitMeshes,width,length,holes:[],effectClock:0,markClock:0};
+  // Closed collision meshes fill gaps between decorative parts. They follow
+  // the hull and turret independently, and are never shown in the armor mask.
+  const collisionMeshes=[],collisionMaterial=new T.MeshBasicMaterial({colorWrite:false,depthWrite:false,side:T.DoubleSide});
+  function solid(parent,w,h,d,x,y,z,zone){const o=new T.Mesh(new T.BoxGeometry(w,h,d),collisionMaterial);o.position.set(x,y,z);o.userData.zone=zone;o.userData.collisionOnly=true;parent.add(o);collisionMeshes.push(o);}
+  solid(group,width*.94,.92,length*.97,0,1,0,'hull');
+  for(const s of [-1,1])solid(group,.68,1.13,length*.82+.9,s*width*.5,.65,0,'tracks');
+  // Reuse the closed primary turret shell exactly, rather than an oversized box.
+  const turretSolid=new T.Mesh(shell.geometry,collisionMaterial);turretSolid.position.copy(shell.position);turretSolid.rotation.copy(shell.rotation);turretSolid.scale.copy(shell.scale);turretSolid.userData={zone:'turret',collisionOnly:true};turret.add(turretSolid);collisionMeshes.push(turretSolid);
+  hitMeshes.push(...collisionMeshes);
+  return {group,turret,gunPivot,barrelLength,wheels,hitMeshes,collisionMeshes,width,length,holes:[],effectClock:0,markClock:0};
  }
  function zone(hit,t){if(['turret','roof','tracks'].includes(hit.object.userData.zone))return hit.object.userData.zone;const p=t.group.worldToLocal(hit.point.clone());return p.y>1.8?'turret':Math.abs(p.x)>t.width*.39?'side':p.z<-.4?'rear':'front';}
- function armorMask(model,enabled,spec){model.hitMeshes.forEach(o=>{if(!enabled){o.material=o.userData.originalMaterial;return;}const z=o.userData.zone||'side',color=z==='turret'?0xea6256:z==='roof'?0x6dce8a:z==='tracks'?0x77cb84:z==='hull'?0xe6aa5b:0x92c078;o.material=maskMaterial(color);});}
+ function armorMask(model,enabled,spec){model.hitMeshes.forEach(o=>{if(o.userData.collisionOnly)return;if(!enabled){o.material=o.userData.originalMaterial;return;}const z=o.userData.zone||'side',color=z==='turret'?0xea6256:z==='roof'?0x6dce8a:z==='tracks'?0x77cb84:z==='hull'?0xe6aa5b:0x92c078;o.material=maskMaterial(color);});}
  const maskCache=new Map();function maskMaterial(c){if(!maskCache.has(c))maskCache.set(c,new T.MeshStandardMaterial({color:c,roughness:.55,metalness:.1,emissive:c,emissiveIntensity:.18}));return maskCache.get(c);}
  function terrainMaterial(kind,size){const m=new T.MeshStandardMaterial({color:kind==='winter'?0xcad5db:kind==='desert'?0xc5ad80:0x879473,roughness:.97});m.onBeforeCompile=shader=>{shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 terrainPosition;').replace('#include <begin_vertex>','#include <begin_vertex>\nterrainPosition=position;');shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
  varying vec3 terrainPosition;
@@ -139,5 +183,11 @@
   }else{box(g,.8,2.2,.8,-w*.28,h+.5,-d*.17,brick);box(g,1,.13,1,-w*.28,h+1.65,-d*.17,stone);for(let i=0;i<8;i++)box(g,.08,2.1,.07,w*.18-.55+i*.16,1.12,d/2+.14,wood);box(g,.1,.16,.05,w*.18+.4,1.1,d/2+.22,metal);}
   batch(g);
  }
- window.Remaster={tank,zone,armorMask,terrainMaterial,sky,environment,material,batch,lighting,render,building};
+ // Separating-axis test for oriented hull footprints, including track width.
+ function overlaps(a,x,z,b){
+  const axes=t=>[{x:Math.cos(t.yaw),z:-Math.sin(t.yaw)},{x:Math.sin(t.yaw),z:Math.cos(t.yaw)}],aa=axes(a),bb=axes(b);
+  const ah=[a.width/2+.44,a.length/2+.28],bh=[b.width/2+.44,b.length/2+.28],dx=b.group.position.x-x,dz=b.group.position.z-z;
+  return [...aa,...bb].every(axis=>{const dot=v=>Math.abs(v.x*axis.x+v.z*axis.z);return Math.abs(dx*axis.x+dz*axis.z)<ah[0]*dot(aa[0])+ah[1]*dot(aa[1])+bh[0]*dot(bb[0])+bh[1]*dot(bb[1]);});
+ }
+ window.Remaster={tank,zone,armorMask,overlaps,terrainMaterial,sky,environment,material,batch,lighting,render,building};
 })();
