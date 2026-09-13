@@ -28,6 +28,8 @@ advance(70);const combat=gameStatus();assert.ok(combat.teams.some(t=>t.hp<D.stat
 if(combat.state==='battle'){el('pauseBtn').onclick();el('leave').onclick();}
 assert.equal(gameStatus().state,'result');assert.ok(saved.silver>=300);assert.equal(saved.battles,1);const before=saved.silver;
 el('returnGarage').onclick();el('upgradeBtn').onclick();assert.equal(gameStatus().levels['0-1'],2);assert.equal(gameStatus().silver,before-300);
+assert.deepEqual(saved.modules['0-1'],{gun:2,armor:1,engine:1,tracks:1},'Garage upgrades only the selected gun');
+el('module-engine').onclick();el('upgradeBtn').onclick();assert.deepEqual(saved.modules['0-1'],{gun:2,armor:1,engine:2,tracks:1});assert.equal(gameStatus().silver,before-600);
 for(const map of ['desert','winter']){el('mapSelect').value=map;el('mapSelect').onchange();el('battleBtn').onclick();advance(3);assert.equal(gameStatus().state,'battle');assert.equal(gameStatus().teams.length,6);el('pauseBtn').onclick();el('leave').onclick();el('returnGarage').onclick();}
 console.log('PASS: hangar, all 3 maps, 3v3, movement, pause, shooting/reload, bot combat, rewards, upgrade, return to hangar.');
 console.log(JSON.stringify({combat,silver:saved.silver,battles:saved.battles},null,2));
