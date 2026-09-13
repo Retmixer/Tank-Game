@@ -185,6 +185,13 @@ function height(x,z){
   const blend=xFade*xFade*(3-2*xFade)*zFade*zFade*(3-2*zFade),plateau=terrainHeightRaw(0,side*spawnZ);
   h=h*(1-blend)+plateau*blend;
  }
+ // Flatten the factory floor and soften the three connected battle lanes.
+ const laneX=arena.size*.29;
+ const laneDistance=Math.min(Math.abs(x),Math.abs(x-laneX),Math.abs(x+laneX),Math.abs(z));
+ const laneBlend=1-THREE.MathUtils.smoothstep(laneDistance,10,30);
+ const interior=1-THREE.MathUtils.smoothstep(Math.abs(z),arena.size*.32,arena.size*.43);
+ h*=1-laneBlend*interior*.82;
+ if(arena===D.maps.winter)h*=1-(1-THREE.MathUtils.smoothstep(Math.max(Math.abs(x),Math.abs(z)),arena.size*.26,arena.size*.4))*.92;
  return h;
 }
 function obstacle(obj,x,z,r){obstacles.push({x,z,r,object:obj});obj.updateMatrixWorld(true);obj.traverse(o=>{if(o.isMesh)solidMeshes.push(o);});}
@@ -208,12 +215,70 @@ function naturalBoundary(){
  const add=(x,z,i,vertical)=>{const r=8+(i%4)*1.8,o=mesh(shared,stone,world,x,height(x,z)+r*.48,z);o.scale.set(vertical?.9:1.45,.8,vertical?1.45:.9);o.rotation.set(.12*(i%3),i*.77,.08*(i%2));obstacle(o,x,z,r*.76);};
  let i=0;for(let a=-edge;a<=edge;a+=step){add(a,-edge,i++,false);add(a,edge,i++,false);}for(let a=-edge+step;a<edge;a+=step){add(-edge,a,i++,true);add(edge,a,i++,true);}
 }
+// Authored districts use the same deterministic layout for solo and LAN.
+function buildDistricts(){
+ const size=arena.size,winter=arena===D.maps.winter,desert=arena===D.maps.desert;
+ const flank=size*.29,decor=new THREE.Group();world.add(decor);
+ const steel=Remaster.material(0x616d70,'steel'),wood=Remaster.material(0x71614a,'wood');
+ const concrete=Remaster.material(desert?0xb29570:0x85877c,'rock');
+ function cover(x,z,w=7,d=3,h=2){
+  const g=new THREE.Group(),support=footprintSupport(x,z,w,d);g.position.set(x,support.high,z);world.add(g);
+  const b=box(g,w,h,d,0,h/2,0,0x827a60);b.material=concrete;
+  for(let a=-w/2+1;a<w/2;a+=2){const seam=box(g,.1,h+.05,d+.05,a,h/2,0,0x494d43);seam.material=steel;}
+  obstacle(g,x,z,Math.hypot(w,d)/2+.2);
+ }
+ function route(points,width,kind){
+  const vertices=[],uv=[],indices=[];
+  for(let p=0;p<points.length-1;p++){
+   const [ax,az]=points[p],[bx,bz]=points[p+1],len=Math.hypot(bx-ax,bz-az),n=Math.ceil(len/4),nx=-(bz-az)/len,nz=(bx-ax)/len;
+   for(let i=0;i<n;i++){
+    const start=vertices.length/3;
+    for(const [t,s] of [[i/n,-1],[i/n,1],[(i+1)/n,-1],[(i+1)/n,1]]){const x=ax+(bx-ax)*t+nx*width*s/2,z=az+(bz-az)*t+nz*width*s/2;vertices.push(x,height(x,z)+.16,z);uv.push(s<0?0:width/8,(p*len+t*len)/8);}
+    indices.push(start,start+1,start+2,start+1,start+3,start+2);
+   }
+  }
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geo.setIndex(indices);geo.computeVertexNormals();
+  const road=mesh(geo,Remaster.material(kind==='ice'?0x96b5c1:desert?0x9c896e:winter?0x686f72:0xaaa38b,kind==='ice'?'ice':'road'),decor);road.castShadow=false;
+ }
+ function tower(x,z){const g=new THREE.Group();g.position.set(x,height(x,z),z);decor.add(g);for(const a of [-1,1])for(const b of [-1,1]){const leg=box(g,.35,10,.35,a*2,5,b*2,0x55635c);leg.material=steel;}box(g,5,.4,5,0,9,0,0x666b5b);box(g,5,1,.2,0,10,2.4,0x717566);box(g,5,1,.2,0,10,-2.4,0x717566);box(g,5.6,.35,5.6,0,12,0,0x505b55);for(let y=0;y<9;y+=.6){const step=box(g,1,.1,.25,2,y,0,0x666c60);step.material=steel;}}
+ function supplies(x,z){const g=new THREE.Group();g.position.set(x,height(x,z),z);decor.add(g);for(let j=0;j<4;j++){const c=box(g,2.4,1.5,1.8,(j%2)*2.6,.75+Math.floor(j/2)*1.5,0,0x736c50);c.material=wood;for(const dx of [-.9,.9]){const strap=box(g,.12,1.55,1.85,(j%2)*2.6+dx,.75+Math.floor(j/2)*1.5,0,0x414d47);strap.material=steel;}}}
+ route([[0,-size*.4],[0,0],[0,size*.4]],16,'road');
+ for(const s of [-1,1])route([[0,-size*.4],[s*flank,-size*.29],[s*flank,0],[s*flank,size*.29],[0,size*.4]],desert?19:15,'road');
+ route([[-flank,0],[0,0],[flank,0]],18,'road');
+ if(desert){
+  // Broken rock ridges separate the dry riverbed from the central outpost.
+  for(const side of [-1,1])for(const z of [-.27,-.17,.17,.27])for(let j=0;j<3;j++)rock(side*(size*.18+j*9),size*z+j*8,8+j*2);
+  for(const side of [-1,1])for(const z of [-65,65]){building(side*48,z,18,15,5,false);cover(side*26,z+side*17,10,3,3);supplies(side*63,z-12);}
+  for(const side of [-1,1]){building(side*90,side*size*.32,22,16,6);tower(side*115,side*size*.32);for(let j=0;j<4;j++)cover(side*(65+j*18),side*size*.1,7,3,2.6);}
+  route([[flank,-size*.3],[flank+24,-size*.15],[flank+12,0],[flank+24,size*.2],[0,size*.4]],23,'road');
+ }else if(winter){
+  // Four factory quadrants; central and lateral streets remain open.
+  for(const sx of [-1,1])for(const sz of [-1,1]){
+   for(let j=0;j<3;j++)building(sx*(42+j*33),sz*65,23,54,12+j*2,true);
+   building(sx*70,sz*132,45,24,10,true);supplies(sx*35,sz*112);cover(sx*35,sz*25,8,3,2);
+   const x=sx*120,z=sz*145,y=height(x,z);for(let j=0;j<2;j++){const chimney=cyl(decor,3.2,4,36,x+j*11,y+18,z,0x737b7b,20);chimney.material=Remaster.material(0x8a8076,'brick');for(let k=0;k<4;k++){const band=cyl(decor,3.5,3.5,1,x+j*11,y+10+k*7,z,0x5a6261,20);band.material=steel;}}
+  }
+  // Rail siding on the west flank; raised sleepers remain below track clearance.
+  for(let z=-size*.34;z<size*.34;z+=3){const x=-flank-20,y=height(x,z);const sleeper=box(decor,5,.12,.32,x,y+.1,z,0x665a4b);sleeper.material=wood;for(const dx of [-1.4,1.4]){const rail=box(decor,.14,.16,3.05,x+dx,y+.18,z,0x596369);rail.material=steel;}}
+  for(const z of [-140,-110,105,135]){building(-flank-37,z,9,20,4,true);}
+  route([[flank+26,-size*.36],[flank+30,0],[flank+26,size*.36]],23,'ice');
+ }else{
+  for(const side of [-1,1]){
+   for(const x of [-105,105]){building(x,side*size*.29,28,42,9,true);supplies(x+22,side*size*.27);tower(x*1.6,side*size*.26);}
+   for(const x of [-55,55]){building(x,side*size*.39,22,28,8,true);supplies(x+16,side*size*.37);}
+   for(const x of [-70,70])for(const z of [45,95,145]){cover(x,side*z,12,3,2.3);cover(x+Math.sign(x)*9,side*(z+6),3,12,2.3);}
+   for(let i=0;i<5;i++){const x=side*(35+i*26);cover(x,side*size*.12,6,3,1.6);supplies(x,side*(size*.12+20));}
+   building(side*size*.35,side*45,15,24,7,true);
+  }
+ }
+ // Cover islands at lane junctions break uninterrupted spawn-to-spawn shots.
+ for(const s of [-1,1])for(const z of [-size*.22,size*.22]){cover(s*26,z,9,4,2.7);cover(s*(flank-23),z,8,4,2.4);supplies(s*(flank-33),z+12);}
+ Remaster.batch(decor,[],true);
+}
 function buildMap(){
  rand=D.rng(arena.seed);const size=arena.size,segments=save.settings.quality==='high'?220:128;const geo=new THREE.PlaneGeometry(size,size,segments,segments);geo.rotateX(-Math.PI/2);const pos=geo.attributes.position, colors=[];for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i);pos.setY(i,height(x,z));const c=new THREE.Color(arena.ground);let tint=.9+rand()*.16;if(Math.abs(x)<5||Math.abs(z)<4)tint*=.87;c.multiplyScalar(tint);colors.push(c.r,c.g,c.b);}geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));geo.computeVertexNormals();ground=mesh(geo,Remaster.terrainMaterial(arena===D.maps.winter?'winter':arena===D.maps.desert?'desert':'training',size),world);ground.receiveShadow=true;ground.castShadow=false;
  const isWinter=arena===D.maps.winter;
- const positions=isWinter?[[-28,-45,13,16,9],[26,-32,12,19,10],[-31,28,17,12,9],[29,45,16,13,10],[-63,0,12,18,8],[65,-4,14,18,9]]:[[-28,-30,9,11,6],[27,30,10,12,6],[-40,24,9,9,5],[38,-25,11,8,6]];
- for(const p of positions)building(...p,isWinter);
- for(const side of [-1,1])for(const flank of [-1,1])for(let i=0;i<4;i++){const x=flank*(62+i*34),z=side*(64+(i%2)*48);building(x,z,9+rand()*8,10+rand()*10,isWinter?12+rand()*6:5+rand()*4,isWinter);}
+ buildDistricts();
  const apron=mesh(new THREE.PlaneGeometry(2200,2200),Remaster.terrainMaterial(arena===D.maps.winter?'winter':arena===D.maps.desert?'desert':'training',2200),world,0,-5,0);apron.rotation.x=-Math.PI/2;apron.castShadow=false;
  for(let i=0;i<(isWinter?22:38);i++){const x=(rand()-.5)*(size-24),z=(rand()-.5)*(size-34);if(Math.abs(x)<15||Math.abs(z)>size*.37||obstacles.some(o=>Math.hypot(o.x-x,o.z-z)<o.r+8))continue;rock(x,z,2+rand()*3.5);}
  for(const [x,z] of [[-17,-13],[18,15],[-55,-50],[54,48]]){const g=new THREE.Group();g.position.set(x,height(x,z),z);world.add(g);box(g,9,1.5,1.4,0,.75,0,isWinter?0x8c9a9b:0x84866f);obstacle(g,x,z,4.8);}
