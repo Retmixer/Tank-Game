@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Стальной рубеж</string>
+    <string name="title_activity_main">Стальной рубеж</string>
+    <string name="package_name">ru.steel.frontier</string>
+    <string name="custom_url_scheme">ru.steel.frontier</string>
+</resources>

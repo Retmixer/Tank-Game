@@ -4,3 +4,11 @@ node_modules/
 Thumbs.db
 *.log
 work/
+
+# Capacitor/Android generated files
+node_modules/
+dist/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
