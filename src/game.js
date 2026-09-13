@@ -33,9 +33,9 @@ function buildTank(spec,team=0){return Remaster.tank(spec,team);}
 function setupScene(kind){
  if(scene){scene.traverse(o=>{if(o.geometry&&o.geometry!==boxGeo&&o.geometry!==wheelGeo&&o.geometry!==sphereGeo&&o.geometry!==holeGeo&&o.geometry!==trackGeo)o.geometry.dispose();});}
  scene=new THREE.Scene();Remaster.lighting(scene);world=new THREE.Group();scene.add(world);obstacles=[];solidMeshes=[];particles=[];bullets=[];trackMarks=[];
- scene.background=new THREE.Color(kind==='garage'?0x182830:D.maps[kind].sky);scene.fog=new THREE.FogExp2(kind==='garage'?0x182830:D.maps[kind].fog,kind==='garage'?.012:.0013);
- const hemi=new THREE.HemisphereLight(kind==='garage'?0xc4e8ef:0xe2eeff,kind==='garage'?0x364237:0x655c43,kind==='garage'?1.8:1.15);scene.add(hemi);
- const sun=new THREE.DirectionalLight(kind==='garage'?0xffd9a0:0xffecc9,kind==='garage'?3.4:2.6);sun.position.set(-35,65,40);sun.castShadow=true;sun.shadow.mapSize.set(4096,4096);sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;sun.shadow.camera.far=400;sun.shadow.bias=-.0006;sun.shadow.normalBias=.08;scene.add(sun);scene.userData.sun=sun;scene.add(sun.target);if(kind!=='garage')Remaster.sky(scene,kind);const rim=new THREE.DirectionalLight(0xb0d6ff,.65);rim.position.set(40,18,-30);scene.add(rim);
+ scene.background=new THREE.Color(kind==='garage'?0x8ca39f:D.maps[kind].sky);scene.fog=new THREE.FogExp2(kind==='garage'?0x8ca39f:D.maps[kind].fog,kind==='garage'?.004:.0013);
+ const hemi=new THREE.HemisphereLight(kind==='garage'?0xe8f5ef:0xe2eeff,kind==='garage'?0x59645f:0x655c43,kind==='garage'?2.35:1.15);scene.add(hemi);
+ const sun=new THREE.DirectionalLight(kind==='garage'?0xfff0c7:0xffecc9,kind==='garage'?4.6:2.6);sun.position.set(-35,65,40);sun.castShadow=true;sun.shadow.mapSize.set(4096,4096);sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;sun.shadow.camera.far=400;sun.shadow.bias=-.0006;sun.shadow.normalBias=.08;scene.add(sun);scene.userData.sun=sun;scene.add(sun.target);if(kind!=='garage')Remaster.sky(scene,kind);const rim=new THREE.DirectionalLight(0xb0d6ff,.65);rim.position.set(40,18,-30);scene.add(rim);
 }
 function buildHangarSet(){
  const steel=0x4a5b60,dark=0x18252b,warning=0xd0a95e,concrete=0x35444a,orange=0xb8663f;
@@ -81,8 +81,8 @@ function buildHangarSet(){
 }
 function hangar(){
  state='garage';paused=false;aiming=false;viewPitch=0;viewYaw=0;countdown=0;countdownClock=null;aimHit=null;Platform.gameplay(false);$('hud').hidden=true;$('garage').hidden=false;$('modal').hidden=true;$('scoreboard').hidden=true;document.exitPointerLock?.();markers.clear();$('markers').innerHTML='';setupScene('garage');
- const floor=box(world,160,.4,160,0,-.4,0,0x28343a);floor.receiveShadow=true;
- const pad=cyl(world,7.5,7.6,.2,0,-.03,0,0x39464a,64);const ring=mesh(new THREE.TorusGeometry(7.25,.025,4,80),mat(0xc0ae7e),world,0,.09,0);ring.rotation.x=Math.PI/2;
+ const floor=box(world,160,.4,160,0,-.4,0,0x727975);floor.receiveShadow=true;
+ const pad=cyl(world,7.5,7.6,.2,0,-.03,0,0x858a82,64);const ring=mesh(new THREE.TorusGeometry(7.25,.025,4,80),mat(0xc0ae7e),world,0,.09,0);ring.rotation.x=Math.PI/2;
  const grid=new THREE.GridHelper(100,40,0x516267,0x37474d);grid.position.y=-.18;world.add(grid);
  for(let i=-3;i<=3;i++){box(world,.04,.02,12,i*2,.08,0,0x556368);}
  buildHangarSet();
@@ -91,7 +91,21 @@ function hangar(){
  box(world,40,15,.6,0,6,-28,0x26383e);
  for(let x=-15;x<=15;x+=6){box(world,4.7,3,.15,x,9,-27.6,0x9ba8a3);box(world,4.7,.08,.18,x,9,-27.4,0x2e4249);}
  const r=D.rng(81);for(let i=0;i<22;i++){let x=(r()-.5)*33,z=-9-r()*16;box(world,1.2+r(),.8+r(),1.2,x,.5,z,0x4d574b);}
- const light=new THREE.PointLight(0x8fdbe0,45,25);light.position.set(6,7,-4);scene.add(light);preview=buildTank(D.stats(chosen(),save.levels[save.selected]));world.add(preview.group);preview.group.rotation.y=-.45;
+ const light=new THREE.PointLight(0x8fdbe0,45,25);light.position.set(6,7,-4);scene.add(light);
+ // Bright clerestory glazing and a wide loading door create the open industrial feel.
+ const glass=new THREE.MeshStandardMaterial({color:0xcde1dc,roughness:.2,metalness:.05,transparent:true,opacity:.72,side:THREE.DoubleSide});
+ for(let x=-16;x<=16;x+=4){const pane=new THREE.Mesh(new THREE.BoxGeometry(3.55,2.2,.08),glass);pane.position.set(x,9.8,-27.55);world.add(pane);box(world,.1,2.45,.16,x-1.87,9.8,-27.48,0x4a5b60);}
+ const outside=new THREE.Mesh(new THREE.PlaneGeometry(12,7),new THREE.MeshBasicMaterial({color:0xc9dfc5}));outside.position.set(-11,4,-27.4);world.add(outside);for(const x of [-17,-5])box(world,.35,8,.45,x,4,-27.1,0x4a5b60);box(world,12,.35,.45,-11,8,-27.1,0x4a5b60);
+ // Long service pits with removable steel grates.
+ for(const x of [-5.2,5.2]){box(world,1.05,.035,13,x,.13,0,0x171f21);for(let z=-6;z<=6;z+=.55)box(world,.98,.045,.08,x,.18,z,0x6e7978);}
+ // Thick pneumatic hoses are laid on the floor around the repair point.
+ const hoseMat=new THREE.MeshStandardMaterial({color:0x22292a,roughness:.78});
+ for(const side of [-1,1]){const curve=new THREE.CatmullRomCurve3([new V(side*2.4,.2,1.2),new V(side*5,.2,2.6),new V(side*7,.2,1.2),new V(side*5.2,.2,-1.6),new V(side*3.2,.2,-1.1)]);const hose=new THREE.Mesh(new THREE.TubeGeometry(curve,38,.075,8,false),hoseMat);hose.castShadow=true;world.add(hose);}
+ // Red tool cabinets, workbench and spare wheels.
+ for(const x of [-15,-11,11,15]){box(world,2.6,2.4,.42,x,1.35,-25.6,0x8f3e35);box(world,2.1,.06,.05,x,1.92,-25.36,0xd0a95e);for(let j=0;j<3;j++)cyl(world,.055,.055,.22,x-.55+j*.55,1.55,-25.34,0x252a2c,10).rotation.x=Math.PI/2;}
+ box(world,6,.22,1.1,0,1.05,-24.5,0x566568);box(world,6,1.2,.18,0,1.6,-24.95,0x39494d);
+ for(const x of [-7,7]){const reel=cyl(world,.7,.7,.28,x,.9,-11,0x384348,24);reel.rotation.z=Math.PI/2;for(let i=0;i<3;i++){const spoke=box(world,.08,1.2,.08,x,.9,-11,0xd0a95e);spoke.rotation.z=i*Math.PI/3;}}
+ preview=buildTank(D.stats(chosen(),save.levels[save.selected]));world.add(preview.group);preview.group.rotation.y=-.45;
  // Reset the battle lens after an aimed shot. Otherwise the garage inherits the
  // low FOV and close camera distance from the previous match.
  camera.fov=45;camera.zoom=1;camera.near=.15;camera.far=2400;camera.updateProjectionMatrix();
