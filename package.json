@@ -1,0 +1,16 @@
+{
+  "name": "steel-frontier",
+  "private": true,
+  "version": "0.3.0",
+  "scripts": {
+    "test": "node tests/collection.cjs && node tests/economy.cjs && node tests/models.cjs && node tests/simulation.cjs",
+    "mobile:add": "npx cap add android",
+    "mobile:sync": "npx cap copy",
+    "mobile:open": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3"
+  }
+}

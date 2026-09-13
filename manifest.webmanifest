@@ -1,0 +1,11 @@
+{
+  "name": "Стальной рубеж",
+  "short_name": "Стальной рубеж",
+  "lang": "ru",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#101a20",
+  "theme_color": "#101a20",
+  "icons": []
+}

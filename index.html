@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101a20"><title>Стальной рубеж — танковые сражения</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="src/enhancements.css"><link rel="stylesheet" href="src/remaster.css"><link rel="stylesheet" href="src/release-ui.css"><link rel="stylesheet" href="src/hangar-ui.css"></head>
 <body>
 <canvas id="world" aria-label="Трёхмерная игровая сцена"></canvas>
@@ -19,4 +19,5 @@
 <div id="countdown" hidden><small>ПОДГОТОВКА К БОЮ</small><b id="countNumber">5</b><span>Команды занимают позиции</span></div><div id="scoreboard" class="overlay" hidden><div class="dialog"><div class="eyebrow">СОСТАВ КОМАНД</div><h2>Боевой порядок</h2><div id="teamList"></div><p class="muted">Отпустите Tab, чтобы вернуться в бой.</p></div></div>
 <div id="modal" class="overlay" hidden><section class="dialog" id="modalContent"></section></div><div id="toast" role="status"></div>
 <script src="vendor/three.min.js"></script><script src="src/data.js"></script><script src="src/platform.js"></script><script src="src/remaster.js"></script><script src="src/game.js"></script>
+<div id="mobileControls" aria-label="Сенсорное управление"><div class="mobile-stick"><button data-touch-key="KeyW">▲</button><div><button data-touch-key="KeyA">◀</button><button data-touch-key="KeyS">▼</button><button data-touch-key="KeyD">▶</button></div></div><div class="mobile-actions"><button id="touchAim">ОПТИКА</button><button id="touchFire">ОГОНЬ</button></div></div>
 </body></html>

@@ -1,0 +1,7 @@
+{
+  "appId": "ru.steel.frontier",
+  "appName": "Стальной рубеж",
+  "webDir": ".",
+  "server": { "androidScheme": "https" },
+  "android": { "backgroundColor": "#101a20" }
+}
