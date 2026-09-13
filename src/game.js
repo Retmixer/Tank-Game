@@ -55,6 +55,29 @@ function buildHangarSet(){
  for(const side of [-1,1]){box(world,.32,1.5,.45,side*5.8,.75,3.8,steel);box(world,1.4,.15,.7,side*5.8,1.52,3.8,warning);box(world,.7,.22,.45,side*5.8,.18,4.8,orange);}
  // Ceiling lamps cast a warm industrial pool over the selected tank.
  for(const x of [-10,0,10]){const fixture=box(world,2.2,.12,.65,x,11.2,-2,0x263b40);const lamp=new THREE.PointLight(0xffd49a,18,18);lamp.position.set(x,10.9,-2);scene.add(lamp);fixture.receiveShadow=false;}
+ // A second maintenance line adds depth behind the presentation platform.
+ for(const z of [-23,-19,-15]){
+  box(world,34,.12,.12,0,.12,z,0x91a19d);
+  for(const x of [-16,-12,-8,8,12,16]){const mark=box(world,.09,.03,1.25,x,.16,z,warning);mark.rotation.y=(x%8?-.2:.2);}
+ }
+ // Ventilation ducts with inspection hatches.
+ for(const x of [-12,12]){
+  const duct=cyl(world,1.15,1.15,28,x,9.9,-19,0x3b4d53,20);duct.rotation.z=Math.PI/2;
+  for(let z=-30;z<=-8;z+=4){const hatch=cyl(world,1.25,1.25,.06,x,9.9,z,0x66777a,20);hatch.rotation.z=Math.PI/2;}
+ }
+ // Welding screens, warning chevrons and hanging service cables.
+ for(const x of [-28,28]){
+  box(world,.16,4.4,7,x,2.35,-18,0x27383e);
+  for(let z=-20;z<=-16;z+=1.2){const stripe=box(world,.04,.42,.9,x+(x>0?-.1:.1),z*.0+2.2,z,warning);stripe.rotation.y=x>0?.55:-.55;}
+  for(let i=0;i<4;i++){const cable=cyl(world,.025,.025,4.5,x+(i-1.5)*.45,6.3,-12,0x151e21,8);cable.rotation.z=.12*(i-1.5);}
+ }
+ // Wheel chocks, oil drums and a pallet of spare road wheels.
+ for(const x of [-7,7]){
+  for(const z of [-10,-7]){const drum=cyl(world,.5,.5,1.05,x,.55,z,0x5d6870,20);drum.rotation.x=Math.PI/2;box(world,.62,.06,.08,x,.95,z,warning);}
+  for(let i=0;i<3;i++){const wheel=cyl(world,.55,.55,.18,x+i*.72-1,.25,-4,0x252b2c,20);wheel.rotation.z=Math.PI/2;const hub=cyl(world,.2,.2,.2,x+i*.72-1,.25,-4,steel,16);hub.rotation.z=Math.PI/2;}
+ }
+ // Small technical display plaques facing the camera.
+ for(const x of [-15,15]){box(world,3.2,1.8,.12,x,3.2,-26.9,0x1b2c32);box(world,2.7,.06,.03,x,3.75,-26.82,warning);for(let j=0;j<4;j++)box(world,.18,.18,.03,x-1+j*.65,3.28,-26.82,j%2?0x80d1c1:0xd05f48);}
 }
 function hangar(){
  state='garage';paused=false;aiming=false;viewPitch=0;viewYaw=0;countdown=0;countdownClock=null;aimHit=null;Platform.gameplay(false);$('hud').hidden=true;$('garage').hidden=false;$('modal').hidden=true;$('scoreboard').hidden=true;document.exitPointerLock?.();markers.clear();$('markers').innerHTML='';setupScene('garage');
