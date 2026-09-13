@@ -21,20 +21,32 @@
  function cylinder(p,a,b,h,x,y,z,m,n=32){return mesh(new T.CylinderGeometry(a,b,h,n),m,p,x,y,z);}
  function plate(p,w,h,d,x,y,z,m,bevel=.08){const shape=new T.Shape(),a=w/2,b=d/2,k=Math.min(bevel,w/5,d/5);shape.moveTo(-a+k,-b);shape.lineTo(a-k,-b);shape.lineTo(a,-b+k);shape.lineTo(a,b-k);shape.lineTo(a-k,b);shape.lineTo(-a+k,b);shape.lineTo(-a,b-k);shape.lineTo(-a,-b+k);shape.closePath();const g=new T.ExtrudeGeometry(shape,{depth:h,bevelEnabled:true,bevelSize:k*.4,bevelThickness:k*.4,bevelSegments:2,steps:1});g.rotateX(-Math.PI/2);g.translate(0,-h/2,0);return mesh(g,m,p,x,y,z);}
  function batch(parent,exclude=[],recursive=false){parent.updateMatrixWorld(true);const groups=new Map(),inv=parent.matrixWorld.clone().invert(),objects=[];if(recursive)parent.traverse(o=>{if(o.isMesh)objects.push(o);});else objects.push(...parent.children);for(const o of objects){if(!o.isMesh||exclude.includes(o)||o.material.customProgramCacheKey?.().startsWith('terrain'))continue;const key=o.material.uuid+'|'+(o.userData.zone||'')+'|'+o.castShadow;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(o);}for(const list of groups.values()){if(list.length<2)continue;const arrays={position:[],normal:[],uv:[]};for(const o of list){const g=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();g.applyMatrix4(new T.Matrix4().multiplyMatrices(inv,o.matrixWorld));for(const k of Object.keys(arrays))if(g.attributes[k])g.attributes[k].array.forEach(value=>arrays[k].push(value));else if(k==='uv')for(let j=0;j<g.attributes.position.count*2;j++)arrays.uv.push(0);g.dispose();}const g=new T.BufferGeometry();for(const k of Object.keys(arrays))g.setAttribute(k,new T.Float32BufferAttribute(arrays[k],k==='uv'?2:3));const o=mesh(g,list[0].material,parent);o.userData={...list[0].userData};o.castShadow=list[0].castShadow;list.forEach(v=>v.parent.remove(v));}}
+ // Each vehicle has its own proportions, turret construction and running gear.
+ const designs={
+  '0-0':{w:2.45,l:4.3,h:.38,slope:.3,wheels:5,skirts:0,gun:2.35,z:.38,shape:'scout'},
+  '0-1':{w:3.1,l:5.55,h:.52,slope:.18,wheels:5,skirts:0,gun:3.65,z:.18,shape:'cast'},
+  '0-2':{w:3.6,l:6.4,h:.64,slope:.27,wheels:6,skirts:3,gun:4.35,z:.05,shape:'pike'},
+  '1-0':{w:2.6,l:4.65,h:.58,slope:.06,wheels:6,skirts:0,gun:2.7,z:.2,shape:'polygon'},
+  '1-1':{w:3.25,l:5.9,h:.55,slope:.32,wheels:8,skirts:5,gun:4.15,z:-.1,shape:'wedge'},
+  '1-2':{w:3.75,l:6.65,h:.76,slope:0,wheels:9,skirts:4,gun:4.65,z:.05,shape:'box'},
+  '2-0':{w:2.35,l:4.5,h:.35,slope:.25,wheels:4,skirts:0,gun:3.1,z:-.35,shape:'oscillating'},
+  '2-1':{w:2.95,l:5.65,h:.46,slope:.22,wheels:6,skirts:2,gun:3.9,z:-.25,shape:'bustle'},
+  '2-2':{w:3.45,l:6.9,h:.7,slope:.09,wheels:8,skirts:6,gun:3.45,z:.48,shape:'fortress'}
+ };
  function tank(spec,team=0){
   const group=new T.Group(),turret=new T.Group(),gunPivot=new T.Group(),wheels=[],hitMeshes=[];
-  const width=[2.65,3.1,3.55][spec.c],length=[4.65,5.45,6.2][spec.c],paint=material(spec.color),dark=material(0x303839),steel=material(0x69716a),rubber=material(0x252927,'rubber'),rust=material(0x70614a),glass=new T.MeshStandardMaterial({color:0x284650,metalness:.75,roughness:.13});
+  const design=designs[spec.id]||designs[`${spec.n}-${spec.c}`],width=design.w,length=design.l,paint=material(spec.color),dark=material(0x303839),steel=material(0x69716a),rubber=material(0x252927,'rubber'),rust=material(0x70614a),glass=new T.MeshStandardMaterial({color:0x284650,metalness:.75,roughness:.13});
   const hull=plate(group,width,.69,length,0,1.01,0,paint,.24);hull.userData.zone='hull';
-  const upper=plate(group,width*.91,.52,length*.77,0,1.5,-.15,paint,.27);upper.rotation.x=-.12;upper.userData.zone='hull';
+  const upper=plate(group,width*.91,design.h,length*.77,0,1.5,-.15,paint,design.shape==='box'?.06:.27);upper.rotation.x=-design.slope;upper.userData.zone='hull';
   const nose=box(group,width*.9,.12,1.32,0,1.49,length*.35,paint);nose.rotation.x=.48;nose.userData.zone='hull';
   const belly=box(group,width*.88,.35,.16,0,.85,length*.5,paint);belly.rotation.x=-.32;belly.userData.zone='hull';
   for(const s of [-1,1]){
    const sx=s*width*.5;
-   for(let j=0;j<7;j++){const z=-length*.39+j*length*.13,wheel=new T.Group();wheel.position.set(s*(width*.5+.05),.64,z);group.add(wheel);const tyre=cylinder(wheel,.45,.45,.49,0,0,0,rubber);tyre.rotation.z=Math.PI/2;const rim=cylinder(wheel,.335,.335,.52,0,0,0,paint);rim.rotation.z=Math.PI/2;const hub=cylinder(wheel,.105,.105,.57,0,0,0,steel);hub.rotation.z=Math.PI/2;for(let n=0;n<6;n++){const a=n*Math.PI/3,b=mesh(boltGeo,steel,wheel,s*.29,Math.sin(a)*.23,Math.cos(a)*.23);b.rotation.z=Math.PI/2;}batch(wheel);wheels.push(wheel);}
+   for(let j=0;j<design.wheels;j++){const z=-length*.39+j*length*.78/(design.wheels-1),wheel=new T.Group();wheel.position.set(s*(width*.5+.05),.64,z);group.add(wheel);const radius=design.wheels<=5?.49:design.wheels>=8?.38:.44;const tyre=cylinder(wheel,radius,radius,.49,0,0,0,rubber);tyre.rotation.z=Math.PI/2;const rim=cylinder(wheel,radius*.75,radius*.75,.52,0,0,0,paint);rim.rotation.z=Math.PI/2;const hub=cylinder(wheel,.105,.105,.57,0,0,0,steel);hub.rotation.z=Math.PI/2;for(let n=0;n<6;n++){const a=n*Math.PI/3,b=mesh(boltGeo,steel,wheel,s*.29,Math.sin(a)*.23,Math.cos(a)*.23);b.rotation.z=Math.PI/2;}batch(wheel);wheels.push(wheel);}
    const trackPath=[];for(let j=0;j<22;j++)trackPath.push({y:.13,z:-length*.41+j*length*.82/21,a:0});for(let j=0;j<10;j++){const a=-Math.PI/2+j*Math.PI/9;trackPath.push({y:.65+Math.sin(a)*.52,z:length*.41+Math.cos(a)*.52,a:-a-Math.PI/2});}for(let j=0;j<22;j++)trackPath.push({y:1.17,z:length*.41-j*length*.82/21,a:0});for(let j=0;j<10;j++){const a=Math.PI/2+j*Math.PI/9;trackPath.push({y:.65+Math.sin(a)*.52,z:-length*.41+Math.cos(a)*.52,a:-a-Math.PI/2});}
    for(const p of trackPath){const link=box(group,.68,.095,.22,sx,p.y,p.z,dark);link.rotation.x=p.a;const cleat=box(group,.53,.03,.06,sx,p.y+.045,p.z,steel);cleat.rotation.x=p.a;}
    plate(group,.87,.1,length+.42,sx,1.3,0,paint,.06);
-   for(let j=0;j<4;j++){const z=-length*.32+j*length*.21,skirt=plate(group,.08,.48,length*.195,s*(width*.5+.43),1.08,z,paint,.015);skirt.userData.zone='tracks';for(let k of [-.28,.28]){const b=mesh(boltGeo,steel,group,s*(width*.5+.49),1.25,z+k);b.rotation.z=Math.PI/2;}}
+   for(let j=0;j<design.skirts;j++){const z=-length*.4+(j+.5)*length*.8/design.skirts,skirt=plate(group,.08,design.shape==='fortress'?.85:.48,length*.76/design.skirts,s*(width*.5+.43),1.08,z,paint,.015);skirt.userData.zone='tracks';for(let k of [-.28,.28]){const b=mesh(boltGeo,steel,group,s*(width*.5+.49),1.25,z+k);b.rotation.z=Math.PI/2;}}
    for(let j=0;j<3;j++)plate(group,.5,.28,.63,sx,1.5,-length*.26+j*.72,paint,.035);
    const tow=new T.Mesh(new T.TorusGeometry(.13,.04,8,20),steel);tow.position.set(s*width*.33,.95,length*.51);group.add(tow);
    const lamp=cylinder(group,.125,.125,.14,s*width*.34,1.54,length*.4,steel);lamp.rotation.x=Math.PI/2;const lens=cylinder(group,.095,.095,.015,s*width*.34,1.54,length*.4+.08,new T.MeshStandardMaterial({color:0xf8deb0,emissive:0xd9b36b,emissiveIntensity:.6}));lens.rotation.x=Math.PI/2;
@@ -43,8 +55,19 @@
   for(let j=0;j<2;j++){const pipe=cylinder(group,.105,.105,.9,(j?1:-1)*width*.3,1.36,-length*.5,steel);pipe.rotation.x=Math.PI/2;const cap=cylinder(group,.08,.08,.01,(j?1:-1)*width*.3,1.36,-length*.58,rubber);cap.rotation.x=Math.PI/2;}
   const cableCurve=new T.CatmullRomCurve3([new V(-width*.34,1.83,-length*.25),new V(-width*.42,1.86,-length*.36),new V(0,1.85,-length*.4),new V(width*.4,1.82,-length*.28)]);mesh(new T.TubeGeometry(cableCurve,32,.026,6,false),steel,group);
   const shovel=box(group,.1,.065,1.3,width*.32,1.86,-.75,rust);const spade=plate(group,.25,.04,.35,width*.32,1.87,-1.47,dark,.04);
-  turret.position.set(0,1.77,.04);group.add(turret);cylinder(turret,width*.32,width*.33,.16,0,0,0,dark,48);
-  let shell;if(spec.n===0){shell=mesh(new T.SphereGeometry(1,40,22),paint,turret,0,.37,-.08);shell.scale.set(width*.37,.55,length*.23);}else{shell=plate(turret,width*.73,.72,length*.4,0,.42,-.13,paint,spec.n===1?.28:.4);shell.rotation.x=spec.n===2?-.09:0;}shell.userData.zone='turret';
+  turret.position.set(0,1.77,design.z);group.add(turret);cylinder(turret,width*.32,width*.33,.16,0,0,0,dark,48);
+  let shell;
+  switch(design.shape){
+   case 'scout': shell=cylinder(turret,.61,.85,.82,0,.4,0,paint,12);break;
+   case 'cast': shell=mesh(new T.SphereGeometry(1,40,22),paint,turret,0,.35,-.12);shell.scale.set(width*.37,.55,1.25);break;
+   case 'pike': shell=mesh(new T.SphereGeometry(1,32,18),paint,turret,0,.32,-.18);shell.scale.set(1.55,.65,1.42);for(const s of [-1,1]){const cheek=plate(group,width*.48,.2,1.9,s*width*.23,1.65,length*.31,paint,.1);cheek.rotation.set(.36,0,s*.2);cheek.userData.zone='hull';}break;
+   case 'polygon': shell=cylinder(turret,.82,1,.9,0,.43,-.1,paint,6);break;
+   case 'wedge': shell=plate(turret,2.25,.85,2.7,0,.4,-.25,paint,.42);shell.rotation.x=-.2;break;
+   case 'box': shell=plate(turret,2.75,1.05,2.8,0,.48,-.2,paint,.05);break;
+   case 'oscillating': shell=plate(turret,1.45,.48,1.9,0,.63,-.12,paint,.3);shell.rotation.x=-.16;for(const s of [-1,1]){const pivot=cylinder(turret,.27,.27,.18,s*.75,.5,0,steel,24);pivot.rotation.z=Math.PI/2;}break;
+   case 'bustle': shell=plate(turret,2.05,.72,2.2,0,.44,.02,paint,.35);plate(turret,1.85,.68,1.45,0,.52,-1.35,paint,.16).userData.zone='turret';break;
+   case 'fortress': shell=cylinder(turret,1.1,1.4,1.05,0,.5,-.1,paint,10);plate(turret,2.25,.5,1.1,0,.37,-1.25,paint,.12).userData.zone='turret';break;
+  }shell.userData.zone='turret';
   const roof=plate(turret,width*.49,.08,length*.26,0,.84,-.14,paint,.14);roof.userData.zone='roof';
   cylinder(turret,.31,.34,.13,-.35,.93,-.29,paint,40);cylinder(turret,.23,.23,.07,-.35,1.03,-.29,steel,32);box(turret,.21,.04,.035,-.35,1.09,-.29,dark);
   for(let j=0;j<5;j++){const a=j*Math.PI*2/5;box(turret,.1,.06,.07,-.35+Math.sin(a)*.25,1.04,-.29+Math.cos(a)*.25,glass);}
@@ -52,11 +75,21 @@
   const antenna=cylinder(turret,.009,.018,1.55,width*.22,1.38,-.62,dark,8);antenna.rotation.z=-.1;cylinder(turret,.05,.07,.18,width*.22,.83,-.62,rubber,12);
   const coax=cylinder(turret,.035,.045,.4,.43,.43,.87,dark,16);coax.rotation.x=Math.PI/2;
   gunPivot.position.set(0,.37,.63);turret.add(gunPivot);const mantle=plate(gunPivot,.84,.56,.46,0,0,.14,paint,.13);mantle.userData.zone='turret';
-  const barrelLength=[2.95,3.55,4.15][spec.c];for(let j=0;j<3;j++){const len=barrelLength/3,r=.112+spec.c*.023+(2-j)*.015,barrel=cylinder(gunPivot,r,r+.012,len,0,0,.37+len*(j+.5),steel,32);barrel.rotation.x=Math.PI/2;}
+  const barrelLength=design.gun;for(let j=0;j<3;j++){const len=barrelLength/3,r=.112+spec.c*.023+(2-j)*.015,barrel=cylinder(gunPivot,r,r+.012,len,0,0,.37+len*(j+.5),steel,32);barrel.rotation.x=Math.PI/2;}
   for(let z of [.6,barrelLength*.55,barrelLength*.8]){const collar=cylinder(gunPivot,.165+spec.c*.018,.165+spec.c*.018,.09,0,0,z,dark,32);collar.rotation.x=Math.PI/2;}
   const brake=plate(gunPivot,.34+spec.c*.035,.28,.48,0,0,barrelLength+.34,dark,.04);for(let s of [-1,1])for(let j=0;j<3;j++)box(gunPivot,.012,.12,.055,s*(.175+spec.c*.018),0,barrelLength+.2+j*.11,rubber);
   const bore=cylinder(gunPivot,.092+spec.c*.02,.092+spec.c*.02,.012,0,0,barrelLength+.59,rubber,24);bore.rotation.x=Math.PI/2;
   const decal=document.createElement('canvas');decal.width=256;decal.height=128;const dc=decal.getContext('2d');dc.fillStyle='#e5e3d1';dc.font='bold 72px sans-serif';dc.textAlign='center';dc.fillText(`${spec.n+1}${spec.c+1}7`,128,87);const dt=new T.CanvasTexture(decal),dm=new T.MeshBasicMaterial({map:dt,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2});for(let side of [-1,1]){const marking=mesh(new T.PlaneGeometry(.69,.34),dm,turret,side*width*.365,.46,-.18);marking.rotation.y=side*Math.PI/2;marking.castShadow=false;}
+  // Signature equipment remains attached to the appropriate rotating assembly.
+  if(design.shape==='scout'){box(group,1.2,.3,.6,0,1.9,-1.45,rust);}
+  if(design.shape==='cast'||design.shape==='pike')for(const s of [-1,1]){const drum=cylinder(group,.27,.27,1.3,s*width*.4,1.75,-length*.34,rust);drum.rotation.x=Math.PI/2;}
+  if(design.shape==='polygon'){const frame=new T.Mesh(new T.TorusGeometry(.95,.025,6,24),steel);frame.rotation.x=Math.PI/2;frame.position.y=1.35;turret.add(frame);for(const s of [-1,1])box(turret,.035,.5,.035,s*.8,1.1,0,steel);}
+  if(design.shape==='wedge')for(const s of [-1,1])for(let j=0;j<5;j++)box(turret,.12,.26,.24,s*1.12,.63,-.6+j*.28,dark);
+  if(design.shape==='box'){for(const s of [-1,1]){cylinder(group,.17,.2,1.25,s*.8,1.8,-length*.48,rust);box(turret,.15,.65,1.45,s*1.42,.45,-.25,dark);}}
+  if(design.shape==='oscillating'){for(const s of [-1,1])plate(turret,.46,.48,1.25,s*.52,.66,-1.12,paint,.18);}
+  if(design.shape==='bustle'){for(let j=0;j<6;j++)box(turret,.045,.5,.04,-.88+j*.35,.78,-2.08,steel);box(turret,1.85,.04,.55,0,.52,-1.85,steel);}
+  if(design.shape==='fortress'){plate(group,1.55,.5,1.2,0,2,-length*.33,paint,.2);for(const s of [-1,1])box(group,.32,.35,length*.65,s*width*.45,1.74,0,steel);}
+  group.userData.design=design.shape;
   batch(group,wheels);batch(turret);batch(gunPivot);group.traverse(o=>{if(o.isMesh&&!o.material.transparent){hitMeshes.push(o);o.userData.originalMaterial=o.material;}});
   return {group,turret,gunPivot,barrelLength,wheels,hitMeshes,width,length,holes:[],effectClock:0,markClock:0};
  }
