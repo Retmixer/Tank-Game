@@ -19,7 +19,6 @@
   }
   if(kind==='road'){
    for(let i=0;i<4500;i++){x.fillStyle=i%2?'rgba(35,32,27,.18)':'rgba(250,241,220,.22)';x.beginPath();x.arc(r()*512,r()*512,1+r()*2,0,Math.PI*2);x.fill();}
-   for(const a of [95,355]){x.fillStyle='rgba(53,48,38,.12)';x.fillRect(a,0,48,512);for(let y=0;y<512;y+=13){x.fillStyle='rgba(40,38,30,.17)';x.fillRect(a,y,48,3);}}
   }
   if(kind==='ice'){
    x.fillStyle='rgba(112,156,177,.3)';x.fillRect(0,0,512,512);

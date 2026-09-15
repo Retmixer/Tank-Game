@@ -200,7 +200,7 @@ function buildBackdrop(){const size=arena.size,isWinter=arena===D.maps.winter,is
  }else{for(let side of [-1,1])for(let i=-7;i<=7;i++){const x=i*24+(rand()-.5)*10,z=side*(far+rand()*20),h=5+rand()*14;box(world,9+rand()*13,h,8,x,h/2-2,z,0x8e795b);if(i%4===0)cyl(world,1.2,1.8,h+11,x+5,(h+11)/2-2,z,0x9c8968,10);}}
  if(arena===D.maps.training){for(let i=-5;i<=5;i++){const x=i*22,z=far*.94+(i%2)*8,w=8+rand()*5,h=5+rand()*5;box(world,w,h,7,x,h/2-1,z,0x777867);box(world,w+.4,.5,7.4,x,h,z,0x4e5549);}}
 }
-function scatterProps(){const isWinter=arena===D.maps.winter,isDesert=arena===D.maps.desert;for(let i=0;i<26;i++){const x=(rand()-.5)*(arena.size-30),z=(rand()-.5)*(arena.size-30);if(Math.abs(x)<15||obstacles.some(o=>Math.hypot(o.x-x,o.z-z)<o.r+3))continue;const g=new THREE.Group();g.position.set(x,height(x,z),z);world.add(g);if(i%3===0){for(let k=0;k<3;k++){const b=cyl(g,.32,.32,.8,(k-1)*.7,.4,0,isDesert?0x756241:0x5c6868,12);b.rotation.z=k===2?Math.PI/2:0;}}else if(i%3===1){box(g,2.2,.85,1.2,0,.43,0,isWinter?0x6b7675:0x746d50);box(g,1.9,.12,1.25,0,.9,0,0x424b44);}else{for(let k=-2;k<=2;k++)box(g,.12,1.4,.12,k*.65,.7,0,0x545a50);box(g,3.1,.12,.12,0,.9,0,0x545a50);}}
+function scatterProps(){const isWinter=arena===D.maps.winter,isDesert=arena===D.maps.desert;for(let i=0;i<26;i++){const x=(rand()-.5)*(arena.size-30),z=(rand()-.5)*(arena.size-30);if(Math.abs(x)<15||obstacles.some(o=>Math.hypot(o.x-x,o.z-z)<o.r+3))continue;const g=new THREE.Group();g.position.set(x,height(x,z),z);world.add(g);if(i%3===0){for(let k=0;k<3;k++){const b=cyl(g,.32,.32,.8,(k-1)*.7,.4,0,isDesert?0x756241:0x5c6868,12);b.rotation.z=k===2?Math.PI/2:0;}}else if(i%3===1){box(g,2.2,.85,1.2,0,.43,0,isWinter?0x6b7675:0x746d50);box(g,1.9,.12,1.25,0,.9,0,0x424b44);obstacle(g,x,z,1.4);}else{for(let k=-2;k<=2;k++)box(g,.12,1.4,.12,k*.65,.7,0,0x545a50);box(g,3.1,.12,.12,0,.9,0,0x545a50);}}
 }
 function naturalBoundary(){
  const edge=arena.size*.468,stone=mat(arena===D.maps.desert?0x92785b:arena===D.maps.winter?0x7f9299:0x68746b),step=26,shared=new THREE.IcosahedronGeometry(1,1);
@@ -225,7 +225,7 @@ function buildDistricts(){
    const [ax,az]=points[p],[bx,bz]=points[p+1],len=Math.hypot(bx-ax,bz-az),n=Math.ceil(len/2),bands=Math.ceil(width/2),nx=-(bz-az)/len,nz=(bx-ax)/len;
    for(let i=0;i<n;i++)for(let j=0;j<bands;j++){
     const lo=j/bands*2-1,hi=(j+1)/bands*2-1,start=vertices.length/3;
-    for(const [t,s] of [[i/n,lo],[i/n,hi],[(i+1)/n,lo],[(i+1)/n,hi]]){const x=ax+(bx-ax)*t+nx*width*s/2,z=az+(bz-az)*t+nz*width*s/2;vertices.push(x,height(x,z)+.16,z);uv.push(s<0?0:width/8,(p*len+t*len)/8);}
+    for(const [t,s] of [[i/n,lo],[i/n,hi],[(i+1)/n,lo],[(i+1)/n,hi]]){const x=ax+(bx-ax)*t+nx*width*s/2,z=az+(bz-az)*t+nz*width*s/2;vertices.push(x,height(x,z)+.16,z);uv.push(x/8,z/8);}
     indices.push(start,start+1,start+2,start+1,start+3,start+2);
    }
   }
@@ -233,7 +233,7 @@ function buildDistricts(){
   const road=mesh(geo,Remaster.material(kind==='ice'?0x96b5c1:desert?0x9c896e:winter?0x686f72:0xaaa38b,kind==='ice'?'ice':'road'),decor);road.castShadow=false;
  }
  function tower(x,z){const g=new THREE.Group();g.position.set(x,footprintSupport(x,z,5,5).low,z);decor.add(g);for(const a of [-1,1])for(const b of [-1,1]){const leg=box(g,.35,10,.35,a*2,5,b*2,0x55635c);leg.material=steel;}box(g,5,.4,5,0,9,0,0x666b5b);box(g,5,1,.2,0,10,2.4,0x717566);box(g,5,1,.2,0,10,-2.4,0x717566);box(g,5.6,.35,5.6,0,12,0,0x505b55);for(let y=0;y<9;y+=.6){const step=box(g,1,.1,.25,2,y,0,0x666c60);step.material=steel;}}
- function supplies(x,z){const g=new THREE.Group();g.position.set(x,footprintSupport(x+1.3,z,5,1.8).low,z);decor.add(g);for(let j=0;j<4;j++){const c=box(g,2.4,1.5,1.8,(j%2)*2.6,.75+Math.floor(j/2)*1.5,0,0x736c50);c.material=wood;for(const dx of [-.9,.9]){const strap=box(g,.12,1.55,1.85,(j%2)*2.6+dx,.75+Math.floor(j/2)*1.5,0,0x414d47);strap.material=steel;}}}
+ function supplies(x,z){const g=new THREE.Group();g.position.set(x,footprintSupport(x+1.3,z,5,1.8).low,z);decor.add(g);for(let j=0;j<4;j++){const c=box(g,2.4,1.5,1.8,(j%2)*2.6,.75+Math.floor(j/2)*1.5,0,0x736c50);c.material=wood;for(const dx of [-.9,.9]){const strap=box(g,.12,1.55,1.85,(j%2)*2.6+dx,.75+Math.floor(j/2)*1.5,0,0x414d47);strap.material=steel;}}obstacle(g,x+1.3,z,2.8);}
  route([[0,-size*.4],[0,0],[0,size*.4]],16,'road');
  for(const s of [-1,1])route([[0,-size*.4],[s*flank,-size*.29],[s*flank,0],[s*flank,size*.29],[0,size*.4]],desert?19:15,'road');
  route([[-flank,0],[0,0],[flank,0]],18,'road');
