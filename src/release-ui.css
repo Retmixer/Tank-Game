@@ -88,7 +88,7 @@
 #hud #killfeed div{border-right-color:var(--ui-gold);background:linear-gradient(90deg,transparent,rgba(7,14,18,.9))}
 
 /* The normal camera gets only a tiny center marker. The full optic exists only while Shift is held. */
-#hud #crosshair{width:26px;height:26px;transition:width .16s,height .16s}
+#hud #crosshair{width:170px;height:170px;transition:width .16s,height .16s}
 #hud #crosshair:before{width:5px;height:5px;left:50%;top:50%;border:1px solid rgba(235,239,226,.9);background:rgba(8,14,17,.65);box-shadow:0 0 0 2px rgba(0,0,0,.25);border-radius:50%}
 #hud #crosshair:after{display:none}
 #hud .reticle,#hud #range,#hud #penetrationLabel{display:none;opacity:0;visibility:hidden;transition:opacity .15s}
@@ -104,3 +104,18 @@
 
 @media(max-width:900px){.garage-mode-tabs{top:76px}.garage-mode-tabs button{min-width:115px;padding:9px 12px}.garage-mode-tabs{z-index:12}#researchView{top:112px;left:14px;right:14px;padding:20px;bottom:44px}#researchTree{grid-template-columns:1fr;gap:16px}.research-node{min-height:260px}.research-node:not(:last-child):after{display:none}.research-silhouette{height:70px}.research-silhouette svg{height:60px}.research-heading h2{font-size:21px}#garage .left-panel{left:14px}#garage .right-panel{right:14px}#hud .key-guide{display:none}#hud .player-panel{width:205px}#hud .minimap-wrap canvas{width:118px;height:118px}}
 @media(max-height:800px) and (min-width:901px){#garage .left-panel,#garage .right-panel{top:132px;padding:14px;max-height:calc(100vh - 240px);overflow-y:auto;scrollbar-width:thin}#garage .tank-heading h1{font-size:27px;margin:7px 0}#garage .tank-heading p,#garage .left-panel #detailsBtn{display:none}#garage nav{margin:8px 0 14px}#garage .stat{margin:7px 0}#garage .vehicle-shelf{bottom:44px}#researchView{top:126px;padding-top:20px}.research-heading{padding-bottom:13px}.research-heading h2{font-size:24px}#researchNations{margin:15px 0 17px}.research-node{min-height:305px;padding:14px}.research-silhouette{height:82px}.research-silhouette svg{height:70px}.research-node p{min-height:38px;margin-bottom:8px}.research-action{padding:9px;margin-top:7px}.research-price{padding-top:8px}}
+/* Artillery-style sight: dispersion circle, chevrons and compact status. */
+#hud #crosshair:before,#hud #crosshair:after{display:none}
+#hud #crosshair .reticle,#hud #range{display:block;opacity:1;visibility:visible}
+#hud #crosshair .reticle{inset:5px;border:2px dotted #8baa65;border-radius:50%;box-shadow:none;background:none;transform-origin:center;transition:transform .12s linear}
+#hud #crosshair .reticle:before,#hud #crosshair .reticle:after{display:none}
+#hud .sight-scale{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap;font:18px monospace;color:#a9c185;text-shadow:0 1px 2px #101b0e}
+#hud .sight-scale:after{content:'';position:absolute;left:50%;top:18px;height:62px;border-left:1px solid #acc188}
+#hud #sightReady,#hud #sightHealth{position:absolute;top:43%;color:#aaca7e;font:12px 'Arial Narrow',sans-serif;text-shadow:1px 1px 2px #000}
+#hud #sightReady{right:100%;white-space:nowrap}#hud #sightHealth{left:100%}
+#hud #range{top:100%;left:50%;transform:translateX(-50%);width:210px;font-size:10px;color:#c9d5ae}
+#hud #penetrationDot{left:50%;top:50%;width:4px;height:4px}
+#hud.aiming #crosshair{width:200px;height:200px}
+#hud #penetrationLabel{top:calc(100% + 18px);font-size:9px}
+#hud.aiming #range{top:100%;left:50%;transform:translateX(-50%)}
+#hud.aiming #penetrationLabel{top:calc(100% + 20px)}
