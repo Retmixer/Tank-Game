@@ -1,0 +1,25 @@
+'use strict';
+const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),THREE=require('../vendor/three.min.js');
+const source=fs.readFileSync(require.resolve('../src/game.js'),'utf8');
+const context={Math,THREE,V:THREE.Vector3,tanks:[],elapsed:0,arena:{size:560},height:()=>0,obstacles:[],blocked:()=>false,los:()=>true};
+vm.createContext(context);vm.runInContext(source.slice(source.indexOf('const botRoles='),source.indexOf('function updateBot(')),context);
+const names=['capturer','captureSupport','tactician','push','tacticalSupport','flanker'];
+for(let i=0;i<6;i++)assert.equal(context.createBrain(()=>(i+.1)/6).role,names[i]);
+function tank(role,x=0,z=-80,team=0){return {brain:{...context.createBrain(()=>0),role},group:{position:new THREE.Vector3(x,0,z)},team,alive:true,hp:800,spec:{hp:1000},reload:0,navTime:2,aimTime:0,yaw:0};}
+const enemy=tank('push',10,0,1);
+let bot=tank('capturer');context.tanks=[bot,enemy];context.botPlan(bot,[enemy]);assert.ok(Math.hypot(bot.brain.goal.x,bot.brain.goal.z)<12,'Capturer stays on objective even with a visible target');
+bot=tank('push');context.tanks=[bot,enemy];context.botPlan(bot,[enemy]);assert.equal(bot.brain.goal.x,10);assert.equal(bot.brain.goal.z,0);assert.equal(bot.brain.pace,1);
+const capturer=tank('capturer',3,0),tactician=tank('tactician',45,-30);
+bot=tank('captureSupport');context.tanks=[bot,capturer,tactician,enemy];context.botPlan(bot,[]);assert.equal(bot.brain.partner,capturer);assert.ok(Math.hypot(bot.brain.goal.x,bot.brain.goal.z)<12,'Support helps secure an uncontested base');
+capturer.alive=false;context.botPlan(bot,[]);assert.equal(bot.brain.partner,tactician,'Dead partner is replaced');
+bot=tank('tacticalSupport');context.tanks=[bot,tactician];context.botPlan(bot,[]);assert.equal(bot.brain.partner,tactician);assert.ok(Math.hypot(bot.brain.goal.x-45,bot.brain.goal.z+30)<25);
+const cover=context.botCover;let wantsPeek;
+context.botCover=(t,e,a,peek)=>{wantsPeek=peek;return {x:-25,z:-45};};
+bot=tank('tactician');context.tanks=[bot,enemy];bot.reload=2;context.botPlan(bot,[enemy]);assert.equal(wantsPeek,false);bot.reload=0;context.botPlan(bot,[enemy]);assert.equal(wantsPeek,true);
+context.botPlan(bot,[]);assert.equal(bot.target,null,'Hidden enemy is never a firing target');assert.ok(bot.brain.memory);context.elapsed=9;context.botPlan(bot,[]);assert.equal(bot.brain.memory,null,'Last sighting expires');
+bot=tank('flanker');context.tanks=[bot,enemy];context.botPlan(bot,[enemy]);assert.ok(Math.abs(bot.brain.goal.x-enemy.group.position.x)>50,'Flanker approaches laterally first');bot.group.position.set(bot.brain.goal.x,0,bot.brain.goal.z);context.botPlan(bot,[enemy]);assert.ok(bot.brain.goal.z<enemy.group.position.z-20,'Rear attack uses enemy hull heading');
+context.botCover=cover;
+const wall=new THREE.Mesh(new THREE.BoxGeometry(12,8,12),new THREE.MeshBasicMaterial());wall.position.set(0,3,0);wall.updateMatrixWorld(true);
+context.obstacles=[{x:0,z:0,r:9}];context.los=(a,b)=>{const origin=a.group.position.clone().add(new THREE.Vector3(0,2,0)),delta=b.group.position.clone().add(new THREE.Vector3(0,1.5,0)).sub(origin);return !new THREE.Raycaster(origin,delta.clone().normalize(),0,delta.length()).intersectObject(wall).length;};
+const safe=context.botCover(tank('tactician',0,-20),{x:0,y:0,z:30},{x:0,z:-20},false);assert.ok(safe&&safe.z<0,'Cover lies behind actual geometry relative to threat');
+console.log('PASS: six random roles, objective priorities, partner selection/replacement, reload cover, bounded memory and staged rear attack.');
