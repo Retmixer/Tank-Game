@@ -1,0 +1,10 @@
+'use strict';
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.resolve(__dirname,'..'),out=path.join(root,'dist');
+if(path.dirname(out)!==root)throw new Error('Unsafe output path');
+fs.rmSync(out,{recursive:true,force:true});
+fs.mkdirSync(out,{recursive:true});
+for(const file of ['index.html','style.css','manifest.webmanifest'])fs.copyFileSync(path.join(root,file),path.join(out,file));
+for(const dir of ['src','vendor','assets'])fs.cpSync(path.join(root,dir),path.join(out,dir),{recursive:true});
+console.log('Web build ready:',out);

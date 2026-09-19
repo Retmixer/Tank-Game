@@ -86,6 +86,10 @@
  function armorColor(mm){return mm<30?'#70e899':mm<60?'#add66a':mm<95?'#f2cd61':mm<135?'#ed9454':mm<170?'#ed6256':'#ba4268';}
  function penetration(attacker,defender,zone='front',cosine=1,distance=0){const armor=armorThickness(defender,zone),effective=armor/Math.max(.2,Math.abs(cosine)),power=([98,125,164,205][attacker.c]+((attacker.modules?.gun||attacker.level||1)-1)*5)*Math.max(.76,1-distance/2200),chance=Math.max(0,Math.min(1,(power/effective-.75)/.5));return {armor,effective,power,chance,color:chance>=.75?'#70e899':chance>=.25?'#ffbb55':'#ff6262'};}
  function ricochetVelocity(velocity,normal,incidence,bounces=0){if(!velocity||!normal||incidence>=.44||bounces>=2)return null;const speed=Math.hypot(velocity.x,velocity.y,velocity.z);if(speed<=48)return null;const dot=velocity.x*normal.x+velocity.y*normal.y+velocity.z*normal.z,retention=.48+incidence*.22;return {x:(velocity.x-2*dot*normal.x)*retention,y:(velocity.y-2*dot*normal.y)*retention,z:(velocity.z-2*dot*normal.z)*retention};}
- root.GameData={moduleNames,moduleLevels,upgradeModule,price,unlock,penetration,ricochetVelocity,armorZones,armorThickness,armorColor,gravity,shellSpeed,shellGravity,aimStep,shellDrop,detectionRange,surfaces,frictionSpeed,verticalStep,driveSpeed,nations,classes,tanks,costs,maps,stats,defaults,clean,upgrade,reward,segmentCircle,rng};
+ function collisionRetention(dx,dz,ox,oz){
+  const approach=(dx*ox+dz*oz)/(Math.hypot(dx,dz)*Math.hypot(ox,oz)||1);
+  return approach<=0?1:approach>.48?0:.16;
+ }
+ root.GameData={moduleNames,moduleLevels,upgradeModule,price,unlock,penetration,ricochetVelocity,collisionRetention,armorZones,armorThickness,armorColor,gravity,shellSpeed,shellGravity,aimStep,shellDrop,detectionRange,surfaces,frictionSpeed,verticalStep,driveSpeed,nations,classes,tanks,costs,maps,stats,defaults,clean,upgrade,reward,segmentCircle,rng};
  if(typeof module!=='undefined')module.exports=root.GameData;
 })(typeof window!=='undefined'?window:globalThis);

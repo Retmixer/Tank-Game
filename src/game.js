@@ -1,11 +1,11 @@
-/* Steel Frontier. Original procedural art; Three.js r160, no external assets. */
+/* Steel Frontier. Three.js renderer with locally bundled CC0 surface assets. */
 (() => {
 'use strict';
 const D=GameData, $=id=>document.getElementById(id), V=THREE.Vector3;
 let save=D.clean(Platform.load()), state='garage', paused=false, scene, world, camera, renderer, preview;
 // Temporary economy preset requested for balancing and progression tests.
 save.silver=Math.max(99999,save.silver);save.xp=Math.max(99999,save.xp);
-let tanks=[],player,bullets=[],particles=[],obstacles=[],solidMeshes=[],ground,arena,rand,trackMarks=[];
+let tanks=[],player,bullets=[],particles=[],obstacles=[],obstacleBuckets=new Map(),solidMeshes=[],ground,arena,rand,trackMarks=[];
 let battleTime=0,elapsed=0,capture=0,record,viewYaw=0,viewPitch=0,mouseDown=false,aiming=false,drag=false,dragX=0,lastTime=0,uiTick=0,shake=0,toastTimer,hitTimer;
 let matchMode='solo',net=null,netTick=0,countdown=0,countdownClock=null,armorView=false,aimHit=null,garageSection='hangar',researchNation=0,selectedModule='gun';
 let engineAudio,engineGain,audio,master,navGrid,navN,navStep=8,lastAimPoint=new V();
@@ -14,7 +14,6 @@ const markers=new Map(), wheelGeo=new THREE.CylinderGeometry(.48,.48,.32,12), bo
 const materials=new Map();
 const mat=(color,metalness=.08,roughness=.83)=>{const key=color+':'+metalness+':'+roughness;if(!materials.has(key))materials.set(key,new THREE.MeshStandardMaterial({color,metalness,roughness}));return materials.get(key);};
 const trackGeo=new THREE.PlaneGeometry(.52,1.5),holeGeo=new THREE.CircleGeometry(1,12),trackMat=new THREE.MeshBasicMaterial({color:0x20231f,transparent:true,opacity:.28,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2});
-function proceduralTexture(kind){const canvas=document.createElement('canvas');canvas.width=canvas.height=256;const c=canvas.getContext('2d'),winter=kind==='winter',desert=kind==='desert';c.fillStyle=winter?'#c7d2d1':desert?'#b9a174':'#718060';c.fillRect(0,0,256,256);let r=D.rng(winter?71:desert?43:29);for(let i=0;i<900;i++){const v=Math.floor(70+r()*80),a=.025+r()*.08;c.fillStyle=winter?`rgba(${v},${v+8},${v+12},${a})`:desert?`rgba(${v+55},${v+40},${v+16},${a})`:`rgba(${v-25},${v},${v-16},${a})`;c.fillRect(r()*256,r()*256,1+r()*5,1+r()*5);}c.strokeStyle=winter?'#aebfc455':desert?'#8f774530':'#4c5d4038';c.lineWidth=2;for(let i=0;i<18;i++){c.beginPath();c.moveTo(0,r()*256);c.bezierCurveTo(70,r()*256,180,r()*256,256,r()*256);c.stroke();}const tex=new THREE.CanvasTexture(canvas);tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(arena.size/24,arena.size/24);tex.colorSpace=THREE.SRGBColorSpace;return tex;}
 function mesh(g,m,parent,x=0,y=0,z=0){const o=new THREE.Mesh(g,m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
 function box(parent,w,h,d,x,y,z,color){const o=mesh(boxGeo,mat(color),parent,x,y,z);o.scale.set(w,h,d);return o;}
 function cyl(parent,r1,r2,h,x,y,z,color,sides=12){return mesh(new THREE.CylinderGeometry(r1,r2,h,sides),mat(color),parent,x,y,z);}
@@ -34,7 +33,7 @@ function sound(type,volume=1){if(!audio||audio.state!=='running')return;const t=
 function buildTank(spec,team=0){return Remaster.tank(spec,team);}
 function setupScene(kind){
  if(scene){scene.traverse(o=>{if(o.geometry&&o.geometry!==boxGeo&&o.geometry!==wheelGeo&&o.geometry!==sphereGeo&&o.geometry!==holeGeo&&o.geometry!==trackGeo)o.geometry.dispose();});}
- scene=new THREE.Scene();Remaster.lighting(scene);world=new THREE.Group();scene.add(world);obstacles=[];solidMeshes=[];particles=[];bullets=[];trackMarks=[];
+ scene=new THREE.Scene();Remaster.lighting(scene);world=new THREE.Group();scene.add(world);obstacles=[];obstacleBuckets.clear();solidMeshes=[];particles=[];bullets=[];trackMarks=[];
  scene.background=new THREE.Color(kind==='garage'?0x8ca39f:D.maps[kind].sky);scene.fog=new THREE.FogExp2(kind==='garage'?0x8ca39f:D.maps[kind].fog,kind==='garage'?.004:.0013);
  const hemi=new THREE.HemisphereLight(kind==='garage'?0xe8f5ef:0xe2eeff,kind==='garage'?0x59645f:0x655c43,kind==='garage'?2.35:1.65);scene.add(hemi);
  const sun=new THREE.DirectionalLight(kind==='garage'?0xfff0c7:0xffecc9,kind==='garage'?4.6:2.05);sun.position.set(-35,65,40);sun.castShadow=true;sun.shadow.mapSize.set(4096,4096);sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;sun.shadow.camera.far=400;sun.shadow.bias=-.0006;sun.shadow.normalBias=.08;scene.add(sun);scene.userData.sun=sun;scene.add(sun.target);if(kind!=='garage')Remaster.sky(scene,kind);const rim=new THREE.DirectionalLight(0xb0d6ff,.65);rim.position.set(40,18,-30);scene.add(rim);
@@ -44,10 +43,7 @@ function buildHangarSet(){
  scene.background=new THREE.Color(0x222a25);scene.fog=new THREE.FogExp2(0x222a25,.012);
  const sun=scene.userData.sun;sun.intensity=3.3;sun.position.set(-12,18,10);sun.shadow.camera.left=-24;sun.shadow.camera.right=24;sun.shadow.camera.top=24;sun.shadow.camera.bottom=-24;sun.shadow.camera.updateProjectionMatrix();
  const set=new THREE.Group();world.add(set);
- const canvas=document.createElement('canvas');canvas.width=canvas.height=512;const ctx=canvas.getContext('2d'),random=D.rng(241);
- ctx.fillStyle='#77786b';ctx.fillRect(0,0,512,512);for(let i=0;i<14000;i++){ctx.fillStyle=random()>.5?'rgba(25,29,23,.12)':'rgba(215,209,181,.09)';ctx.fillRect(random()*512,random()*512,1+random()*3,1+random()*3);}ctx.strokeStyle='#464c43';ctx.lineWidth=3;ctx.strokeRect(2,2,508,508);
- const texture=new THREE.CanvasTexture(canvas);texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.repeat.set(14,14);texture.colorSpace=THREE.SRGBColorSpace;
- const floor=mesh(new THREE.BoxGeometry(70,.3,70),new THREE.MeshStandardMaterial({map:texture,roughness:.66,metalness:.13}),world,0,-.25,0);
+ const floor=mesh(new THREE.BoxGeometry(70,.3,70),Remaster.terrainMaterial('road',70),world,0,-.25,0);
  // Repair lanes lead into the workshop instead of a circular showroom plinth.
  for(const x of [-5.6,5.6]){box(set,.09,.015,36,x,-.085,-5,gold);box(set,.65,.025,22,x-.4,-.08,-3,0x171d19);for(let z=-14;z<8;z+=.32)box(set,.61,.04,.075,x-.4,-.065,z,trim);}
  box(set,42,12,.5,0,5.9,-19,0x3b453c);box(set,.5,12,48,-21,5.9,0,steel);box(set,.5,12,48,21,5.9,0,steel);
@@ -157,7 +153,17 @@ function terrainHeightRaw(x,z){
  const escarpment=edgeT*edgeT*(3-2*edgeT)*(arena===D.maps.desert?24:32);
  return h*(1-basin*.38)+escarpment;
 }
+// Physics and props use exactly the same triangles as the visible ground.
 function height(x,z){
+ if(!arena)return 0;
+ const n=save.settings.quality==='high'?220:128,step=arena.size/n,half=arena.size/2;
+ if(Math.abs(x)>half||Math.abs(z)>half)return terrainHeightSmooth(x,z);
+ const ix=Math.min(n-1,Math.max(0,Math.floor((x+half)/step))),iz=Math.min(n-1,Math.max(0,Math.floor((z+half)/step)));
+ const ax=ix*step-half,az=iz*step-half,u=(x-ax)/step,v=(z-az)/step;
+ const a=terrainHeightSmooth(ax,az),b=terrainHeightSmooth(ax,az+step),d=terrainHeightSmooth(ax+step,az);
+ return u+v<=1?a+(d-a)*u+(b-a)*v:b*(1-u)+d*(1-v)+terrainHeightSmooth(ax+step,az+step)*(u+v-1);
+}
+function terrainHeightSmooth(x,z){
  if(!arena)return 0;
  let h=terrainHeightRaw(x,z);const spawnZ=arena.size*.4;
  // Broad, gently blended deployment terraces keep every vehicle clear of the
@@ -176,12 +182,18 @@ function height(x,z){
  if(arena===D.maps.winter)h*=1-(1-THREE.MathUtils.smoothstep(Math.max(Math.abs(x),Math.abs(z)),arena.size*.26,arena.size*.4))*.92;
  return h;
 }
-function obstacle(obj,x,z,r){obstacles.push({x,z,r,object:obj});obj.updateMatrixWorld(true);obj.traverse(o=>{if(o.isMesh)solidMeshes.push(o);});}
+function obstacle(obj,x,z,r,footprint){
+ obj.updateMatrixWorld(true);
+ const bounds=footprint?new THREE.Box3(new THREE.Vector3(x-footprint[0]/2,-Infinity,z-footprint[1]/2),new THREE.Vector3(x+footprint[0]/2,Infinity,z+footprint[1]/2)):new THREE.Box3().setFromObject(obj);
+ const entry={x,z,r,object:obj,bounds};obstacles.push(entry);
+ if(typeof obstacleBuckets!=='undefined')for(let ix=Math.floor(bounds.min.x/24);ix<=Math.floor(bounds.max.x/24);ix++)for(let iz=Math.floor(bounds.min.z/24);iz<=Math.floor(bounds.max.z/24);iz++){const key=`${ix}:${iz}`;if(!obstacleBuckets.has(key))obstacleBuckets.set(key,[]);obstacleBuckets.get(key).push(entry);}
+ obj.traverse(o=>{if(o.isMesh)solidMeshes.push(o);});
+}
 function footprintSupport(x,z,w,d){const samples=[];for(const sx of [-.5,0,.5])for(const sz of [-.5,0,.5])samples.push(height(x+sx*w,z+sz*d));return {low:Math.min(...samples),high:Math.max(...samples)};}
 function building(x,z,w,d,h,industrial=false){const support=footprintSupport(x,z,w,d),foundation=Math.max(.8,support.high-support.low+.55),g=new THREE.Group();g.position.set(x,support.high-.08,z);world.add(g);box(g,w+.75,foundation,d+.75,0,-foundation/2+.12,0,arena===D.maps.desert?0x756b59:0x59625f);box(g,w,h,d,0,h/2,0,industrial?0x6a7779:arena===D.maps.desert?0xc2ae86:0xa0a391);box(g,w+.3,.25,d+.3,0,h,0,0x515c5d);
  if(!industrial){const rw=w/2+.4,rd=d/2+.4;const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute([-rw,0,-rd,rw,0,-rd,0,2.1,-rd,-rw,0,rd,rw,0,rd,0,2.1,rd],3));geo.setIndex([0,2,1,3,4,5,0,3,5,0,5,2,1,2,5,1,5,4,0,1,4,0,4,3]);geo.computeVertexNormals();mesh(geo,mat(arena===D.maps.winter?0xc6d2d2:0x626957),g,0,h,0);}
  for(const side of [-1,1])for(let a=-w/2+1.2;a<w/2-.5;a+=2){box(g,.65,1.1,.09,a,h*.58,side*(d/2+.06),0x34474a);box(g,.8,.13,.17,a,h*.58-.6,side*(d/2+.1),0x7d8984);}
- box(g,1.2,2.3,.13,w*.18,1.15,d/2+.05,0x50584d);Remaster.building(g,w,d,h,industrial,arena===D.maps.desert?'desert':arena===D.maps.winter?'winter':'training');obstacle(g,x,z,Math.hypot(w,d)*.5+.15);
+ box(g,1.2,2.3,.13,w*.18,1.15,d/2+.05,0x50584d);Remaster.building(g,w,d,h,industrial,arena===D.maps.desert?'desert':arena===D.maps.winter?'winter':'training');obstacle(g,x,z,Math.hypot(w,d)*.5+.15,[w+.75,d+.75]);
 }
 function rock(x,z,r){const o=mesh(new THREE.IcosahedronGeometry(r,2),mat(arena===D.maps.desert?0x9d886d:arena===D.maps.winter?0x8a9b9e:0x777e72),world,x,height(x,z)+r*.46,z);o.scale.set(1.2,.8,1);o.rotation.set(rand()*.4,rand()*6,.2);obstacle(o,x,z,r*1.08);}
 function tree(x,z){const g=new THREE.Group();g.position.set(x,height(x,z),z);world.add(g);const h=4+rand()*4;cyl(g,.15,.25,h,0,h/2,0,0x535147,6);for(let j=0;j<3;j++)cyl(g,0,2-j*.4,3.6,0,h-1+j*1.2,0,arena===D.maps.winter?0x768e86:0x4a6350,7);}
@@ -190,7 +202,7 @@ function buildBackdrop(){const size=arena.size,isWinter=arena===D.maps.winter,is
  }else{for(let side of [-1,1])for(let i=-7;i<=7;i++){const x=i*24+(rand()-.5)*10,z=side*(far+rand()*20),h=5+rand()*14;box(world,9+rand()*13,h,8,x,h/2-2,z,0x8e795b);if(i%4===0)cyl(world,1.2,1.8,h+11,x+5,(h+11)/2-2,z,0x9c8968,10);}}
  if(arena===D.maps.training){for(let i=-5;i<=5;i++){const x=i*22,z=far*.94+(i%2)*8,w=8+rand()*5,h=5+rand()*5;box(world,w,h,7,x,h/2-1,z,0x777867);box(world,w+.4,.5,7.4,x,h,z,0x4e5549);}}
 }
-function scatterProps(){const isWinter=arena===D.maps.winter,isDesert=arena===D.maps.desert;for(let i=0;i<26;i++){const x=(rand()-.5)*(arena.size-30),z=(rand()-.5)*(arena.size-30);if(Math.abs(x)<15||obstacles.some(o=>Math.hypot(o.x-x,o.z-z)<o.r+3))continue;const g=new THREE.Group();g.position.set(x,height(x,z),z);world.add(g);if(i%3===0){for(let k=0;k<3;k++){const b=cyl(g,.32,.32,.8,(k-1)*.7,.4,0,isDesert?0x756241:0x5c6868,12);b.rotation.z=k===2?Math.PI/2:0;}}else if(i%3===1){box(g,2.2,.85,1.2,0,.43,0,isWinter?0x6b7675:0x746d50);box(g,1.9,.12,1.25,0,.9,0,0x424b44);}else{for(let k=-2;k<=2;k++)box(g,.12,1.4,.12,k*.65,.7,0,0x545a50);box(g,3.1,.12,.12,0,.9,0,0x545a50);}}
+function scatterProps(){const isWinter=arena===D.maps.winter,isDesert=arena===D.maps.desert;for(let i=0;i<26;i++){const x=(rand()-.5)*(arena.size-30),z=(rand()-.5)*(arena.size-30);if(Math.abs(x)<15||obstacles.some(o=>Math.hypot(o.x-x,o.z-z)<o.r+3))continue;const g=new THREE.Group();g.position.set(x,height(x,z),z);world.add(g);if(i%3===0){for(let k=0;k<3;k++){const b=cyl(g,.32,.32,.8,(k-1)*.7,.4,0,isDesert?0x756241:0x5c6868,12);b.rotation.z=k===2?Math.PI/2:0;}}else if(i%3===1){box(g,2.2,.85,1.2,0,.43,0,isWinter?0x6b7675:0x746d50);box(g,1.9,.12,1.25,0,.9,0,0x424b44);obstacle(g,x,z,1.4);}else{for(let k=-2;k<=2;k++)box(g,.12,1.4,.12,k*.65,.7,0,0x545a50);box(g,3.1,.12,.12,0,.9,0,0x545a50);}}
 }
 function naturalBoundary(){
  const edge=arena.size*.468,stone=mat(arena===D.maps.desert?0x92785b:arena===D.maps.winter?0x7f9299:0x68746b),step=26,shared=new THREE.IcosahedronGeometry(1,1);
@@ -204,26 +216,27 @@ function buildDistricts(){
  const steel=Remaster.material(0x616d70,'steel'),wood=Remaster.material(0x71614a,'wood');
  const concrete=Remaster.material(desert?0xb29570:0x85877c,'rock');
  function cover(x,z,w=7,d=3,h=2){
-  const g=new THREE.Group(),support=footprintSupport(x,z,w,d);g.position.set(x,support.high,z);world.add(g);
+  const g=new THREE.Group(),support=footprintSupport(x,z,w,d),foundation=Math.max(.4,support.high-support.low+.35);g.position.set(x,support.high-.1,z);world.add(g);
+  const base=box(g,w+.08,foundation,d+.08,0,-foundation/2+.08,0,0x827a60);base.material=concrete;
   const b=box(g,w,h,d,0,h/2,0,0x827a60);b.material=concrete;
   for(let a=-w/2+1;a<w/2;a+=2){const seam=box(g,.1,h+.05,d+.05,a,h/2,0,0x494d43);seam.material=steel;}
-  obstacle(g,x,z,Math.hypot(w,d)/2+.2);
+  obstacle(g,x,z,Math.hypot(w,d)/2+.2,[w+.08,d+.08]);
  }
  function route(points,width,kind){
   const vertices=[],uv=[],indices=[];
   for(let p=0;p<points.length-1;p++){
-   const [ax,az]=points[p],[bx,bz]=points[p+1],len=Math.hypot(bx-ax,bz-az),n=Math.ceil(len/4),nx=-(bz-az)/len,nz=(bx-ax)/len;
-   for(let i=0;i<n;i++){
-    const start=vertices.length/3;
-    for(const [t,s] of [[i/n,-1],[i/n,1],[(i+1)/n,-1],[(i+1)/n,1]]){const x=ax+(bx-ax)*t+nx*width*s/2,z=az+(bz-az)*t+nz*width*s/2;vertices.push(x,height(x,z)+.16,z);uv.push(s<0?0:width/8,(p*len+t*len)/8);}
+   const [ax,az]=points[p],[bx,bz]=points[p+1],len=Math.hypot(bx-ax,bz-az),n=Math.ceil(len/2),bands=Math.ceil(width/2),nx=-(bz-az)/len,nz=(bx-ax)/len;
+   for(let i=0;i<n;i++)for(let j=0;j<bands;j++){
+    const lo=j/bands*2-1,hi=(j+1)/bands*2-1,start=vertices.length/3;
+    for(const [t,s] of [[i/n,lo],[i/n,hi],[(i+1)/n,lo],[(i+1)/n,hi]]){const x=ax+(bx-ax)*t+nx*width*s/2,z=az+(bz-az)*t+nz*width*s/2;vertices.push(x,height(x,z)+.16,z);uv.push(x/8,z/8);}
     indices.push(start,start+1,start+2,start+1,start+3,start+2);
    }
   }
   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geo.setIndex(indices);geo.computeVertexNormals();
   const road=mesh(geo,Remaster.material(kind==='ice'?0x96b5c1:desert?0x9c896e:winter?0x686f72:0xaaa38b,kind==='ice'?'ice':'road'),decor);road.castShadow=false;
  }
- function tower(x,z){const g=new THREE.Group();g.position.set(x,height(x,z),z);decor.add(g);for(const a of [-1,1])for(const b of [-1,1]){const leg=box(g,.35,10,.35,a*2,5,b*2,0x55635c);leg.material=steel;}box(g,5,.4,5,0,9,0,0x666b5b);box(g,5,1,.2,0,10,2.4,0x717566);box(g,5,1,.2,0,10,-2.4,0x717566);box(g,5.6,.35,5.6,0,12,0,0x505b55);for(let y=0;y<9;y+=.6){const step=box(g,1,.1,.25,2,y,0,0x666c60);step.material=steel;}}
- function supplies(x,z){const g=new THREE.Group();g.position.set(x,height(x,z),z);decor.add(g);for(let j=0;j<4;j++){const c=box(g,2.4,1.5,1.8,(j%2)*2.6,.75+Math.floor(j/2)*1.5,0,0x736c50);c.material=wood;for(const dx of [-.9,.9]){const strap=box(g,.12,1.55,1.85,(j%2)*2.6+dx,.75+Math.floor(j/2)*1.5,0,0x414d47);strap.material=steel;}}}
+ function tower(x,z){const g=new THREE.Group(),support=footprintSupport(x,z,5,5);g.position.set(x,support.high,z);decor.add(g);for(const a of [-1,1])for(const b of [-1,1]){const leg=box(g,.35,10+support.high-support.low,.35,a*2,(10-support.high+support.low)/2,b*2,0x55635c);leg.material=steel;}box(g,5,.4,5,0,9,0,0x666b5b);box(g,5,1,.2,0,10,2.4,0x717566);box(g,5,1,.2,0,10,-2.4,0x717566);box(g,5.6,.35,5.6,0,12,0,0x505b55);for(let y=0;y<9;y+=.6){const step=box(g,1,.1,.25,2,y,0,0x666c60);step.material=steel;}obstacle(g,x,z,3.8,[5.6,5.6]);}
+ function supplies(x,z){const g=new THREE.Group(),support=footprintSupport(x+1.3,z,5,1.8),top=support.high??support.low,depth=Math.max(.3,top-support.low+.2);g.position.set(x,top,z);decor.add(g);const foundation=box(g,5.2,depth,2,1.3,-depth/2,0,0x736c50);foundation.material=wood;for(let j=0;j<4;j++){const c=box(g,2.4,1.5,1.8,(j%2)*2.6,.75+Math.floor(j/2)*1.5,0,0x736c50);c.material=wood;for(const dx of [-.9,.9]){const strap=box(g,.12,1.55,1.85,(j%2)*2.6+dx,.75+Math.floor(j/2)*1.5,0,0x414d47);strap.material=steel;}}obstacle(g,x+1.3,z,2.8,[5.2,2]);}
  route([[0,-size*.4],[0,0],[0,size*.4]],16,'road');
  for(const s of [-1,1])route([[0,-size*.4],[s*flank,-size*.29],[s*flank,0],[s*flank,size*.29],[0,size*.4]],desert?19:15,'road');
  route([[-flank,0],[0,0],[flank,0]],18,'road');
@@ -238,10 +251,10 @@ function buildDistricts(){
   for(const sx of [-1,1])for(const sz of [-1,1]){
    for(let j=0;j<3;j++)building(sx*(42+j*33),sz*65,23,54,12+j*2,true);
    building(sx*70,sz*132,45,24,10,true);supplies(sx*35,sz*112);cover(sx*35,sz*25,8,3,2);
-   const x=sx*120,z=sz*145,y=height(x,z);for(let j=0;j<2;j++){const chimney=cyl(decor,3.2,4,36,x+j*11,y+18,z,0x737b7b,20);chimney.material=Remaster.material(0x8a8076,'brick');for(let k=0;k<4;k++){const band=cyl(decor,3.5,3.5,1,x+j*11,y+10+k*7,z,0x5a6261,20);band.material=steel;}}
+   const x=sx*120,z=sz*145,y=height(x,z);for(let j=0;j<2;j++){const chimney=cyl(decor,3.2,4,36,x+j*11,y+18,z,0x737b7b,20);chimney.material=Remaster.material(0x8a8076,'brick');obstacle(chimney,x+j*11,z,4.2,[8,8]);for(let k=0;k<4;k++){const band=cyl(decor,3.5,3.5,1,x+j*11,y+10+k*7,z,0x5a6261,20);band.material=steel;}}
   }
   // Rail siding on the west flank; raised sleepers remain below track clearance.
-  for(let z=-size*.34;z<size*.34;z+=3){const x=-flank-20,y=height(x,z);const sleeper=box(decor,5,.12,.32,x,y+.1,z,0x665a4b);sleeper.material=wood;for(const dx of [-1.4,1.4]){const rail=box(decor,.14,.16,3.05,x+dx,y+.18,z,0x596369);rail.material=steel;}}
+  for(let z=-size*.34;z<size*.34;z+=3){const x=-flank-20,y=footprintSupport(x,z,5,3).low;const sleeper=box(decor,5,.12,.32,x,y+.1,z,0x665a4b);sleeper.material=wood;for(const dx of [-1.4,1.4]){const rail=box(decor,.14,.16,3.05,x+dx,y+.18,z,0x596369);rail.material=steel;}}
   for(const z of [-140,-110,105,135]){building(-flank-37,z,9,20,4,true);}
   route([[flank+26,-size*.36],[flank+30,0],[flank+26,size*.36]],23,'ice');
  }else{
@@ -261,7 +274,6 @@ function buildMap(){
  rand=D.rng(arena.seed);const size=arena.size,segments=save.settings.quality==='high'?220:128;const geo=new THREE.PlaneGeometry(size,size,segments,segments);geo.rotateX(-Math.PI/2);const pos=geo.attributes.position, colors=[];for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i);pos.setY(i,height(x,z));const c=new THREE.Color(arena.ground);let tint=.9+rand()*.16;if(Math.abs(x)<5||Math.abs(z)<4)tint*=.87;c.multiplyScalar(tint);colors.push(c.r,c.g,c.b);}geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));geo.computeVertexNormals();ground=mesh(geo,Remaster.terrainMaterial(arena===D.maps.winter?'winter':arena===D.maps.desert?'desert':'training',size),world);ground.receiveShadow=true;ground.castShadow=false;
  const isWinter=arena===D.maps.winter;
  buildDistricts();
- const apron=mesh(new THREE.PlaneGeometry(2200,2200),Remaster.terrainMaterial(arena===D.maps.winter?'winter':arena===D.maps.desert?'desert':'training',2200),world,0,-5,0);apron.rotation.x=-Math.PI/2;apron.castShadow=false;
  for(let i=0;i<(isWinter?22:38);i++){const x=(rand()-.5)*(size-24),z=(rand()-.5)*(size-34);if(Math.abs(x)<15||Math.abs(z)>size*.37||obstacles.some(o=>Math.hypot(o.x-x,o.z-z)<o.r+8))continue;rock(x,z,2+rand()*3.5);}
  for(const [x,z] of [[-17,-13],[18,15],[-55,-50],[54,48]]){const g=new THREE.Group();g.position.set(x,height(x,z),z);world.add(g);box(g,9,1.5,1.4,0,.75,0,isWinter?0x8c9a9b:0x84866f);obstacle(g,x,z,4.8);}
  for(let i=0;i<14;i++){const x=(rand()>.5?1:-1)*(25+rand()*45),z=(rand()-.5)*140;if(obstacles.some(o=>Math.hypot(o.x-x,o.z-z)<o.r+4))continue;const g=new THREE.Group();g.position.set(x,height(x,z),z);world.add(g);box(g,2,1.6,2,0,.8,0,0x716c50);box(g,2.05,.13,2.05,0,1.3,0,0x434b43);obstacle(g,x,z,1.45);}
@@ -278,10 +290,16 @@ function buildMap(){
  const baseY=height(0,0),ring=mesh(new THREE.RingGeometry(11.7,12,72),new THREE.MeshBasicMaterial({color:0xddcc92,side:THREE.DoubleSide,transparent:true,opacity:.75}),world,0,baseY+.12,0);ring.rotation.x=-Math.PI/2;const pole=cyl(world,.08,.08,6,0,baseY+3,0,0xb4b7a3,8);const flag=box(world,1.8,1,.05,.95,baseY+5.3,0,0xc3b784);pole.castShadow=false;flag.castShadow=false;
  Remaster.environment(world,arena,height,rand,save.settings.quality);naturalBoundary();Remaster.vegetation(world,arena,height,obstacles,save.settings.quality);world.updateMatrixWorld(true);makeNavigation();
 }
-function blocked(x,z,r=2.1){return Math.abs(x)>arena.size/2-r-1||Math.abs(z)>arena.size/2-r-1||obstacles.some(o=>(x-o.x)**2+(z-o.z)**2<(r+o.r)**2);}
+function blocked(x,z,r=2.1){
+ if(Math.abs(x)>arena.size/2-r-1||Math.abs(z)>arena.size/2-r-1)return true;
+ let candidates=obstacles;
+ if(typeof obstacleBuckets!=='undefined'&&obstacleBuckets.size){const nearby=new Set();for(let ix=Math.floor((x-r)/24);ix<=Math.floor((x+r)/24);ix++)for(let iz=Math.floor((z-r)/24);iz<=Math.floor((z+r)/24);iz++)for(const o of obstacleBuckets.get(`${ix}:${iz}`)||[])nearby.add(o);candidates=nearby;}
+ for(const o of candidates)if(o.bounds?x+r>o.bounds.min.x&&x-r<o.bounds.max.x&&z+r>o.bounds.min.z&&z-r<o.bounds.max.z:(x-o.x)**2+(z-o.z)**2<(r+o.r)**2)return true;
+ return false;
+}
 function makeNavigation(){navN=Math.floor(arena.size/navStep);navGrid=new Uint8Array(navN*navN);for(let z=0;z<navN;z++)for(let x=0;x<navN;x++)navGrid[z*navN+x]=blocked((x+.5)*navStep-arena.size/2,(z+.5)*navStep-arena.size/2,2.5)?1:0;}
 function route(ax,az,bx,bz){const idx=(x,z)=>Math.max(0,Math.min(navN-1,Math.floor((z+arena.size/2)/navStep)))*navN+Math.max(0,Math.min(navN-1,Math.floor((x+arena.size/2)/navStep)));const start=idx(ax,az);let goal=idx(bx,bz);if(navGrid[goal]){let best=Infinity;for(let i=0;i<navGrid.length;i++)if(!navGrid[i]){const d=(i%navN-goal%navN)**2+(Math.floor(i/navN)-Math.floor(goal/navN))**2;if(d<best){best=d;goal=i;}}}const open=[start],cost=new Float32Array(navN*navN).fill(Infinity),prev=new Int32Array(navN*navN).fill(-1),closed=new Uint8Array(navN*navN);cost[start]=0;let loops=0;const heuristic=i=>Math.hypot(i%navN-goal%navN,Math.floor(i/navN)-Math.floor(goal/navN));while(open.length&&loops++<12000){let k=0;for(let i=1;i<open.length;i++)if(cost[open[i]]+heuristic(open[i])<cost[open[k]]+heuristic(open[k]))k=i;const current=open.splice(k,1)[0];if(current===goal){const p=[];let v=goal;while(v!==start&&v!==-1){p.push({x:(v%navN+.5)*navStep-arena.size/2,z:(Math.floor(v/navN)+.5)*navStep-arena.size/2});v=prev[v];}return p.reverse();}closed[current]=1;const x=current%navN,z=Math.floor(current/navN);for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]]){const nx=x+dx,nz=z+dz;if(nx<0||nz<0||nx>=navN||nz>=navN)continue;const n=nz*navN+nx;if(navGrid[n]||closed[n]||(dx&&dz&&(navGrid[z*navN+nx]||navGrid[nz*navN+x])))continue;const nc=cost[current]+(dx&&dz?1.414:1);if(nc<cost[n]){cost[n]=nc;prev[n]=current;if(!open.includes(n))open.push(n);}}}return [];}
-function spawn(spec,team,index,isPlayer=false){const model=buildTank(spec,team);const side=team===0?-1:1,x=side*arena.size*.4+(index-1)*12,z=side*arena.size*.4-(index-1)*12;model.group.position.set(x,height(x,z),z);world.add(model.group);const t={...model,spec,team,isPlayer,hp:spec.hp,yaw:team===0?Math.PI/4:-Math.PI*3/4,turretYaw:team===0?0:Math.PI,reload:1+index*.25,speed:0,alive:true,target:null,think:rand()*.4,path:[],navTime:0,seen:false,aimTime:0,aimBloom:1,revealTime:0,stuck:0,trackTime:0,name:isPlayer?'Вы':(team===0?['Кедр','Сокол','Риф'][index]:['Коршун','Кремень','Буран'][index])};model.group.rotation.y=t.yaw;Remaster.suspension(t,height,1/60);model.hitMeshes.forEach(o=>o.userData.tank=t);tanks.push(t);if(!isPlayer){const el=document.createElement('div');el.className='marker '+(team===0?'friendly':'');$('markers').append(el);markers.set(t,el);}return t;}
+function spawn(spec,team,index,isPlayer=false){const model=buildTank(spec,team);const side=team===0?-1:1,x=side*arena.size*.4+(index-1)*12,z=side*arena.size*.4-(index-1)*12;model.group.position.set(x,height(x,z),z);world.add(model.group);const t={...model,spec,team,isPlayer,hp:spec.hp,yaw:team===0?Math.PI/4:-Math.PI*3/4,turretYaw:team===0?0:Math.PI,reload:1+index*.25,speed:0,alive:true,target:null,think:rand()*.4,path:[],navTime:0,seen:false,aimTime:0,aimBloom:1,revealTime:0,stuck:0,trackTime:0,name:isPlayer?'Вы':(team===0?['Кедр','Сокол','Риф'][index]:['Коршун','Кремень','Буран'][index])};model.group.rotation.y=t.yaw;Remaster.suspension(t,height,1/60);model.hitMeshes.forEach(o=>o.userData.tank=t);if(!isPlayer&&matchMode!=='lan')t.brain=createBrain();tanks.push(t);if(!isPlayer){const el=document.createElement('div');el.className='marker '+(team===0?'friendly':'');$('markers').append(el);markers.set(t,el);}return t;}
 function specFromNet(data){const base=D.tanks.find(t=>t.id===data?.id)||chosen();return D.stats(base,data?.modules?D.moduleLevels(data.modules):Math.max(1,Math.min(5,Number(data?.level)||1)));}
 function startBattle(options={}){
  if(!options.lan&&!save.owned[save.selected]){toast('Сначала исследуйте и купите танк');return;}countdown=5;countdownClock=null;aiming=false;$('hud').classList?.remove?.('aiming');Object.keys(keys).forEach(k=>keys[k]=false);$('countdown').hidden=false;$('countNumber').textContent='5';
@@ -305,20 +323,87 @@ function handleNetMessage(message){if(!net)return;if(message.type==='joined'){ne
 async function createLan(){try{const info=await lanApi('info'),data=await lanApi('create',{name:'Командир'});net={...data,addresses:info.addresses?.length?info.addresses:[location.origin],since:0,players:data.players,failures:0};lobbyView();lanPoll();}catch(error){showModal(`<div class="eyebrow">ЛОКАЛЬНАЯ СЕТЬ</div><h2>Сервер не запущен</h2><p>${error.message}. Запустите игру через <b>PLAY.cmd</b>, а не прямым открытием index.html.</p><button id="lanBack" class="secondary">← Назад</button>`);$('lanBack').onclick=showLan;}}
 async function joinLan(){const input=$('lanCode'),joinButton=$('lanJoin'),code=input.value.toUpperCase().replace(/[^A-Z2-9]/g,'');if(code.length!==5){input.focus();return;}joinButton.disabled=true;try{const data=await lanApi('join',{code,name:'Соперник'});net={...data,since:0,players:data.players,failures:0};netSend('ready',{spec:localSpec(),name:'Соперник'});lobbyView();lanPoll();}catch(error){$('lanError').textContent=error.message;joinButton.disabled=false;}}
 function showLan(){showModal('<div class="eyebrow">ЛОКАЛЬНАЯ СЕТЬ · RADMIN VPN</div><h2>Бой 1 × 1</h2><p>Хост создаёт лобби и отправляет другу адрес сервера вместе с кодом. Оба игрока должны открыть игру через один и тот же компьютер-хост.</p><div class="lan-actions"><button id="lanCreate" class="primary">СОЗДАТЬ ЛОББИ</button><div><input id="lanCode" maxlength="5" placeholder="КОД" style="width:100%;padding:16px;background:#0d1a20;border:1px solid #ffffff25;color:#fff;text-transform:uppercase"><button id="lanJoin" class="secondary">ВОЙТИ ПО КОДУ</button></div></div><p id="lanError" class="enemy"></p><button id="lanCancel" class="text-btn">← Назад в ангар</button>');$('lanCreate').onclick=createLan;$('lanJoin').onclick=joinLan;$('lanCancel').onclick=()=>{$('modal').hidden=true;};$('lanCode').onkeydown=e=>{if(e.key==='Enter')joinLan();};}
-function updateRemote(t,dt){const i=net?.input||{},accel=(i.w?1:0)-(i.s?1:0),turn=(i.a?1:0)-(i.d?1:0);t.yaw+=turn*t.spec.turn*dt*(t.trackTime?0:1);accelerateTank(t,accel,dt,turn);moveTank(t,dt);t.group.rotation.y=t.yaw;t.turretYaw=approach(t.turretYaw,Number.isFinite(i.yaw)?i.yaw:t.turretYaw,t.spec.turret*dt);t.turret.rotation.y=angle(t.turretYaw-t.yaw);t.remoteAim=!!i.aiming;t.aimBloom=D.aimStep(t.aimBloom,t.remoteAim,Math.min(1,Math.abs(t.speed)/Math.max(1,t.spec.speed)+Math.abs(turn)*.7),t.spec.aim,dt);if(Array.isArray(i.target)&&i.target.length===3){const target=new V(i.target[0],i.target[1],i.target[2]),delta=target.clone().sub(muzzlePos(t));t.gunPivot.rotation.x=THREE.MathUtils.clamp(-Math.atan2(delta.y,Math.hypot(delta.x,delta.z)),-.32,.22);if(i.fire)fire(t,target);}}
+function updateRemote(t,dt){const i=net?.input||{},accel=(i.w?1:0)-(i.s?1:0),turn=(i.a?1:0)-(i.d?1:0);t.yaw+=turn*t.spec.turn*dt*(t.trackTime?0:1);accelerateTank(t,accel,dt,turn);moveTank(t,dt);t.group.rotation.y=t.yaw;t.turretYaw=approach(t.turretYaw,Number.isFinite(i.yaw)?i.yaw:t.turretYaw,t.spec.turret*dt);t.turret.rotation.y=angle(t.turretYaw-t.yaw);t.remoteAim=!!i.aiming;t.aimBloom=D.aimStep(t.aimBloom,t.remoteAim,Math.min(1,Math.abs(t.speed)/Math.max(1,t.spec.speed)+Math.abs(turn)*.7),t.spec.aim,dt);if(Array.isArray(i.target)&&i.target.length===3){const target=new V(i.target[0],i.target[1],i.target[2]);aimGun(t,target,dt);if(i.fire)fire(t,target);}}
 function netSnapshot(){return {time:battleTime,capture,countdown,tanks:tanks.map(t=>({team:t.team,x:t.group.position.x,y:t.group.position.y,z:t.group.position.z,yaw:t.yaw,turret:t.turretYaw,hp:t.hp,alive:t.alive,reload:t.reload,speed:t.speed,trackTime:t.trackTime,brokenSide:t.brokenSide,vy:t.suspension?.vy||0,grounded:t.suspension?.grounded!==false,pitch:t.group.rotation.x,roll:t.group.rotation.z}))};}
 function applyNetSnapshot(data){if(!data?.tanks||state!=='battle')return;battleTime=data.time;capture=data.capture;for(const s of data.tanks){const t=tanks.find(v=>v.team===s.team);if(!t)continue;const previous=t.group.position.clone(),alpha=t.isPlayer?.22:.62;t.group.position.lerp(new V(s.x,s.y,s.z),alpha);t.yaw=angle(t.yaw+angle(s.yaw-t.yaw)*alpha);t.turretYaw=angle(t.turretYaw+angle(s.turret-t.turretYaw)*alpha);t.group.rotation.y=t.yaw;t.turret.rotation.y=angle(t.turretYaw-t.yaw);if(t.alive&&!s.alive)makeWreck(t);t.trackTime=s.trackTime||0;t.brokenSide=s.brokenSide;t.trackYaw=s.yaw;t.hp=s.hp;t.alive=s.alive;t.reload=s.reload;if(t.suspension){t.suspension.y=t.group.position.y;t.suspension.vy=s.vy||0;t.suspension.grounded=s.grounded!==false;}
  if(!t.isPlayer){t.speed=s.speed;Remaster.suspension(t,height,.1,Math.sign(t.speed)*previous.distanceTo(t.group.position));t.group.position.y=s.y;t.suspension.y=s.y;t.suspension.vy=s.vy||0;t.suspension.grounded=s.grounded!==false;t.group.rotation.x=s.pitch||0;t.group.rotation.z=s.roll||0;}}}
 function networkStep(dt){if(matchMode!=='lan'||!net)return;netTick-=dt;if(net.role==='host'){for(const t of tanks)if(t.remote&&t.alive)updateRemote(t,dt);if(netTick<=0){netTick=.1;netSend('snapshot',netSnapshot());}}else if(netTick<=0){netTick=.055;netSend('input',{w:!!(keys.KeyW||keys.ArrowUp),s:!!(keys.KeyS||keys.ArrowDown),a:!!(keys.KeyA||keys.ArrowLeft),d:!!(keys.KeyD||keys.ArrowRight),yaw:viewYaw,aiming,fire:!!(mouseDown||keys.Space),target:[lastAimPoint.x,lastAimPoint.y,lastAimPoint.z]});}}
 function los(a,b){const origin=a.group.position.clone().add(new V(0,2,0)),end=b.group.position.clone().add(new V(0,1.5,0));const direction=end.sub(origin),len=direction.length();ray.set(origin,direction.normalize());ray.far=len;return ray.intersectObjects(solidMeshes,false).length===0;}
+const botRoles={capturer:'Захватчик',captureSupport:'Поддержка захвата',tactician:'Тактик',push:'Пуш',tacticalSupport:'Поддержка тактика',flanker:'Крыса'};
+function createBrain(random=Math.random){return {role:Object.keys(botRoles)[Math.min(5,Math.floor(random()*6))],side:random()<.5?-1:1,memory:null,partner:null,goal:null,mode:'Сбор',flankStage:0};}
+function botCover(t,threat,anchor,peek=false){
+ const p=t.group.position,e=threat,choices=[];
+ for(const o of obstacles){if(Math.hypot(o.x-p.x,o.z-p.z)>75||o.r<3)continue;
+  const dx=o.x-e.x,dz=o.z-e.z,len=Math.hypot(dx,dz)||1,nx=dx/len,nz=dz/len;
+  for(const side of peek?[-1,1]:[0]){const gap=o.r+4,point={x:o.x+nx*gap-nz*side*(o.r+5),z:o.z+nz*gap+nx*side*(o.r+5)};
+   if(blocked(point.x,point.z,2.8))continue;
+   const probe={group:{position:new V(point.x,height(point.x,point.z),point.z)}};
+   const clear=los(probe,{group:{position:new V(e.x,e.y??height(e.x,e.z),e.z)}});
+   if(clear!==peek)continue;
+   choices.push({point,score:Math.hypot(point.x-p.x,point.z-p.z)+Math.hypot(point.x-anchor.x,point.z-anchor.z)*.4});
+  }
+ }
+ choices.sort((a,b)=>a.score-b.score);return choices[0]?.point;
+}
+function botPlan(t,visible){
+ const b=t.brain,p=t.group.position,role=b.role,allies=tanks.filter(a=>a!==t&&a.alive&&a.team===t.team);
+ const base={x:b.side*5,z:t.team===0?-3:3},support=role==='captureSupport'||role==='tacticalSupport';
+ if(support){const preferred=role==='captureSupport'?'capturer':'tactician';
+  const valid=a=>a&&a.alive&&a.team===t.team&&a!==t;
+  if(!valid(b.partner)||b.partner.brain?.role!==preferred){const candidates=allies.filter(a=>a.brain?.role===preferred);b.partner=candidates.sort((a,c)=>p.distanceToSquared(a.group.position)-p.distanceToSquared(c.group.position))[0]||(valid(b.partner)?b.partner:allies.find(a=>!['captureSupport','tacticalSupport'].includes(a.brain?.role)&&(!a.isPlayer||Math.abs(a.speed)>1||Math.hypot(a.group.position.x,a.group.position.z)<80)))||null;}
+ }
+ const anchor=b.partner?.group.position||p;
+ // Only sensed enemies are eligible: partners do not grant vision through walls.
+ const score=e=>{const q=e.group.position;let s=p.distanceTo(q);if(role==='capturer'||role==='captureSupport')s+=Math.hypot(q.x,q.z)*.9;if(support)s+=q.distanceTo(anchor)*1.3;if(e===t.target)s-=18;return s;};
+ visible.sort((a,c)=>score(a)-score(c));const target=visible[0]||null;
+ if(target!==t.target)t.aimTime=0;t.target=target;
+ if(target){b.memory={x:target.group.position.x,y:target.group.position.y,z:target.group.position.z,yaw:target.yaw,until:elapsed+8};}
+ if(b.memory&&b.memory.until<elapsed){b.memory=null;b.flankStage=0;b.flankGoal=null;}
+ const threat=target?.group.position||b.memory,dist=threat?Math.hypot(p.x-threat.x,p.z-threat.z):Infinity;
+ let goal=base,mode='Захват базы',pace=.85;
+ const retreat=()=>({x:p.x+(p.x-threat.x)/Math.max(1,dist)*22,z:p.z+(p.z-threat.z)/Math.max(1,dist)*22});
+ if(role==='capturer'){// Do not abandon a capture merely to chase an enemy.
+  if(threat&&dist<28&&t.hp<t.spec.hp*.2){goal=botCover(t,threat,base)||retreat();mode='Сохранение машины';}
+ }else if(role==='captureSupport'){
+  goal=b.partner?{x:anchor.x+b.side*9,z:anchor.z+(t.team===0?-1:1)*7}:base;mode='Прикрытие захватчика';
+  if(Math.hypot(anchor.x,anchor.z)<20&&!target){goal={x:-base.x,z:-base.z};mode='Совместный захват';}
+  if(target&&Math.hypot(p.x,p.z)<65){goal=botCover(t,threat,anchor,t.reload<.7)||{x:p.x,z:p.z};mode='Огневая поддержка базы';}
+ }else if(role==='push'){
+  pace=1;goal=threat?{x:threat.x,z:threat.z}:base;mode='Прорыв';if(dist<15)goal={x:p.x,z:p.z};
+ }else if(role==='tactician'||role==='tacticalSupport'){
+  pace=.72;const protect=t.hp<t.spec.hp*.4||t.reload>.9;
+  goal=role==='tacticalSupport'&&b.partner?{x:anchor.x+b.side*15,z:anchor.z+(t.team===0?-1:1)*12}:base;
+  mode=role==='tacticalSupport'?'Прикрытие тактика':'Выход на позицию';
+  if(threat){const cover=botCover(t,threat,role==='tacticalSupport'?anchor:p,!protect);
+   goal=cover||(protect||dist<45?retreat():dist>95?{x:threat.x,z:threat.z}:{x:p.x,z:p.z});mode=protect?'Укрытие / перезарядка':'Выход для выстрела';
+  }
+ }else if(role==='flanker'){
+  pace=.92;mode='Обход по флангу';
+  if(threat){const heading=target?.yaw??b.memory.yaw,nx=Math.sin(heading),nz=Math.cos(heading);
+   if(!b.flankGoal||b.flankStage===0){b.flankGoal={x:threat.x+nz*b.side*65-nx*15,z:threat.z-nx*b.side*65-nz*15};b.flankStage=1;}
+   if(b.flankStage===1&&Math.hypot(p.x-b.flankGoal.x,p.z-b.flankGoal.z)<14)b.flankStage=2;
+   goal=b.flankStage===1?b.flankGoal:{x:threat.x-nx*32,z:threat.z-nz*32};mode=b.flankStage===1?'Обход по флангу':'Атака в корму';
+  }else{const side=t.team===0?-1:1;goal=b.flankStage===0?{x:b.side*arena.size*.27,z:side*arena.size*.12}:base;if(Math.hypot(p.x-goal.x,p.z-goal.z)<15)b.flankStage=1;}
+ }
+ const limit=arena.size*.44;goal={x:Math.max(-limit,Math.min(limit,goal.x)),z:Math.max(-limit,Math.min(limit,goal.z))};
+ if(!b.goal||Math.hypot(goal.x-b.goal.x,goal.z-b.goal.z)>9)t.navTime=0;
+ b.goal=goal;b.mode=mode;b.pace=pace;
+}
 function updateBot(t,dt){
  const p=t.group.position;t.think-=dt;t.navTime-=dt;const difficulty=save.settings.difficulty;const cfg=difficulty==='easy'?{reaction:.9,spread:.055,aggression:.7}:difficulty==='hard'?{reaction:.26,spread:.016,aggression:1}:{reaction:.55,spread:.031,aggression:.87};
- if(t.think<=0){t.think=.3+rand()*.15;const enemies=tanks.filter(e=>e.alive&&e.team!==t.team&&p.distanceTo(e.group.position)<D.detectionRange(t.spec,e.spec,Math.abs(e.speed)>1,e.revealTime>0)&&los(t,e));enemies.sort((a,b)=>p.distanceToSquared(a.group.position)-p.distanceToSquared(b.group.position));const target=enemies[0]||null;if(target!==t.target)t.aimTime=0;t.target=target;}
- let goal={x:(t.team===0?-1:1)*4,z:0},retreat=t.hp<t.spec.hp*.24;
- if(t.target){const e=t.target.group.position,dist=p.distanceTo(e);goal=retreat?{x:p.x+(p.x-e.x)*.6,z:p.z+(p.z-e.z)*.6}:dist>34?{x:e.x,z:e.z}:{x:p.x,z:p.z};t.turretYaw=approach(t.turretYaw,Math.atan2(e.x-p.x,e.z-p.z),t.spec.turret*dt);t.aimTime+=dt;if(t.aimTime>cfg.reaction&&Math.abs(angle(Math.atan2(e.x-p.x,e.z-p.z)-t.turretYaw))<.12&&t.reload<=0){const target=e.clone().add(new V((rand()-.5)*dist*cfg.spread,1.45+(rand()-.5)*.8,(rand()-.5)*dist*cfg.spread));fire(t,target);t.aimTime=0;}}
- else{t.turretYaw=approach(t.turretYaw,t.yaw,t.spec.turret*dt);t.aimTime=0;}
- if(Math.hypot(goal.x-p.x,goal.z-p.z)>5){if(t.navTime<=0){t.path=route(p.x,p.z,goal.x,goal.z);t.navTime=1.6+rand();}while(t.path.length&&Math.hypot(t.path[0].x-p.x,t.path[0].z-p.z)<3.7)t.path.shift();const next=t.path[0]||goal;const desired=Math.atan2(next.x-p.x,next.z-p.z);const turn=angle(desired-t.yaw);t.yaw=approach(t.yaw,desired,t.spec.turn*dt);accelerateTank(t,t.stuck>1.5?-.6:cfg.aggression*Math.max(.12,1-Math.abs(turn)/1.8),dt,turn);if(!moveTank(t,dt)){t.stuck+=dt;t.yaw+=dt*(t.team===0?1:-1);if(t.stuck>1.5){t.path=[];t.navTime=0;if(t.stuck>3)t.stuck=0;}}else t.stuck=0;}else{accelerateTank(t,0,dt);moveTank(t,dt);}
- t.group.rotation.y=t.yaw;t.turret.rotation.y=angle(t.turretYaw-t.yaw);if(t.target){const e=t.target.group.position;const delta=e.clone().add(new V(0,1.4,0)).sub(p.clone().add(new V(0,2.05,0)));t.gunPivot.rotation.x=-Math.atan2(delta.y,Math.hypot(delta.x,delta.z));}
+ t.brain??=createBrain();
+ if(t.think<=0){t.think=.45+rand()*.3;const enemies=tanks.filter(e=>e.alive&&e.team!==t.team&&p.distanceTo(e.group.position)<D.detectionRange(t.spec,e.spec,Math.abs(e.speed)>1,e.revealTime>0)&&los(t,e));botPlan(t,enemies);}
+ const goal=t.brain.goal||{x:0,z:0};
+ if(t.target&&(!t.target.alive||!los(t,t.target))){t.target=null;t.aimTime=0;}
+ if(t.target){const e=t.target.group.position,dist=p.distanceTo(e),bearing=Math.atan2(e.x-p.x,e.z-p.z);t.turretYaw=approach(t.turretYaw,bearing,t.spec.turret*dt);t.aimTime+=dt;
+  const friendly=tanks.some(a=>a!==t&&a.team===t.team&&p.distanceTo(a.group.position)<dist&&D.segmentCircle(p.x,p.z,e.x,e.z,a.group.position.x,a.group.position.z,a.width*.6));
+  if(!friendly&&t.aimTime>cfg.reaction&&Math.abs(angle(bearing-t.turretYaw))<.09&&t.reload<=0){const lead=Math.min(.6,dist/D.shellSpeed),q=e.clone().add(new V(Math.sin(t.target.yaw)*t.target.speed*lead+(rand()-.5)*dist*cfg.spread,1.45+(rand()-.5)*.5,Math.cos(t.target.yaw)*t.target.speed*lead+(rand()-.5)*dist*cfg.spread));fire(t,q);t.aimTime=0;t.think=0;}
+ }else{t.turretYaw=approach(t.turretYaw,t.yaw,t.spec.turret*dt);t.aimTime=0;}
+ if(Math.hypot(goal.x-p.x,goal.z-p.z)>5){if(t.navTime<=0){t.path=route(p.x,p.z,goal.x,goal.z);t.navTime=1.6+rand();}while(t.path.length&&Math.hypot(t.path[0].x-p.x,t.path[0].z-p.z)<3.7)t.path.shift();let next=t.path[0]||goal;const vx=next.x-p.x,vz=next.z-p.z,len=Math.hypot(vx,vz)||1,ux=vx/len,uz=vz/len;
+  const blocker=tanks.find(o=>o!==t&&(o.alive||o.wreck)&&Math.abs(p.y-o.group.position.y)<3&&(()=>{const ox=o.group.position.x-p.x,oz=o.group.position.z-p.z,forward=ox*ux+oz*uz,side=Math.abs(ox*uz-oz*ux);return forward>0&&forward<Math.max(14,t.length+o.length)&&side<(t.width+o.width)/2+2;})());
+  if(blocker){const ox=blocker.group.position.x-p.x,oz=blocker.group.position.z-p.z,side=ux*oz-uz*ox>=0?-1:1,clearance=(t.width+blocker.width)/2+4;let detour={x:blocker.group.position.x-uz*side*clearance,z:blocker.group.position.z+ux*side*clearance};if(blocked(detour.x,detour.z,t.width*.65))detour={x:blocker.group.position.x+uz*side*clearance,z:blocker.group.position.z-ux*side*clearance};if(!blocked(detour.x,detour.z,t.width*.65))next=detour;}
+  const desired=Math.atan2(next.x-p.x,next.z-p.z);const turn=angle(desired-t.yaw);t.yaw=approach(t.yaw,desired,t.spec.turn*dt);accelerateTank(t,t.stuck>1.5?-.6:cfg.aggression*t.brain.pace*Math.max(.08,1-Math.abs(turn)/1.8),dt,turn);if(!moveTank(t,dt)){t.stuck+=dt;t.yaw+=dt*(t.team===0?1:-1);if(t.stuck>1.5){t.path=[];t.navTime=0;if(t.stuck>3)t.stuck=0;}}else t.stuck=0;}else{accelerateTank(t,0,dt);moveTank(t,dt);}
+ t.group.rotation.y=t.yaw;t.turret.rotation.y=angle(t.turretYaw-t.yaw);if(t.target){const e=t.target.group.position;aimGun(t,e.clone().add(new V(0,1.4,0)),dt);}
 }
 function vehicleEffects(t,dt,moved){t.effectClock-=dt;t.markClock-=dt;const p=t.group.position;if(t.effectClock<=0){t.effectClock=moved?.09:.28;const rear=new V(-Math.sin(t.yaw)*t.length*.44,1.35,-Math.cos(t.yaw)*t.length*.44).add(p);smoke(rear,moved?(arena===D.maps.winter?0xd7e0df:0x9d927b):0x5d6460,moved?.18:.11,moved?1.1:.55);if(moved){for(const side of [-1,1]){const dust=p.clone().add(new V(Math.cos(t.yaw)*side*t.width*.55,.12,-Math.sin(t.yaw)*side*t.width*.55));smoke(dust,arena===D.maps.winter?0xe1e7e5:arena===D.maps.desert?0xc5a879:0x817963,.24,1.8);}}}if(moved&&Math.abs(t.speed)>1&&t.markClock<=0){t.markClock=.16;for(const side of [-1,1]){const mark=new THREE.Mesh(trackGeo,trackMat);mark.rotation.x=-Math.PI/2;mark.rotation.z=-t.yaw;mark.position.set(p.x+Math.cos(t.yaw)*side*t.width*.5,height(p.x,p.z)+.035,p.z-Math.sin(t.yaw)*side*t.width*.5);mark.renderOrder=-1;world.add(mark);trackMarks.push({mesh:mark,life:32});}while(trackMarks.length>260){world.remove(trackMarks.shift().mesh);}}}
 function groundSurface(){return arena===D.maps.winter?D.surfaces.snow:arena===D.maps.desert?D.surfaces.sand:D.surfaces.earth;}
@@ -338,8 +423,16 @@ function moveTank(t,dt){
   const total=Math.hypot(t.speed,t.slip);if(total>t.spec.speed){t.speed*=t.spec.speed/total;t.slip*=t.spec.speed/total;}
   t.velocityX=sn*t.speed+cs*t.slip;t.velocityZ=cs*t.speed-sn*t.slip;
  }
- const dx=(t.velocityX||0)*dt,dz=(t.velocityZ||0)*dt,r=t.width*.65,oldX=p.x,oldZ=p.z;
+ let dx=(t.velocityX||0)*dt,dz=(t.velocityZ||0)*dt;const r=t.width*.65,oldX=p.x,oldZ=p.z;
  const blockedByTank=(x,z)=>tanks.some(o=>o!==t&&(o.alive||o.wreck)&&Math.abs(p.y-o.group.position.y)<3&&Remaster.overlaps(t,x,z,o));
+ const contact=tanks.find(o=>o!==t&&(o.alive||o.wreck)&&Math.abs(p.y-o.group.position.y)<3&&Remaster.overlaps(t,p.x+dx,p.z+dz,o));
+ if(contact){
+  const ox=contact.group.position.x-p.x,oz=contact.group.position.z-p.z;
+  // A square-on impact stops the hull. A shallow scrape retains only a small
+  // fraction of motion, so axis-by-axis obstacle checks cannot cause skating.
+  const retained=D.collisionRetention(dx,dz,ox,oz);
+  dx*=retained;dz*=retained;t.velocityX*=retained;t.velocityZ*=retained;
+ }
  if(!blocked(p.x+dx,p.z,r)&&!blockedByTank(p.x+dx,p.z))p.x+=dx;else t.velocityX=0;
  if(!blocked(p.x,p.z+dz,r)&&!blockedByTank(p.x,p.z+dz))p.z+=dz;else t.velocityZ=0;
  const travelled=Math.hypot(p.x-oldX,p.z-oldZ),didMove=travelled>.00001;
@@ -348,6 +441,12 @@ function moveTank(t,dt){
  if(t.suspension.impact>2){if(t.isPlayer)shake=Math.min(.45,t.suspension.impact*.025);smoke(p.clone().add(new V(0,.2,0)),0x938577,.5,2);}
  if(t.alive&&t.suspension.grounded)vehicleEffects(t,dt,didMove);
  return didMove;
+}
+function aimGun(t,target,dt){
+ t.group.updateMatrixWorld(true);
+ const local=t.turret.worldToLocal(target.clone()).sub(t.gunPivot.position);
+ const desired=THREE.MathUtils.clamp(-Math.atan2(local.y,Math.max(2.5,Math.hypot(local.x,local.z))),-.32,.22);
+ t.gunPivot.rotation.x+=THREE.MathUtils.clamp(desired-t.gunPivot.rotation.x,-.65*dt,.65*dt);
 }
 function muzzlePos(t){t.group.updateMatrixWorld(true);return t.gunPivot.localToWorld(new V(0,0,t.barrelLength+.5));}
 function aimPoint(){ray.setFromCamera(new THREE.Vector2(0,0),camera);ray.far=800;const targets=[ground,...solidMeshes,...tanks.filter(t=>t!==player&&(t.wreck||t.visible)&&(t.alive||t.wreck)).flatMap(t=>[...t.hitMeshes,...(t.wreckCollider?[t.wreckCollider]:[])] )];const hit=ray.intersectObjects(targets,false)[0];aimHit=hit||null;return hit?hit.point:ray.ray.at(750,new V());}
@@ -383,7 +482,7 @@ function updateCamera(dt){const focus=player.alive?player:tanks.find(t=>t.alive&
 function updateBattle(dt,frameTime){
  if(countdown>0){const delta=countdownClock===null?0:Math.max(0,(frameTime-countdownClock)/1000);countdownClock=frameTime;countdown=Math.max(0,countdown-delta);$('countNumber').textContent=Math.ceil(countdown);$('countdown').hidden=countdown<=0;updateCamera(dt);if(countdown===0){mouseDown=false;Object.keys(keys).forEach(k=>keys[k]=false);}return;}
  aiming=!!(keys.ShiftLeft||keys.ShiftRight);$('hud').classList?.toggle('aiming',aiming);elapsed+=dt;battleTime=Math.max(0,battleTime-dt);if(player.alive)record.life=elapsed;
- for(const t of tanks){if(!t.alive){accelerateTank(t,0,dt);moveTank(t,dt);continue;}t.reload=Math.max(0,t.reload-dt);t.revealTime=Math.max(0,(t.revealTime||0)-dt);t.trackTime=Math.max(0,t.trackTime-dt);if(t.isPlayer){const accel=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0);const turn=(keys.KeyA||keys.ArrowLeft?1:0)-(keys.KeyD||keys.ArrowRight?1:0);t.yaw+=turn*t.spec.turn*dt*(t.trackTime?0:1);accelerateTank(t,accel,dt,turn);moveTank(t,dt);t.group.rotation.y=t.yaw;t.turretYaw=approach(t.turretYaw,viewYaw,t.spec.turret*dt);t.turret.rotation.y=angle(t.turretYaw-t.yaw);t.aimBloom=D.aimStep(t.aimBloom,aiming,Math.min(1,Math.abs(t.speed)/Math.max(1,t.spec.speed)+Math.abs(turn)*.72),t.spec.aim,dt);lastAimPoint.copy(aimPoint());const muzzle=muzzlePos(t);const delta=lastAimPoint.clone().sub(muzzle);t.gunPivot.rotation.x=THREE.MathUtils.clamp(-Math.atan2(delta.y,Math.hypot(delta.x,delta.z)),-.32,.22);if((mouseDown||keys.Space)&&!(matchMode==='lan'&&net?.role==='guest'))fire(t,lastAimPoint);}else if(!t.remote)updateBot(t,dt);}
+ for(const t of tanks){if(!t.alive){accelerateTank(t,0,dt);moveTank(t,dt);continue;}t.reload=Math.max(0,t.reload-dt);t.revealTime=Math.max(0,(t.revealTime||0)-dt);t.trackTime=Math.max(0,t.trackTime-dt);if(t.isPlayer){const accel=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0);const turn=(keys.KeyA||keys.ArrowLeft?1:0)-(keys.KeyD||keys.ArrowRight?1:0);t.yaw+=turn*t.spec.turn*dt*(t.trackTime?0:1);accelerateTank(t,accel,dt,turn);moveTank(t,dt);t.group.rotation.y=t.yaw;t.turretYaw=approach(t.turretYaw,viewYaw,t.spec.turret*dt);t.turret.rotation.y=angle(t.turretYaw-t.yaw);t.aimBloom=D.aimStep(t.aimBloom,aiming,Math.min(1,Math.abs(t.speed)/Math.max(1,t.spec.speed)+Math.abs(turn)*.72),t.spec.aim,dt);lastAimPoint.copy(aimPoint());aimGun(t,lastAimPoint,dt);if((mouseDown||keys.Space)&&!(matchMode==='lan'&&net?.role==='guest'))fire(t,lastAimPoint);}else if(!t.remote)updateBot(t,dt);}
  networkStep(dt);updateProjectiles(dt);updateCamera(dt);
  const onBase=tanks.filter(t=>t.alive&&t.suspension?.grounded!==false&&Math.hypot(t.group.position.x,t.group.position.z)<12),a=onBase.filter(t=>t.team===0).length,b=onBase.filter(t=>t.team===1).length;if(a&&!b){capture=Math.min(100,capture+dt*3*a);if(onBase.includes(player))record.capture+=dt;}else if(b&&!a)capture=Math.max(-100,capture-dt*3*b);else if(!a&&!b)capture*=Math.exp(-dt*.015);
  const allies=tanks.filter(t=>t.alive&&t.team===0),enemies=tanks.filter(t=>t.alive&&t.team===1);if(!(matchMode==='lan'&&net?.role==='guest')){if(!enemies.length||capture>=100){endBattle(true,capture>=100?'База под контролем вашей команды':'Все противники уничтожены');return;}if(!allies.length||capture<=-100){endBattle(false,capture<=-100?'Противник захватил базу':'Ваша команда уничтожена');return;}if(battleTime<=0){const aHP=allies.reduce((s,t)=>s+t.hp/t.spec.hp,0),bHP=enemies.reduce((s,t)=>s+t.hp/t.spec.hp,0);endBattle(aHP>bHP,'Время вышло. Итог по оставшейся прочности команд.');return;}}
@@ -391,7 +490,7 @@ function updateBattle(dt,frameTime){
 }
 function updateMarkers(){for(const [t,el]of markers){if(!t.alive){el.hidden=true;continue;}const friendly=t.team===player.team,dist=player.group.position.distanceTo(t.group.position),visible=friendly||(dist<D.detectionRange(player.spec,t.spec,Math.abs(t.speed)>1,t.revealTime>0)&&los(player,t));el.className='marker '+(friendly?'friendly':'');if(visible&&!friendly&&!t.seen&&player.alive){t.seen=true;record.spotted++;}t.visible=visible;t.group.visible=visible;const point=t.group.position.clone().add(new V(0,4.1,0)).project(camera);el.hidden=!visible||point.z>1||point.z<0||Math.abs(point.x)>1.15||Math.abs(point.y)>1.15;if(!el.hidden){el.style.left=(point.x*.5+.5)*innerWidth+'px';el.style.top=(-point.y*.5+.5)*innerHeight+'px';el.innerHTML=`${friendly?'◆':'◇'} ${t.spec.name}<div><i style="width:${t.hp/t.spec.hp*100}%"></i></div>${Math.ceil(t.hp)} · ${Math.round(dist)} м`;}}}
 function updatePenetration(){const dot=$('penetrationDot'),label=$('penetrationLabel'),t=aimHit?.object.userData.tank;if(!t||!t.alive||t.team===player.team){dot.style.background='#dbe2dc';label.textContent=aiming?player.spec.zoom.toFixed(1)+'×':'';return;}const normal=aimHit.face?.normal.clone().transformDirection(aimHit.object.matrixWorld),direction=aimHit.point.clone().sub(muzzlePos(player)).normalize(),result=D.penetration(player.spec,t.spec,Remaster.zone(aimHit,t),normal?Math.abs(normal.dot(direction)):1,player.group.position.distanceTo(aimHit.point));dot.style.background=result.color;dot.style.boxShadow='0 0 12px '+result.color;label.style.color=result.color;label.textContent=(result.chance>=.75?'ПРОБИТИЕ':result.chance>=.25?'РИСК НЕПРОБИТИЯ':'БРОНЯ НЕ ПРОБИВАЕТСЯ')+' · '+Math.round(result.chance*100)+'%';}
-function updateHUD(){updatePenetration();const a=tanks.filter(t=>t.alive&&t.team===0).length,b=tanks.filter(t=>t.alive&&t.team===1).length;$('alliesScore').textContent=a;$('enemiesScore').textContent=b;$('timer').textContent=`${Math.floor(battleTime/60).toString().padStart(2,'0')}:${Math.floor(battleTime%60).toString().padStart(2,'0')}`;$('hpText').textContent=`${Math.ceil(player.hp)} / ${player.spec.hp}`;$('hpBar').style.width=player.hp/player.spec.hp*100+'%';$('speedText').textContent=player.trackTime>0?'ГУСЕНИЦА · '+Math.ceil(player.trackTime)+' С':Math.round(Math.abs(player.speed)*3.6)+' км/ч';$('reloadLabel').textContent=!player.alive?'МАШИНА УНИЧТОЖЕНА':player.reload>.05?`ПЕРЕЗАРЯДКА ${player.reload.toFixed(1)} с`:'ОРУДИЕ ГОТОВО';$('reloadBar').style.width=(1-player.reload/player.spec.reload)*100+'%';$('objectiveText').textContent=Math.abs(capture)>1?`${capture>0?'ВАША КОМАНДА':'ПРОТИВНИК'} · БАЗА A ${Math.floor(Math.abs(capture))}%`:'ЗАХВАТИТЕ БАЗУ A';$('captureBar').style.width=Math.abs(capture)+'%';$('captureBar').style.background=capture>=0?'#80c7c0':'#e78c72';const settled=Math.round((1-(player.aimBloom||1))*100);$('range').textContent=player.reload>.05?`${player.reload.toFixed(1)} С`:`${Math.round(player.group.position.distanceTo(lastAimPoint))} М · СВЕДЕНИЕ ${settled}%`;document.querySelector('.reticle').style.transform=`scale(${.42+(player.aimBloom||1)*.88})`;drawMinimap();if(elapsed>22&&!save.tutorial){save.tutorial=true;persist();$('tutorialHint').textContent='';}}
+function updateHUD(){updatePenetration();const a=tanks.filter(t=>t.alive&&t.team===0).length,b=tanks.filter(t=>t.alive&&t.team===1).length;$('alliesScore').textContent=a;$('enemiesScore').textContent=b;$('timer').textContent=`${Math.floor(battleTime/60).toString().padStart(2,'0')}:${Math.floor(battleTime%60).toString().padStart(2,'0')}`;$('hpText').textContent=`${Math.ceil(player.hp)} / ${player.spec.hp}`;$('hpBar').style.width=player.hp/player.spec.hp*100+'%';$('speedText').textContent=player.trackTime>0?'ГУСЕНИЦА · '+Math.ceil(player.trackTime)+' С':Math.round(Math.abs(player.speed)*3.6)+' км/ч';$('reloadLabel').textContent=!player.alive?'МАШИНА УНИЧТОЖЕНА':player.reload>.05?`ПЕРЕЗАРЯДКА ${player.reload.toFixed(1)} с`:'ОРУДИЕ ГОТОВО';$('reloadBar').style.width=(1-player.reload/player.spec.reload)*100+'%';$('objectiveText').textContent=Math.abs(capture)>1?`${capture>0?'ВАША КОМАНДА':'ПРОТИВНИК'} · БАЗА A ${Math.floor(Math.abs(capture))}%`:'ЗАХВАТИТЕ БАЗУ A';$('captureBar').style.width=Math.abs(capture)+'%';$('captureBar').style.background=capture>=0?'#80c7c0':'#e78c72';$('sightReady').textContent=player.reload>.05?player.reload.toFixed(1)+' с':'Готов';$('sightHealth').textContent=Math.round(player.hp/player.spec.hp*100)+'%';const settled=Math.round((1-(player.aimBloom||1))*100);$('range').textContent=player.reload>.05?`${player.reload.toFixed(1)} С`:`${Math.round(player.group.position.distanceTo(lastAimPoint))} М · СВЕДЕНИЕ ${settled}%`;document.querySelector('.reticle').style.transform=`scale(${.42+(player.aimBloom||1)*.88})`;drawMinimap();if(elapsed>22&&!save.tutorial){save.tutorial=true;persist();$('tutorialHint').textContent='';}}
 function drawMinimap(){const ctx=$('minimap').getContext('2d'),size=220,scale=size/arena.size;ctx.fillStyle=arena===D.maps.desert?'#655d47':arena===D.maps.winter?'#56686e':'#394d43';ctx.fillRect(0,0,size,size);ctx.strokeStyle='#ffffff0e';ctx.lineWidth=1;for(let i=0;i<=5;i++){ctx.beginPath();ctx.moveTo(i*44,0);ctx.lineTo(i*44,220);ctx.moveTo(0,i*44);ctx.lineTo(220,i*44);ctx.stroke();}const X=x=>110+x*scale,Z=z=>110-z*scale;ctx.fillStyle='#adbaab50';for(const o of obstacles){ctx.beginPath();ctx.arc(X(o.x),Z(o.z),o.r*scale,0,Math.PI*2);ctx.fill();}ctx.strokeStyle='#ddc88b';ctx.beginPath();ctx.arc(110,110,12*scale,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#eddbab';ctx.font='11px sans-serif';ctx.fillText('A',107,114);for(const t of tanks){if(!t.alive||(t.team===1&&!t.visible))continue;ctx.save();ctx.translate(X(t.group.position.x),Z(t.group.position.z));ctx.rotate(t.yaw);ctx.fillStyle=t.isPlayer?'#fff0ba':t.team===0?'#83d0c1':'#ef997a';ctx.beginPath();ctx.moveTo(0,-5);ctx.lineTo(4,4);ctx.lineTo(-4,4);ctx.closePath();ctx.fill();if(t.isPlayer){ctx.strokeStyle='#fff0ba70';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-11,-24);ctx.moveTo(0,0);ctx.lineTo(11,-24);ctx.stroke();}ctx.restore();}}
 function endBattle(win,reason){if(state!=='battle')return;if(matchMode==='lan'&&net?.role==='host')netSend('end',{winner:win?player.team:1-player.team,reason});updateHUD();state='result';paused=false;Platform.gameplay(false);document.exitPointerLock?.();mouseDown=false;record.win=win;record.survived=player.alive;const reward=D.reward(record);save.silver+=reward.silver;save.xp+=reward.xp;save.battles++;if(win)save.wins++;persist();if(engineGain)engineGain.gain.value=0;$('scoreboard').hidden=true;showModal(`<div class="end-medal">${win?'◈':'◇'}</div><div class="result-title"><small>ОПЕРАЦИЯ ЗАВЕРШЕНА</small><h2>${win?'Победа':'Поражение'}</h2><p>${reason}</p></div><div class="row"><span>Нанесённый урон</span><b>${record.damage}</b></div><div class="row"><span>Уничтожено / обнаружено</span><b>${record.kills} / ${record.spotted}</b></div><div class="row"><span>Время жизни / захват базы</span><b>${Math.floor(record.life)} с / ${Math.floor(record.capture)} с</b></div><div class="reward"><div>+${reward.silver} ◉<small>СЕРЕБРО</small></div><div>+${reward.xp} ✦<small>ОПЫТ</small></div></div><p class="help-note">Участие ${reward.parts.participation} · урон ${reward.parts.damage} · фраги ${reward.parts.kills} · победа ${reward.parts.victory} · разведка ${reward.parts.spotting} · база ${reward.parts.objective} · выживание ${reward.parts.survival}</p><button id="returnGarage" class="primary">В АНГАР →</button>`);$('returnGarage').onclick=()=>{net=null;matchMode='solo';hangar();};}
 function showModal(html){$('modalContent').innerHTML=html;$('modal').hidden=false;}
@@ -401,7 +500,7 @@ function settings(){const inBattle=state==='battle';showModal(`<div class="eyebr
 function applyQuality(){renderer.shadowMap.enabled=save.settings.quality==='high';renderer.setPixelRatio(Math.min(devicePixelRatio,save.settings.quality==='high'?2:1));if(scene)scene.traverse(o=>{if(o.material)o.material.needsUpdate=true;});}
 function details(){const s=D.stats(chosen(),save.modules[save.selected]);showModal(`<div class="eyebrow">ПАСПОРТ МАШИНЫ · ${s.nation.toUpperCase()}</div><h2>${s.name}</h2><table>${[['Класс',s.cls],['Уровень',s.level+'/5'],['Прочность',s.hp+' HP'],['Урон',s.damage],['Перезарядка',s.reload+' с'],['Скорость',Math.round(s.speed*3.6)+' км/ч'],['Поворот корпуса',(s.turn*180/Math.PI).toFixed(0)+' °/с'],['Поворот башни',(s.turret*180/Math.PI).toFixed(0)+' °/с'],['Снижение урона бронёй',s.armor+'%'],['Дальность обзора',s.view+' м'],['Оптическое увеличение',s.zoom.toFixed(2)+'×'],['Точность',Math.round((1-s.spread)*1000)/10+'%'],['Разброс',s.spread.toFixed(3)+' рад'],['Время сведения',s.aim.toFixed(2)+' с'],['Прочность ходовой',s.tracks+' (паспорт)'],['Маскировка',Math.round(s.camo*100)+'%']].map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table><p class="help-note">Оптика включается удержанием Shift. Увеличение зависит от класса, нации и уровня модернизации.</p><button id="closeDetails" class="secondary">← Назад в ангар</button>`);$('closeDetails').onclick=()=>$('modal').hidden=true;}
 function help(){showModal('<div class="eyebrow">КУРС МОЛОДОГО КОМАНДИРА</div><h2>Займите свой рубеж</h2><p>В одиночном режиме вы и два союзных бота сражаетесь против трёх противников. В локальной сети — честный бой 1 × 1.</p><div class="tutorial-keys"><span><kbd>W / S</kbd> вперёд / назад</span><span><kbd>A / D</kbd> поворот корпуса</span><span><kbd>Мышь</kbd> башня и камера</span><span><kbd>ЛКМ</kbd> выстрел</span><span><kbd>Shift</kbd> оптика танка</span><span><kbd>Пробел</kbd> выстрел</span><span><kbd>Tab</kbd> состав команд</span><span><kbd>Esc</kbd> пауза</span></div><p>Удерживайте Shift для оптического прицела. Его увеличение зависит от характеристик выбранной машины и растёт с модернизацией.</p><p>Для боя через Radmin хост запускает PLAY.cmd, создаёт лобби и передаёт другу адрес сервера и пятизначный код.</p><button id="closeHelp" class="primary">ПОНЯТНО →</button>');$('closeHelp').onclick=()=>{$('modal').hidden=true;};}
-function scoreboard(){if(state!=='battle'||paused)return;$('scoreboard').hidden=false;const order=player.team===0?[0,1]:[1,0];$('teamList').innerHTML=order.map((team,index)=>`<p class="${index===0?'ally':'enemy'}">${index===0?'ВАША КОМАНДА':'ПРОТИВНИК'}</p>`+tanks.filter(t=>t.team===team).map(t=>`<div class="team-row ${t.alive?'':'dead'}"><span>${t.name} · ${t.spec.name}</span><b>${t.alive?Math.ceil(t.hp)+' HP':'Уничтожен'}</b></div>`).join('')).join('');}
+function scoreboard(){if(state!=='battle'||paused)return;$('scoreboard').hidden=false;const order=player.team===0?[0,1]:[1,0];$('teamList').innerHTML=order.map((team,index)=>`<p class="${index===0?'ally':'enemy'}">${index===0?'ВАША КОМАНДА':'ПРОТИВНИК'}</p>`+tanks.filter(t=>t.team===team).map(t=>`<div class="team-row ${t.alive?'':'dead'}"><span>${t.name} · ${t.spec.name}${t.brain?' · '+botRoles[t.brain.role]:''}</span><b>${t.alive?Math.ceil(t.hp)+' HP':'Уничтожен'}</b></div>`).join('')).join('');}
 function bindMobileControls(){
  const buttons=document.querySelectorAll?document.querySelectorAll('[data-touch-key]'):[];buttons.forEach(button=>{const code=button.dataset.touchKey;const press=e=>{e.preventDefault();initAudio();keys[code]=true;button.classList.add('pressed');};const release=e=>{e.preventDefault();keys[code]=false;button.classList.remove('pressed');};button.addEventListener('pointerdown',press,{passive:false});button.addEventListener('pointerup',release,{passive:false});button.addEventListener('pointercancel',release,{passive:false});button.addEventListener('pointerleave',release,{passive:false});});
  const aim=$('touchAim'),fireButton=$('touchFire');if(aim){const on=e=>{e.preventDefault();keys.ShiftLeft=true;aim.classList.add('pressed');};const off=e=>{e.preventDefault();keys.ShiftLeft=false;aim.classList.remove('pressed');};aim.addEventListener('pointerdown',on,{passive:false});aim.addEventListener('pointerup',off,{passive:false});aim.addEventListener('pointercancel',off,{passive:false});}if(fireButton){const on=e=>{e.preventDefault();initAudio();mouseDown=true;fireButton.classList.add('pressed');};const off=e=>{e.preventDefault();mouseDown=false;fireButton.classList.remove('pressed');};fireButton.addEventListener('pointerdown',on,{passive:false});fireButton.addEventListener('pointerup',off,{passive:false});fireButton.addEventListener('pointercancel',off,{passive:false});}
@@ -409,7 +508,7 @@ function bindMobileControls(){
 }
 bindMobileControls();
 function bind(){
- $('hangarTab').onclick=()=>showGarageSection('hangar');$('techTab').onclick=()=>{researchNation=chosen().n;showGarageSection('research');};$('researchTab').onclick=()=>{researchNation=chosen().n;showGarageSection('research');};$('tasksTab').onclick=()=>{showModal('<div class="eyebrow">БОЕВЫЕ ЗАДАЧИ</div><h2>Приказы командования</h2><div class="row"><span>Провести один бой</span><b>+300 ◉</b></div><div class="row"><span>Обнаружить противника</span><b>+25 ◉</b></div><div class="row"><span>Одержать победу</span><b>+200 ◉</b></div><button id="closeTasks" class="secondary">ЗАКРЫТЬ</button>');$('closeTasks').onclick=()=>{$('modal').hidden=true;};};$('researchClose').onclick=()=>showGarageSection('hangar');
+ $('hangarTab').onclick=()=>showGarageSection('hangar');$('researchTab').onclick=()=>{researchNation=chosen().n;showGarageSection('research');};$('tasksTab').onclick=()=>{showModal('<div class="eyebrow">БОЕВЫЕ ЗАДАЧИ</div><h2>Приказы командования</h2><div class="row"><span>Провести один бой</span><b>+300 ◉</b></div><div class="row"><span>Обнаружить противника</span><b>+25 ◉</b></div><div class="row"><span>Одержать победу</span><b>+200 ◉</b></div><button id="closeTasks" class="secondary">ЗАКРЫТЬ</button>');$('closeTasks').onclick=()=>{$('modal').hidden=true;};};$('researchClose').onclick=()=>showGarageSection('hangar');
  for(const key of Object.keys(D.moduleNames))$('module-'+key).onclick=()=>{selectedModule=key;renderGarage();sound('ui');};
  $('armorBtn').onclick=()=>{armorView=!armorView;Remaster.armorMask(preview,armorView,D.stats(chosen(),save.modules[save.selected]));$('armorLegend').hidden=!armorView;renderGarage();};$('unlockBtn').onclick=()=>{if(D.unlock(save,save.selected)){persist();renderGarage();toast('Танк исследован и куплен');}};
  $('fullscreenBtn').onclick=()=>{if(document.fullscreenElement)document.exitFullscreen?.();else document.documentElement.requestFullscreen?.()?.catch?.(()=>toast('Откройте игру в отдельном окне браузера.'));};
@@ -423,5 +522,6 @@ function animate(now){const dt=Math.min(.045,(now-lastTime)/1000||.016);lastTime
 try{renderer=new THREE.WebGLRenderer({canvas:$('world'),antialias:true,powerPreference:'high-performance'});renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.04;camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.15,2400);applyQuality();bind();hangar();renderer.render(scene,camera);$('loading').hidden=true;Platform.markReady();renderer.setAnimationLoop(animate);Platform.init((cloud,started)=>{if(state==='garage'&&save.updated<started&&cloud.updated>save.updated){save=cloud;hangar();toast('Облачный прогресс восстановлен');}},pause);}
 catch(error){console.error(error);$('loading').innerHTML='<h1>Не удалось запустить 3D</h1><p>Включите аппаратное ускорение в браузере и обновите драйвер видеокарты.</p><p>'+String(error.message).replace(/[<>]/g,'')+'</p>';}
 // Read-only inspection, useful for support and acceptance tests.
-window.gameStatus=()=>({state,paused,countdown,armorView,owned:{...save.owned},map:save.map,tank:save.selected,mode:matchMode,network:net?{role:net.role,code:net.code,players:net.players?.length||0}:null,silver:save.silver,levels:{...save.levels},modules:structuredClone(save.modules),elapsed,camera:{fov:camera?.fov,zoom:camera?.zoom,aiming},player:player?{team:player.team,hp:player.hp,x:player.group.position.x,z:player.group.position.z,reload:player.reload,zoom:player.spec.zoom}:null,teams:tanks.map(t=>({team:t.team,hp:t.hp,alive:t.alive,x:t.group.position.x,z:t.group.position.z})),drawCalls:renderer?.info.render.calls});
+window.gameStatus=()=>({state,paused,countdown,armorView,owned:{...save.owned},map:save.map,tank:save.selected,mode:matchMode,network:net?{role:net.role,code:net.code,players:net.players?.length||0}:null,silver:save.silver,levels:{...save.levels},modules:structuredClone(save.modules),elapsed,camera:{fov:camera?.fov,zoom:camera?.zoom,aiming},player:player?{team:player.team,hp:player.hp,x:player.group.position.x,z:player.group.position.z,reload:player.reload,zoom:player.spec.zoom}:null,teams:tanks.map(t=>({team:t.team,hp:t.hp,alive:t.alive,role:t.brain?.role,behavior:t.brain?.mode,x:t.group.position.x,z:t.group.position.z})),drawCalls:renderer?.info.render.calls});
+window.gameMapAudit=()=>state==='battle'?{map:save.map,obstacles:obstacles.length,spawns:tanks.map(t=>{const p=t.group.position,samples=[];for(const sx of [-t.width/2,t.width/2])for(const sz of [-t.length/2,t.length/2])samples.push(height(p.x+sx,p.z+sz));return {team:t.team,x:p.x,z:p.z,blocked:blocked(p.x,p.z,t.width*.65),relief:Math.max(...samples)-Math.min(...samples),routeSteps:route(p.x,p.z,0,0).length};})}:null;
 })();

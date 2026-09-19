@@ -3,9 +3,10 @@
   "private": true,
   "version": "0.3.0",
   "scripts": {
-    "test": "node tests/collection.cjs && node tests/economy.cjs && node tests/models.cjs && node tests/simulation.cjs",
+    "test": "node tests/collection.cjs && node tests/economy.cjs && node tests/models.cjs && node tests/physics.cjs && node tests/tank-contact.cjs && node tests/roads-crates.cjs && node tests/terrain-aim-regression.cjs && node tests/visual-world.cjs && node tests/map-layout.cjs && node tests/simulation.cjs",
+    "build:web": "node tools/build-web.cjs",
     "mobile:add": "npx cap add android",
-    "mobile:sync": "npx cap copy",
+    "mobile:sync": "npm run build:web && npx cap sync android",
     "mobile:open": "npx cap open android"
   },
   "dependencies": {
