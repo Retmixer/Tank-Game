@@ -6,7 +6,7 @@ const crypto=require('node:crypto');
 const root=__dirname;
 const port=Number(process.env.STEEL_PORT)||8765;
 const rooms=new Map();
-const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.txt':'text/plain; charset=utf-8'};
+const types={'.ogg':'audio/ogg','.md':'text/plain; charset=utf-8','.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.txt':'text/plain; charset=utf-8'};
 const json=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
 const body=req=>new Promise((resolve,reject)=>{let raw='';req.on('data',c=>{raw+=c;if(raw.length>65536)req.destroy();});req.on('end',()=>{try{resolve(raw?JSON.parse(raw):{});}catch(e){reject(e);}});req.on('error',reject);});
 const code=()=>{const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let value='';do{value='';for(let i=0;i<5;i++)value+=chars[crypto.randomInt(chars.length)];}while(rooms.has(value));return value;};

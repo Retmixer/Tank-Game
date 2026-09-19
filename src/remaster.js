@@ -216,7 +216,8 @@
   // Reuse the closed primary turret shell exactly, rather than an oversized box.
   const turretSolid=new T.Mesh(shell.geometry,collisionMaterial);turretSolid.position.copy(shell.position);turretSolid.rotation.copy(shell.rotation);turretSolid.scale.copy(shell.scale);turretSolid.userData={zone:'turret',collisionOnly:true};turret.add(turretSolid);collisionMeshes.push(turretSolid);
   hitMeshes.push(...collisionMeshes);
-  const model={group,turret,gunPivot,barrelLength,wheels,hitMeshes,collisionMeshes,trackBelts,width,length,holes:[],effectClock:0,markClock:0};
+  const gunRecoil=new T.Group();for(const child of [...gunPivot.children])gunRecoil.add(child);gunPivot.add(gunRecoil);
+  const model={group,turret,gunPivot,gunRecoil,barrelLength,wheels,hitMeshes,collisionMeshes,trackBelts,width,length,holes:[],effectClock:0,markClock:0};
   updateBelts(model,()=>0);return model;
  }
  function updateBelts(t,groundLocal){

@@ -6,7 +6,8 @@
     "test": "node tests/collection.cjs && node tests/economy.cjs && node tests/models.cjs && node tests/simulation.cjs",
     "mobile:add": "npx cap add android",
     "mobile:sync": "npx cap copy",
-    "mobile:open": "npx cap open android"
+    "mobile:open": "npx cap open android",
+    "test:combat": "node tests/battle-upgrade.cjs && node tests/battle-results.cjs && node tests/mobility.cjs && node tests/physics.cjs"
   },
   "dependencies": {
     "@capacitor/android": "^6.2.1",
