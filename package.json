@@ -7,7 +7,8 @@
     "build:web": "node tools/build-web.cjs",
     "mobile:add": "npx cap add android",
     "mobile:sync": "npm run build:web && npx cap sync android",
-    "mobile:open": "npx cap open android"
+    "mobile:open": "npx cap open android",
+    "test:combat": "node tests/battle-upgrade.cjs && node tests/battle-results.cjs && node tests/mobility.cjs && node tests/physics.cjs"
   },
   "dependencies": {
     "@capacitor/android": "^6.2.1",

@@ -25,7 +25,24 @@
   return Math.max(.18,Math.min(1,value+(target-value)*(1-Math.exp(-Math.max(0,dt)*4/rate))));
  }
  function shellDrop(distance,speed=shellSpeed,gravityScale=shellGravity){const time=Math.max(0,distance)/Math.max(1,speed);return .5*gravity*Math.max(0,gravityScale)*time*time;}
- function detectionRange(observer,target,moving=false,fired=false){const concealment=Math.max(0,Math.min(.55,(target?.camo||0)+(moving?-.05:0)+(fired?-.22:0)));return Math.max(45,(observer?.view||100)*(1-concealment*.72));}
+ function sightRange(spec,scoped=false){return (spec?.view||100)*(scoped?([1.9,1.65,1.45,2.1][spec?.c]||1.5):1);}
+ function detectionRange(observer,target,moving=false,fired=false,scoped=false){const concealment=Math.max(0,Math.min(.55,(target?.camo||0)+(moving?-.05:0)+(fired?-.22:0)));return Math.max(45,sightRange(observer,scoped)*(1-concealment*.72));}
+ // Differential steering: heavier hulls build yaw momentum more slowly;
+ // traction limits steering at speed and on slippery surfaces.
+ function steeringStep(spec,rate,input,speed,dt,surface=surfaces.earth){
+  const grip=Math.min(1,surface.kinetic/surfaces.earth.kinetic),fraction=Math.min(1,Math.abs(speed)/spec.speed);
+  const target=Math.max(-1,Math.min(1,input))*spec.turn*Math.sqrt(grip)*(1-fraction*.48);
+  const response=(input?3.8:6)*Math.sqrt(32/spec.mass)*grip;
+  return rate+(target-rate)*(1-Math.exp(-response*Math.max(0,dt)));
+ }
+ function contactImpulse(massA,massB,closingSpeed){return Math.max(0,closingSpeed)*1.04/(1/Math.max(1,massA)+(Number.isFinite(massB)?1/Math.max(1,massB):0));}
+ function randomRoster(count,random=Math.random){const pool=tanks.slice();for(let i=pool.length-1;i>0;i--){const j=Math.min(i,Math.floor(random()*(i+1)));[pool[i],pool[j]]=[pool[j],pool[i]];}return pool.slice(0,count);}
+ // Equal damage and kills share a place. Stable IDs only order tied rows.
+ function standings(rows){
+  const sorted=rows.map(r=>({...r,damage:Math.max(0,r.damage||0),kills:Math.max(0,r.kills||0)})).sort((a,b)=>b.damage-a.damage||b.kills-a.kills||String(a.id).localeCompare(String(b.id)));
+  sorted.forEach((r,i)=>{const previous=sorted[i-1];r.place=previous&&r.damage===previous.damage&&r.kills===previous.kills?previous.place:i+1;});return sorted;
+ }
+
  const surfaces={earth:{static:.72,kinetic:.55,rolling:.025},sand:{static:.58,kinetic:.46,rolling:.065},snow:{static:.35,kinetic:.24,rolling:.04}};
  // Acceleration along a slope with Coulomb friction and static sticking.
  function frictionSpeed(speed,slope,dt,mu){const angle=Math.atan(slope),pull=-gravity*Math.sin(angle),friction=mu*gravity*Math.cos(angle);if(Math.abs(speed)<.001&&Math.abs(pull)<=friction)return 0;const sign=Math.sign(speed)||Math.sign(pull),next=speed+(pull-sign*friction)*dt;if(next*sign<0&&Math.abs(pull)<=friction)return 0;return next;}
@@ -50,9 +67,13 @@
   const brake=Math.min(surface.static,3.2*Math.sqrt(32/spec.mass)/gravity);
   if(braking)return Math.max(-spec.reverse,Math.min(spec.speed,frictionSpeed(speed,slope,dt,Math.abs(speed)<.001?surface.static:brake)));
   const mass=spec.mass*1000,power=spec.power*735.5*.72;
-  const traction=Math.min(2.3,surface.kinetic*gravity/Math.sqrt(1+slope*slope),power/(mass*Math.max(3,Math.abs(speed))));
+  // Low gear supplies wheel torque uphill. Limit net acceleration rather than
+  // tractive force, otherwise a heavy tank stalls on a modest slope at launch.
+  const traction=Math.min(surface.kinetic*gravity/Math.sqrt(1+slope*slope),power/(mass*Math.max(1.2,Math.abs(speed))))*Math.abs(throttle);
   const resistance=surface.rolling*gravity+.0025*speed*speed+Math.abs(turn)*.32;
-  const force=Math.sign(throttle)*Math.max(0,traction-resistance)-gravity*Math.sin(Math.atan(slope));
+  const rawForce=Math.sign(throttle)*Math.max(0,traction-resistance)-gravity*Math.sin(Math.atan(slope));
+  const accelerationLimit=Math.min(2.65,1+spec.power/spec.mass*.06);
+  const force=Math.max(-accelerationLimit,Math.min(accelerationLimit,rawForce));
   let next=speed+force*dt;
   // Static grip can hold a stalled vehicle only below the friction angle.
   if(next*throttle<0&&Math.abs(slope)<=surface.static)next=0;
@@ -61,7 +82,7 @@
  function defaults(){return {version:3,purchaseOrder:['0-1'],modules:Object.fromEntries(tanks.map(t=>[t.id,moduleLevels()])),owned:{'0-1':true},updated:0,selected:'0-1',nation:0,silver:0,xp:0,levels:Object.fromEntries(tanks.map(t=>[t.id,1])),battles:0,wins:0,tutorial:false,settings:{volume:.45,quality:'high',difficulty:'normal',sensitivity:1},map:'training'};}
  function clean(raw){const d=defaults();if(!raw||typeof raw!=='object')return d;const number=(x,min,max,fallback)=>Number.isFinite(x)?Math.max(min,Math.min(max,x)):fallback;for(const k of ['silver','xp','battles','wins','updated'])d[k]=Math.floor(number(raw[k],0,1e14,0));for(const t of tanks){d.levels[t.id]=Math.floor(number(raw.levels?.[t.id],1,5,1));if(raw.owned?.[t.id]===true||(!raw.owned&&d.levels[t.id]>1))d.owned[t.id]=true;}for(const t of tanks){d.modules[t.id]=moduleLevels(raw.modules?.[t.id]??d.levels[t.id]);d.levels[t.id]=Math.max(...Object.values(d.modules[t.id]));}const requested=tanks.find(t=>t.id===raw.selected),fallback=tanks.find(t=>d.owned[t.id])||tanks[1];d.selected=requested&&d.owned[requested.id]?requested.id:fallback.id;d.nation=tanks.find(t=>t.id===d.selected).n;d.purchaseOrder=[...new Set([...(Array.isArray(raw.purchaseOrder)?raw.purchaseOrder:[]),...Object.keys(d.owned)])].filter(id=>d.owned[id]);d.tutorial=raw.tutorial===true;d.map=maps[raw.map]?raw.map:'training';const s=raw.settings||{};d.settings.volume=number(s.volume,0,1,.45);d.settings.sensitivity=number(s.sensitivity,.25,2.5,1);d.settings.quality=['low','high'].includes(s.quality)?s.quality:'high';d.settings.difficulty=['easy','normal','hard'].includes(s.difficulty)?s.difficulty:'normal';return d;}
  function upgrade(save,id){if(!save.owned?.[id])return false;const level=save.levels[id];if(!tanks.some(t=>t.id===id)||level>=5||save.silver<costs[level])return false;save.silver-=costs[level];save.levels[id]++;(save.modules??={})[id]=moduleLevels(save.levels[id]);return true;}
- function reward(r){const parts={participation:300,damage:Math.floor(Math.max(0,r.damage)*.2),kills:r.kills*150,victory:r.win?200:0,spotting:r.spotted*25,objective:Math.floor(r.capture*4),survival:r.survived?75:0};return {parts,silver:Object.values(parts).reduce((a,b)=>a+b,0),xp:Math.floor(70+Math.max(0,r.damage)*.12+r.kills*60+(r.win?100:0))};}
+ function reward(r){const rank=r.place>0?Math.max(0,7-r.place):0,parts={participation:300,damage:Math.floor(Math.max(0,r.damage||0)*.2),kills:(r.kills||0)*150,victory:r.win?200:0,spotting:(r.spotted||0)*25,objective:Math.floor((r.capture||0)*4),survival:r.survived?75:0,placement:rank*75};return {parts,silver:Object.values(parts).reduce((a,b)=>a+b,0),xp:Math.floor(70+Math.max(0,r.damage||0)*.12+(r.kills||0)*60+(r.win?100:0)+rank*30)};}
  function segmentCircle(ax,az,bx,bz,cx,cz,r){const dx=bx-ax,dz=bz-az,l=dx*dx+dz*dz,t=l?Math.max(0,Math.min(1,((cx-ax)*dx+(cz-az)*dz)/l)):0;return (ax+dx*t-cx)**2+(az+dz*t-cz)**2<=r*r;}
  function rng(seed){return ()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
  function price(id){const t=tanks.find(t=>t.id===id);return t?{xp:[350,850,1500,2100][t.c]+t.n*150,silver:[1200,2800,4800,6500][t.c]+t.n*400}:null;}
@@ -90,6 +111,6 @@
   const approach=(dx*ox+dz*oz)/(Math.hypot(dx,dz)*Math.hypot(ox,oz)||1);
   return approach<=0?1:approach>.48?0:.16;
  }
- root.GameData={moduleNames,moduleLevels,upgradeModule,price,unlock,penetration,ricochetVelocity,collisionRetention,armorZones,armorThickness,armorColor,gravity,shellSpeed,shellGravity,aimStep,shellDrop,detectionRange,surfaces,frictionSpeed,verticalStep,driveSpeed,nations,classes,tanks,costs,maps,stats,defaults,clean,upgrade,reward,segmentCircle,rng};
+ root.GameData={contactImpulse,sightRange,steeringStep,randomRoster,standings,moduleNames,moduleLevels,upgradeModule,price,unlock,penetration,ricochetVelocity,collisionRetention,armorZones,armorThickness,armorColor,gravity,shellSpeed,shellGravity,aimStep,shellDrop,detectionRange,surfaces,frictionSpeed,verticalStep,driveSpeed,nations,classes,tanks,costs,maps,stats,defaults,clean,upgrade,reward,segmentCircle,rng};
  if(typeof module!=='undefined')module.exports=root.GameData;
 })(typeof window!=='undefined'?window:globalThis);

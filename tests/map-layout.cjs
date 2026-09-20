@@ -11,7 +11,8 @@ if(!process.argv[2]){
  global.document={getElementById:el,querySelector:el,createElement:()=>new Element(),exitPointerLock(){},addEventListener(){},head:new Element()};global.addEventListener=()=>{};
  global.Platform={load:()=>GameData.defaults(),save(){},gameplay(){},markReady(){},init(){},status:'test'};
  THREE.WebGLRenderer=class {constructor(){this.shadowMap={};this.info={render:{calls:0}};}setSize(){}setPixelRatio(){}setAnimationLoop(){}render(){}};
- require('../src/remaster.js');require('../src/game.js');
+ THREE.TextureLoader=class{load(){return new THREE.Texture();}};
+ require('../src/remaster.js');require('../assets/models/kenney.js');require('../src/map-assets.js');require('../src/map-dressing.js');require('../src/game.js');
  el('mapSelect').value=process.argv[2];el('mapSelect').onchange();el('battleBtn').onclick();
  const audit=gameMapAudit();assert.equal(audit.spawns.length,6);
  for(const spawn of audit.spawns){assert.equal(spawn.blocked,false,`${audit.map}: blocked spawn at ${spawn.x},${spawn.z}`);assert.ok(spawn.relief<1.5,`${audit.map}: steep spawn (${spawn.relief.toFixed(2)}m)`);assert.ok(spawn.routeSteps>0,`${audit.map}: no path from spawn to center`);}

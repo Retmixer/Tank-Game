@@ -15,5 +15,7 @@
 | Дороги/бетон | concrete_floor_worn_02 | https://polyhaven.com/a/concrete_floor_worn_02 |
 | Гусеницы/резина | rubberized_track | https://polyhaven.com/a/rubberized_track |
 | Листва | forest_leaves_03 | https://polyhaven.com/a/forest_leaves_03 |
+| Грунт, грязь, переходы ландшафта | brown_mud_rocks_01 | https://polyhaven.com/a/brown_mud_rocks_01 |
+| Ткань палаток и мешков | denim_fabric | https://polyhaven.com/a/denim_fabric |
 
 Текстуры хранятся в игре локально; для их показа интернет у игрока не нужен. Файлы в этом каталоге не являются результатом генерации ИИ.

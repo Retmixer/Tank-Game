@@ -119,3 +119,17 @@
 #hud #penetrationLabel{top:calc(100% + 18px);font-size:9px}
 #hud.aiming #range{top:100%;left:50%;transform:translateX(-50%)}
 #hud.aiming #penetrationLabel{top:calc(100% + 20px)}
+#hud:not(.aiming) #range,#hud:not(.aiming) .sight-scale,#hud:not(.aiming) #sightReady,#hud:not(.aiming) #sightHealth{display:none}
+#hud #hitMessage:empty,#hud #tutorialHint:empty,#hud #penetrationLabel:empty{display:none}
+/* Post-battle table remains readable on both desktop and narrow screens. */
+.dialog:has(.battle-results){width:min(900px,96vw);max-width:900px;max-height:94vh;overflow-y:auto}
+.result-place{text-align:center;color:#d9c48d;font-size:18px}
+.results-scroll{overflow-x:auto;border:1px solid #a6af8033;border-radius:5px}
+.results-table{width:100%;border-collapse:collapse;min-width:540px;font-variant-numeric:tabular-nums}
+.results-table caption{text-align:left;padding:12px;background:#19231f;color:#d5c59c}
+.results-table th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#a8b09a;background:#131c19}
+.results-table td,.results-table th{padding:11px 9px;text-align:right;border-bottom:1px solid #ffffff10}
+.results-table td:nth-child(2),.results-table th:nth-child(2){text-align:left}
+.results-table td small{display:block;font-size:11px;color:#a5ac9c;margin-top:4px}
+.results-table .result-own{background:#53634355;color:#f2dfab;box-shadow:inset 3px 0 #d1b365}
+.battle-results .reward{margin-top:15px}

@@ -16,8 +16,37 @@
  function material(color,kind='steel'){
   const key=color+kind;if(cache.has(key))return cache.get(key);
   const map=texture(kind),normalMap=texture(kind,'normal'),roughnessMap=texture(kind,'rough');
-  const tint=new T.Color(color).lerp(new T.Color(0xffffff),kind==='paint'?.47:.28);
-  const m=new T.MeshStandardMaterial({color:tint,map,normalMap,normalScale:new T.Vector2(.42,.42),roughnessMap,roughness:kind==='rubber'?1:kind==='steel'?.72:.95,metalness:kind==='steel'?.58:kind==='paint'?.13:.02,envMapIntensity:.45,transparent:false,opacity:1,depthWrite:true,depthTest:true});cache.set(key,m);return m;
+  const tint=new T.Color(color).lerp(new T.Color(0xffffff),kind==='paint'||kind==='steel'?0:.20);
+  const m=new T.MeshStandardMaterial({color:tint,map,normalMap,normalScale:new T.Vector2(.42,.42),roughnessMap,roughness:kind==='rubber'?1:kind==='steel'?.72:.95,metalness:kind==='steel'?.58:kind==='paint'?.13:.02,envMapIntensity:.45,transparent:false,opacity:1,depthWrite:true,depthTest:true});
+  if(kind==='paint'||kind==='steel'){
+   m.normalMap=null;m.bumpMap=texture(kind,'rough');m.bumpScale=.035;m.roughnessMap=null;
+   m.onBeforeCompile=shader=>{
+    shader.vertexShader='varying vec3 armorPosition; varying vec3 armorNormal;\n'+shader.vertexShader;
+    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\n armorPosition=position; armorNormal=normal;');
+    shader.fragmentShader='varying vec3 armorPosition; varying vec3 armorNormal;\n'+shader.fragmentShader;
+    shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',`#ifdef USE_MAP
+     vec3 weights=pow(abs(normalize(armorNormal)),vec3(6.0));weights/=max(dot(weights,vec3(1.0)),0.001);
+     vec3 finish=texture2D(map,armorPosition.yz*1.7).rgb*weights.x+texture2D(map,armorPosition.xz*1.7).rgb*weights.y+texture2D(map,armorPosition.xy*1.7).rgb*weights.z;
+     float grain=dot(finish,vec3(.2126,.7152,.0722));
+     diffuseColor.rgb*=.42+1.45*grain;
+     float wear=smoothstep(.48,.73,grain)*.32;
+     diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.27,.28,.25),wear);
+    #endif`);
+    shader.fragmentShader=shader.fragmentShader.replace('#include <normal_fragment_maps>','normal=perturbNormalArb(-vViewPosition,normal,vec2(dFdx(grain),dFdy(grain))*.12,faceDirection);');
+   };m.customProgramCacheKey=()=> 'paint-triplanar-pbr-v3';
+  }
+  if(kind==='rock'){
+   m.onBeforeCompile=shader=>{
+    shader.vertexShader='varying vec3 rockPosition; varying vec3 rockNormal;\n'+shader.vertexShader;
+    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\n rockPosition=(modelMatrix*vec4(position,1.0)).xyz; rockNormal=mat3(modelMatrix)*normal;');
+    shader.fragmentShader='varying vec3 rockPosition; varying vec3 rockNormal;\n'+shader.fragmentShader;
+    shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',`#ifdef USE_MAP
+     vec3 w=pow(abs(normalize(rockNormal)),vec3(5.0));w/=max(dot(w,vec3(1.0)),.001);
+     diffuseColor.rgb*=texture2D(map,rockPosition.yz*.15).rgb*w.x+texture2D(map,rockPosition.xz*.15).rgb*w.y+texture2D(map,rockPosition.xy*.15).rgb*w.z;
+    #endif`);
+   };m.customProgramCacheKey=()=> 'rock-triplanar-pbr-v1';
+  }
+  cache.set(key,m);return m;
  }
  const cube=new T.BoxGeometry(1,1,1),boltGeo=new T.CylinderGeometry(.035,.035,.025,6);
  function mesh(g,m,p,x=0,y=0,z=0){const o=new T.Mesh(g,m);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;p.add(o);return o;}
@@ -214,7 +243,8 @@
   // Reuse the closed primary turret shell exactly, rather than an oversized box.
   const turretSolid=new T.Mesh(shell.geometry,collisionMaterial);turretSolid.position.copy(shell.position);turretSolid.rotation.copy(shell.rotation);turretSolid.scale.copy(shell.scale);turretSolid.userData={zone:'turret',collisionOnly:true};turret.add(turretSolid);collisionMeshes.push(turretSolid);
   hitMeshes.push(...collisionMeshes);
-  const model={group,turret,gunPivot,barrelLength,wheels,hitMeshes,collisionMeshes,trackBelts,width,length,holes:[],effectClock:0,markClock:0};
+  const gunRecoil=new T.Group();for(const child of [...gunPivot.children])gunRecoil.add(child);gunPivot.add(gunRecoil);
+  const model={group,turret,gunPivot,gunRecoil,barrelLength,wheels,hitMeshes,collisionMeshes,trackBelts,width,length,holes:[],effectClock:0,markClock:0};
   updateBelts(model,()=>0);return model;
  }
  function updateBelts(t,groundLocal){
@@ -289,9 +319,27 @@
  const maskCache=new Map();function maskMaterial(c){if(!maskCache.has(c))maskCache.set(c,new T.MeshStandardMaterial({color:c,roughness:.55,metalness:.1,emissive:c,emissiveIntensity:.18}));return maskCache.get(c);}
  function terrainMaterial(kind,size){
   const repeat=Math.max(1,Math.round(size/11));
-  const m=new T.MeshStandardMaterial({color:0xffffff,map:texture(kind,'color',repeat),normalMap:texture(kind,'normal',repeat),roughnessMap:texture(kind,'rough',repeat),roughness:1,metalness:0});
+  const m=new T.MeshStandardMaterial({color:kind==='desert'?0xe8c582:0xffffff,map:texture(kind,'color',repeat),normalMap:texture(kind,'normal',repeat),roughnessMap:texture(kind,'rough',repeat),roughness:1,metalness:0});
   if(m.normalMap)m.normalScale.set(.38,.38);
-  m.customProgramCacheKey=()=>`terrain-${kind}`;
+  if(kind!=='road')m.onBeforeCompile=shader=>{
+   shader.uniforms.cliffMap={value:texture('rock')};shader.uniforms.soilMap={value:texture('mud')};
+   shader.vertexShader='varying vec3 landPosition; varying vec3 landNormal;\n'+shader.vertexShader;
+   shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\n landPosition=position; landNormal=normal;');
+   shader.fragmentShader='uniform sampler2D cliffMap; uniform sampler2D soilMap; varying vec3 landPosition; varying vec3 landNormal;\n'+shader.fragmentShader;
+   shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',`#ifdef USE_MAP
+    vec3 blend=pow(abs(normalize(landNormal)),vec3(5.0));blend/=max(dot(blend,vec3(1.0)),.001);
+    vec3 cliffs=texture2D(cliffMap,landPosition.yz*.12).rgb*blend.x+texture2D(cliffMap,landPosition.xz*.12).rgb*blend.y+texture2D(cliffMap,landPosition.xy*.12).rgb*blend.z;
+    vec3 base=texture2D(map,vMapUv).rgb;
+    float macro=texture2D(soilMap,landPosition.xz*.003).r;
+    vec3 soil=texture2D(soilMap,landPosition.xz*.24).rgb;
+    float slope=1.0-abs(normalize(landNormal).y);
+    base*=.82+.45*macro;
+    base=mix(base,soil,${kind==='training'?'smoothstep(.22,.56,macro)*.42':kind==='winter'?'.025':'.12'});
+    base=mix(base,cliffs*${kind==='desert'?'vec3(1.22,.94,.65)':kind==='winter'?'vec3(.82,.90,1.0)':'vec3(.93,.96,.91)'},smoothstep(.10,.42,slope)*.94);
+    diffuseColor.rgb*=base;
+   #endif`);
+  };
+  m.customProgramCacheKey=()=>`terrain-layered-${kind}`;
   return m;
  }
  function sky(scene,kind){const geo=new T.SphereGeometry(1800,32,20),mat=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color(kind==='desert'?0x6d9cb3:kind==='winter'?0x687f97:0x487f9f)},bottom:{value:new T.Color(kind==='desert'?0xe6ceb1:0xd9e2df)}},vertexShader:'varying vec3 p;void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec3 p;uniform vec3 top;uniform vec3 bottom;void main(){float h=pow(max(normalize(p).y,0.),.48);vec3 c=mix(bottom,top,h);float clouds=sin(p.x*.009+sin(p.z*.007))*sin(p.z*.005+p.x*.003);c=mix(c,vec3(.94,.94,.91),smoothstep(.55,.9,clouds)*smoothstep(.05,.25,h)*.26);gl_FragColor=vec4(c,1.);}'});scene.add(new T.Mesh(geo,mat));}
@@ -303,8 +351,9 @@
    const map=new T.CanvasTexture(c);map.colorSpace=T.SRGBColorSpace;map.anisotropy=4;textures.set(key,map);return map;}
   const grassMat=new T.MeshStandardMaterial({map:atlas('grass'),color:desert?0xc2ad72:winter?0x969889:0xb5bd91,alphaTest:.4,side:T.DoubleSide,roughness:1,metalness:0});
   const leafMat=new T.MeshStandardMaterial({map:atlas('leaf'),color:winter?0x94a69a:desert?0x9b9a64:0xc1c598,alphaTest:.45,side:T.DoubleSide,roughness:1});
+  if(winter){leafMat.color.set(0xe5e9e8);leafMat.onBeforeCompile=shader=>{shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',T.ShaderChunk.map_fragment.replace('diffuseColor *= sampledDiffuseColor;','sampledDiffuseColor.rgb=vec3(.68+.32*dot(sampledDiffuseColor.rgb,vec3(.2126,.7152,.0722)));diffuseColor *= sampledDiffuseColor;'));};leafMat.customProgramCacheKey=()=> 'frosted-leaves';}
   const grass=[],leaves=[],trunks=[],dummy=new T.Object3D();
-  const free=(x,z,pad)=>Math.abs(x)>7&&Math.abs(z)>6&&Math.hypot(x,z)>18&&!obstacles.some(o=>Math.hypot(x-o.x,z-o.z)<o.r+pad);
+  const free=(x,z,pad)=>Math.abs(x)>10&&Math.abs(z)>10&&Math.hypot(x,z)>18&&Math.abs(Math.abs(x)-arena.size*.31)>12&&[-1,1].every(s=>Math.hypot(x-s*arena.size*.4,z-s*arena.size*.4)>45)&&!obstacles.some(o=>Math.hypot(x-o.x,z-o.z)<o.r+pad);
   const record=(list,x,y,z,sx,sy,sz,yaw)=>{dummy.position.set(x,y,z);dummy.rotation.set(0,yaw,0);dummy.scale.set(sx,sy,sz);dummy.updateMatrix();list.push(dummy.matrix.clone());};
   // Seeded groves and scrub patches leave roads, the objective and hard cover clear.
   for(let i=0;i<(high?620:240);i++){
