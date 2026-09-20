@@ -11,8 +11,9 @@ for(const arena of Object.values(GameData.maps)){
 }
 const source=fs.readFileSync(require.resolve('../src/game.js'),'utf8'),start=source.indexOf('function updateCamera('),end=source.indexOf('\nfunction ',start+10);
 const player={alive:true,length:6,team:0,spec:{zoom:3},group:new THREE.Group()},camera=new THREE.PerspectiveCamera(60,1,.15,2400);
-const context={player,tanks:[player],camera,THREE,V:THREE.Vector3,viewYaw:0,viewPitch:0,aiming:true,ray:new THREE.Raycaster(),solidMeshes:[],height:()=>0,shake:0,Math};vm.createContext(context);vm.runInContext(source.slice(start,end),context);context.updateCamera(1/60);
+const context={save:{settings:{cameraShake:true}},player,tanks:[player],camera,THREE,V:THREE.Vector3,viewYaw:0,viewPitch:0,aiming:true,ray:new THREE.Raycaster(),solidMeshes:[],height:()=>0,shake:0,Math};vm.createContext(context);vm.runInContext(source.slice(start,end),context);context.updateCamera(1/60);
 assert.ok(camera.position.z>3,'Optics camera is in front of the hull');assert.ok(camera.position.y>=1.5);
 const wall=new THREE.Mesh(new THREE.BoxGeometry(8,8,.2),new THREE.MeshBasicMaterial());wall.position.set(0,3,2);wall.updateMatrixWorld(true);context.solidMeshes=[wall];context.updateCamera(1/60);assert.ok(camera.position.z<2,'Optics must not see through cover');
 context.solidMeshes=[];context.aiming=false;for(let i=0;i<60;i++)context.updateCamera(1/60);assert.ok(camera.position.z<-11,'Third person camera returns behind the tank');
-console.log('PASS: biome vegetation, instancing, clear roads/cover, forward optics, wall obstruction and camera return.');
+context.save.settings.cameraShake=false;context.shake=1;player.cameraKick=1;context.updateCamera(1/60);assert.equal(context.shake,0);assert.equal(player.cameraKick,0);
+console.log('PASS: biome vegetation, instancing, clear roads/cover, forward optics, wall obstruction, camera return and shake setting.');
