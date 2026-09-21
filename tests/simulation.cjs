@@ -17,7 +17,7 @@ global.addEventListener=(k,f)=>windowEvents[k]=f;
 let saved,loop;global.Platform={load:()=>{const save=D.defaults();save.settings.quality='low';return save;},save:d=>{saved=structuredClone(d);},gameplay(){},markReady(){},init(){},status:'test'};
 THREE.WebGLRenderer=class {constructor(){this.shadowMap={};this.info={render:{calls:0}};}setSize(){}setPixelRatio(){}setAnimationLoop(f){loop=f;}render(scene){scene.updateMatrixWorld(true);}};
 require('../src/remaster.js');
-THREE.TextureLoader=class{load(){return new THREE.Texture();}};require('../assets/models/kenney.js');require('../src/map-assets.js');require('node:vm').runInThisContext(require('node:fs').readFileSync(require.resolve('../src/game.js'),'utf8').replace('function startBattle(options={}){',"function startBattle(options={}){options.map=global.testMap||'training';"));
+THREE.TextureLoader=class{load(){return new THREE.Texture();}};require('../assets/models/kenney.js');require('../src/map-assets.js');require('../src/game.js');
 assert.equal(gameStatus().state,'garage');assert.equal(gameStatus().silver,99999);assert.equal(el('upgradeBtn').disabled,false);
 el('battleBtn').onclick();assert.equal(gameStatus().teams.length,6);
 let now=0;const advance=seconds=>{for(let i=0;i<seconds*30;i++){now+=1000/30;loop(now);}};
@@ -30,6 +30,6 @@ assert.equal(gameStatus().state,'result');assert.ok(saved.silver>=300);assert.eq
 el('returnGarage').onclick();el('upgradeBtn').onclick();assert.equal(gameStatus().levels['0-1'],2);assert.equal(gameStatus().silver,before-300);
 assert.deepEqual(saved.modules['0-1'],{gun:2,armor:1,engine:1,tracks:1},'Garage upgrades only the selected gun');
 el('module-engine').onclick();el('upgradeBtn').onclick();assert.deepEqual(saved.modules['0-1'],{gun:2,armor:1,engine:2,tracks:1});assert.equal(gameStatus().silver,before-600);
-for(const [map,size] of [['desert',5],['winter',7]]){global.testMap=map;el('modeSelect').value=String(size);el('modeSelect').onchange();el('battleBtn').onclick();advance(3);assert.equal(gameStatus().state,'battle');assert.equal(gameStatus().teams.length,size*2);assert.ok(gameStatus().teams.filter(t=>t.id!=='0-1').every(t=>t.role));const balance=gameStatus().silver;el('pauseBtn').onclick();el('leave').onclick();assert.equal(gameStatus().silver,balance,'Early exit awards no silver');el('returnGarage').onclick();}
+for(const [map,size] of [['desert',5],['winter',7]]){el('mapSelect').value=map;el('mapSelect').onchange();el('modeSelect').value=String(size);el('modeSelect').onchange();el('battleBtn').onclick();advance(3);assert.equal(gameStatus().state,'battle');assert.equal(gameStatus().map,map);assert.equal(gameStatus().teams.length,size*2);assert.ok(gameStatus().teams.filter(t=>t.id!=='0-1').every(t=>t.role));const balance=gameStatus().silver;el('pauseBtn').onclick();el('leave').onclick();assert.equal(gameStatus().silver,balance,'Early exit awards no silver');el('returnGarage').onclick();}
 console.log('PASS: hangar, all 3 maps, 3v3, movement, pause, shooting/reload, bot combat, rewards, upgrade, return to hangar.');
 console.log(JSON.stringify({combat,silver:saved.silver,battles:saved.battles},null,2));
