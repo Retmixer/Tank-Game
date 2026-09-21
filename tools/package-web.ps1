@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'Stop'
+Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $zipPath = Join-Path $projectRoot 'Yandex-Games.zip'
@@ -9,7 +10,7 @@ try {
         $files += Get-ChildItem -LiteralPath (Join-Path $projectRoot $folder) -Recurse -File
     }
     foreach ($file in $files) {
-        $entryName = [IO.Path]::GetRelativePath($projectRoot, $file.FullName).Replace('\', '/')
+        $entryName = $file.FullName.Substring($projectRoot.Length + 1).Replace('\', '/')
         $entry = $archive.GetEntry($entryName)
         if ($entry) { $entry.Delete() }
         [IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $file.FullName, $entryName, [IO.Compression.CompressionLevel]::Optimal) | Out-Null
