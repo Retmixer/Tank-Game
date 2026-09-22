@@ -5,6 +5,10 @@ Thumbs.db
 *.log
 work/
 
+# Godot editor/import cache (recreated by the engine)
+godot/.godot/
+godot/.import/
+
 # Capacitor/Android generated files
 node_modules/
 dist/
