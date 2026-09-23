@@ -1,0 +1,42 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/native/rock_largeB/0003_Mesh.res" id="1_uo532"]
+[ext_resource type="Material" path="res://materials/surface_d8461e837644.tres" id="2_80u4x"]
+[ext_resource type="Shape3D" path="res://assets/native/rock_largeB/0005_Shape.res" id="3_1fe4h"]
+[ext_resource type="ArrayMesh" path="res://assets/native/rock_largeB/0006_Mesh2.res" id="4_wwnci"]
+[ext_resource type="Material" path="res://materials/surface_8f7f32de70ce.tres" id="5_o2f6n"]
+[ext_resource type="Shape3D" path="res://assets/native/rock_largeB/0008_Shape.res" id="6_t5mll"]
+[ext_resource type="ArrayMesh" path="res://assets/native/rock_largeB/0009_Mesh3.res" id="7_vxwtw"]
+[ext_resource type="Material" path="res://materials/surface_22f75b080ca7.tres" id="8_yrqtr"]
+[ext_resource type="Shape3D" path="res://assets/native/rock_largeB/0011_Shape.res" id="9_hk58r"]
+
+[node name="rock_largeB" type="Node3D" unique_id=862816653]
+
+[node name="rock_largeB" type="Node3D" parent="." unique_id=660421994]
+
+[node name="Mesh" type="MeshInstance3D" parent="rock_largeB" unique_id=1354504553]
+mesh = ExtResource("1_uo532")
+surface_material_override/0 = ExtResource("2_80u4x")
+
+[node name="Collision" type="StaticBody3D" parent="rock_largeB/Mesh" unique_id=866912922]
+
+[node name="Shape" type="CollisionShape3D" parent="rock_largeB/Mesh/Collision" unique_id=1706782187]
+shape = ExtResource("3_1fe4h")
+
+[node name="Mesh2" type="MeshInstance3D" parent="rock_largeB" unique_id=978237683]
+mesh = ExtResource("4_wwnci")
+surface_material_override/0 = ExtResource("5_o2f6n")
+
+[node name="Collision" type="StaticBody3D" parent="rock_largeB/Mesh2" unique_id=707434344]
+
+[node name="Shape" type="CollisionShape3D" parent="rock_largeB/Mesh2/Collision" unique_id=1504787761]
+shape = ExtResource("6_t5mll")
+
+[node name="Mesh3" type="MeshInstance3D" parent="rock_largeB" unique_id=500713876]
+mesh = ExtResource("7_vxwtw")
+surface_material_override/0 = ExtResource("8_yrqtr")
+
+[node name="Collision" type="StaticBody3D" parent="rock_largeB/Mesh3" unique_id=358517126]
+
+[node name="Shape" type="CollisionShape3D" parent="rock_largeB/Mesh3/Collision" unique_id=405274369]
+shape = ExtResource("9_hk58r")

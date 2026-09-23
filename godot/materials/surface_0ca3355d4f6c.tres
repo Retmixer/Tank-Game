@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/wood-color.jpg" id="1_kt6nf"]
+[ext_resource type="Texture2D" path="res://assets/textures/wood-normal.jpg" id="2_4hwpu"]
+[ext_resource type="Texture2D" path="res://assets/textures/wood-rough.jpg" id="3_g7die"]
+
+[resource]
+resource_name = "surface_0ca3355d4f6c"
+albedo_color = Color(0.61147565, 0.5799382, 0.5417922, 1)
+albedo_texture = ExtResource("1_kt6nf")
+metallic = 0.02
+roughness = 0.95
+roughness_texture = ExtResource("3_g7die")
+normal_enabled = true
+normal_scale = 0.4
+normal_texture = ExtResource("2_4hwpu")

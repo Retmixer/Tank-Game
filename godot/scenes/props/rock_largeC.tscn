@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/native/rock_largeC/0003_Mesh.res" id="1_boy0c"]
+[ext_resource type="Material" path="res://materials/surface_d8461e837644.tres" id="2_03q7f"]
+[ext_resource type="Shape3D" path="res://assets/native/rock_largeC/0005_Shape.res" id="3_tk8l7"]
+[ext_resource type="ArrayMesh" path="res://assets/native/rock_largeC/0006_Mesh2.res" id="4_2xxa4"]
+[ext_resource type="Material" path="res://materials/surface_22f75b080ca7.tres" id="5_a4qr1"]
+[ext_resource type="Shape3D" path="res://assets/native/rock_largeC/0008_Shape.res" id="6_yv1mk"]
+
+[node name="rock_largeC" type="Node3D" unique_id=1476208254]
+
+[node name="rock_largeC" type="Node3D" parent="." unique_id=309010498]
+
+[node name="Mesh" type="MeshInstance3D" parent="rock_largeC" unique_id=2106275454]
+mesh = ExtResource("1_boy0c")
+surface_material_override/0 = ExtResource("2_03q7f")
+
+[node name="Collision" type="StaticBody3D" parent="rock_largeC/Mesh" unique_id=1116277842]
+
+[node name="Shape" type="CollisionShape3D" parent="rock_largeC/Mesh/Collision" unique_id=1392326107]
+shape = ExtResource("3_tk8l7")
+
+[node name="Mesh2" type="MeshInstance3D" parent="rock_largeC" unique_id=1118064689]
+mesh = ExtResource("4_2xxa4")
+surface_material_override/0 = ExtResource("5_a4qr1")
+
+[node name="Collision" type="StaticBody3D" parent="rock_largeC/Mesh2" unique_id=185525289]
+
+[node name="Shape" type="CollisionShape3D" parent="rock_largeC/Mesh2/Collision" unique_id=412395021]
+shape = ExtResource("6_yv1mk")

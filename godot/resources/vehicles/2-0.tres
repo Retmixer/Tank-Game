@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/vehicle_definition.gd" id="1_lny1k"]
+
+[resource]
+script = ExtResource("1_lny1k")
+vehicle_id = "2-0"
+display_name = "A-7 «Стриж»"
+hit_points = 560.0
+damage = 101.0
+armor = 7.0
+reload_seconds = 2.35
+track_health = 90.0
+speed = 9.72222222222222
+reverse_speed = 4.444444444444445
+turn_speed = 1.25
+turret_speed = 1.65
+view_distance = 140.0
+dispersion = 0.019
+aim_seconds = 0.85
+zoom = 2.5500000000000003

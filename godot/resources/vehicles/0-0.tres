@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/vehicle_definition.gd" id="1_k3a2o"]
+
+[resource]
+script = ExtResource("1_k3a2o")
+vehicle_id = "0-0"
+display_name = "105 «Ветер»"
+hit_points = 580.0
+damage = 109.0
+armor = 8.0
+reload_seconds = 2.5
+track_health = 90.0
+speed = 9.72222222222222
+reverse_speed = 3.888888888888889
+turn_speed = 1.25
+turret_speed = 1.65
+view_distance = 135.0
+dispersion = 0.019
+aim_seconds = 0.85
+zoom = 2.25

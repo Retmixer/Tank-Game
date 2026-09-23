@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/vehicle_definition.gd" id="1_svbrk"]
+
+[resource]
+script = ExtResource("1_svbrk")
+vehicle_id = "2-3"
+display_name = "AM-155 «Оса»"
+hit_points = 670.0
+damage = 470.0
+armor = 7.0
+reload_seconds = 11.7
+track_health = 100.0
+speed = 7.5
+reverse_speed = 2.5
+turn_speed = 0.65
+turret_speed = 0.75
+view_distance = 130.0
+dispersion = 0.021
+aim_seconds = 2.2
+zoom = 4.5

@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/native/tree_pineDefaultA/0003_Mesh.res" id="1_vn8vd"]
+[ext_resource type="Material" path="res://materials/surface_04939f8b8618.tres" id="2_25f5q"]
+[ext_resource type="Shape3D" path="res://assets/native/tree_pineDefaultA/0005_Shape.res" id="3_86by7"]
+[ext_resource type="ArrayMesh" path="res://assets/native/tree_pineDefaultA/0006_Mesh2.res" id="4_g0rr1"]
+[ext_resource type="Material" path="res://materials/surface_177d24b6cdc5.tres" id="5_t4qy0"]
+[ext_resource type="Shape3D" path="res://assets/native/tree_pineDefaultA/0008_Shape.res" id="6_27me4"]
+
+[node name="tree_pineDefaultA" type="Node3D" unique_id=1028974284]
+
+[node name="tree_pineDefaultA" type="Node3D" parent="." unique_id=351123267]
+
+[node name="Mesh" type="MeshInstance3D" parent="tree_pineDefaultA" unique_id=1951360542]
+mesh = ExtResource("1_vn8vd")
+surface_material_override/0 = ExtResource("2_25f5q")
+
+[node name="Collision" type="StaticBody3D" parent="tree_pineDefaultA/Mesh" unique_id=1727784229]
+
+[node name="Shape" type="CollisionShape3D" parent="tree_pineDefaultA/Mesh/Collision" unique_id=718067075]
+shape = ExtResource("3_86by7")
+
+[node name="Mesh2" type="MeshInstance3D" parent="tree_pineDefaultA" unique_id=1348686311]
+mesh = ExtResource("4_g0rr1")
+surface_material_override/0 = ExtResource("5_t4qy0")
+
+[node name="Collision" type="StaticBody3D" parent="tree_pineDefaultA/Mesh2" unique_id=1803272926]
+
+[node name="Shape" type="CollisionShape3D" parent="tree_pineDefaultA/Mesh2/Collision" unique_id=1400194868]
+shape = ExtResource("6_27me4")

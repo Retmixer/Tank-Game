@@ -14,6 +14,7 @@ https://github.com/Retmixer/Tank-Game.git
 - посмотри git status;
 - если нужно, выполни git pull origin main;
 - прочитай README.md и файлы, которые относятся к задаче.
+- Для нативной версии прочитай godot/README_RU.md. Открывай godot/project.godot: карты и танки редактируются непосредственно в scenes/levels и scenes/vehicles, параметры — в resources/vehicles. Не запускай инструменты повторной миграции без необходимости: они перезаписывают ручные изменения сцен. Интерфейс — scenes/ui, загрузка — scenes/boot.tscn.
 
 Когда получаешь задачу:
 - коротко пойми, что нужно изменить;

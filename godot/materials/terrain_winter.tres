@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://materials/terrain.gdshader" id="1_it1eq"]
+[ext_resource type="Texture2D" path="res://assets/textures/winter-color.jpg" id="2_kw0bu"]
+[ext_resource type="Texture2D" path="res://assets/textures/rock-color.jpg" id="3_nxdoj"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_it1eq")
+shader_parameter/ground_map = ExtResource("2_kw0bu")
+shader_parameter/rock_map = ExtResource("3_nxdoj")
+shader_parameter/tint = Color(1, 1, 1, 1)
+shader_parameter/texture_scale = 0.12

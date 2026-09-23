@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://materials/terrain.gdshader" id="1_31btr"]
+[ext_resource type="Texture2D" path="res://assets/textures/training-color.jpg" id="2_qp05i"]
+[ext_resource type="Texture2D" path="res://assets/textures/rock-color.jpg" id="3_b1p0j"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_31btr")
+shader_parameter/ground_map = ExtResource("2_qp05i")
+shader_parameter/rock_map = ExtResource("3_b1p0j")
+shader_parameter/tint = Color(0.5372549, 0.5921569, 0.5137255, 1)
+shader_parameter/texture_scale = 0.12

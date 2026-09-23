@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "surface_94010438655b"
+transparency = 1
+cull_mode = 2
+albedo_color = Color(0.8666667, 0.8, 0.57254905, 0.75)

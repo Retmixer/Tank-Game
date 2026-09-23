@@ -1,0 +1,481 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://scenes/ui/military_theme.tres" id="1_3d5ah"]
+[ext_resource type="Script" path="res://scripts/browser_layout.gd" id="2_k3mr0"]
+[ext_resource type="Texture2D" path="res://assets/ui/battle-select.png" id="3_whaku"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ujpwb"]
+bg_color = Color(0.08235294, 0.13725491, 0.12156863, 0.9843137)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="SystemFont" id="SystemFont_u2ba5"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_84n4c"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1fc6m"]
+atlas = ExtResource("3_whaku")
+region = Rect2(103.7, 257.5, 473.2, 320.8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wqilj"]
+bg_color = Color(0.0627451, 0.101960786, 0.078431375, 0.98039216)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="SystemFont" id="SystemFont_lt7xt"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="SystemFont" id="SystemFont_srw00"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0iky6"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i1gft"]
+atlas = ExtResource("3_whaku")
+region = Rect2(600.2, 257.5, 473.2, 320.8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n1dxm"]
+bg_color = Color(0.0627451, 0.101960786, 0.078431375, 0.98039216)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="SystemFont" id="SystemFont_jiqae"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="SystemFont" id="SystemFont_qmdce"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1s30y"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_huanp"]
+atlas = ExtResource("3_whaku")
+region = Rect2(1095.2, 257.5, 473.2, 320.8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7i7y5"]
+bg_color = Color(0.0627451, 0.101960786, 0.078431375, 0.98039216)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="SystemFont" id="SystemFont_7mm8v"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="SystemFont" id="SystemFont_dmr0a"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_16drl"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dlusi"]
+bg_color = Color(0.827451, 0.69803923, 0.4627451, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9411765, 0.8392157, 0.5764706, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rk3pw"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d14d3"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="BattleSetup" type="Control" unique_id=1287215490]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = ExtResource("1_3d5ah")
+script = ExtResource("2_k3mr0")
+design_size = Vector2(1672, 941)
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=1601312547]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02745098, 0.047058824, 0.043137256, 0.8156863)
+
+[node name="Design" type="Control" parent="." unique_id=1151713080]
+anchors_preset = 0
+offset_right = 1672.0
+offset_bottom = 941.0
+mouse_filter = 2
+
+[node name="Artwork" type="TextureRect" parent="Design" unique_id=1911579855]
+layout_mode = 0
+offset_right = 1672.0
+offset_bottom = 941.0
+mouse_filter = 2
+texture = ExtResource("3_whaku")
+expand_mode = 1
+
+[node name="HeadingMask" type="Panel" parent="Design" unique_id=1246801563]
+layout_mode = 0
+offset_right = 1672.0
+offset_bottom = 235.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ujpwb")
+
+[node name="Title" type="Label" parent="Design" unique_id=1882499410]
+layout_mode = 0
+offset_left = 180.0
+offset_top = 75.0
+offset_right = 1492.0
+offset_bottom = 141.0
+theme_override_fonts/font = SubResource("SystemFont_u2ba5")
+theme_override_font_sizes/font_size = 50
+theme_override_colors/font_color = Color(0.92156863, 0.8235294, 0.60784316, 1)
+text = "ВЫБЕРИТЕ КАРТУ"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Design" unique_id=307129272]
+layout_mode = 0
+offset_left = 180.0
+offset_top = 154.0
+offset_right = 1492.0
+offset_bottom = 190.0
+theme_override_font_sizes/font_size = 19
+theme_override_colors/font_color = Color(0.76862746, 0.77254903, 0.72156864, 1)
+text = "Настройте формат боя и сложность ботов"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="training" type="Button" parent="Design" unique_id=1712537689]
+layout_mode = 0
+offset_left = 103.7
+offset_top = 250.3
+offset_right = 576.9
+offset_bottom = 708.6
+theme_override_styles/normal = SubResource("StyleBoxFlat_84n4c")
+toggle_mode = true
+
+[node name="Photo" type="TextureRect" parent="Design/training" unique_id=17307537]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 471.2
+offset_bottom = 321.0
+mouse_filter = 2
+texture = SubResource("AtlasTexture_1fc6m")
+expand_mode = 1
+
+[node name="CaptionPanel" type="Panel" parent="Design/training" unique_id=1498526711]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 279.0
+offset_right = 471.2
+offset_bottom = 393.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_wqilj")
+
+[node name="Caption" type="Label" parent="Design/training" unique_id=1607600531]
+layout_mode = 0
+offset_left = 25.0
+offset_top = 298.0
+offset_right = 460.0
+offset_bottom = 338.0
+theme_override_fonts/font = SubResource("SystemFont_lt7xt")
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.9019608, 0.85882354, 0.7529412, 1)
+text = "УЧЕБНЫЙ ПОЛИГОН"
+vertical_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Design/training" unique_id=842082249]
+layout_mode = 0
+offset_left = 25.0
+offset_top = 342.0
+offset_right = 445.0
+offset_bottom = 367.0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.7137255, 0.69411767, 0.6039216, 1)
+text = "ОТРАБАТЫВАЙТЕ ТАКТИКУ"
+vertical_alignment = 1
+
+[node name="Action" type="Label" parent="Design/training" unique_id=443847430]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 395.0
+offset_right = 471.2
+offset_bottom = 456.0
+theme_override_fonts/font = SubResource("SystemFont_srw00")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "ВЫБРАТЬ       →"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="desert" type="Button" parent="Design" unique_id=764196449]
+layout_mode = 0
+offset_left = 600.2
+offset_top = 250.3
+offset_right = 1073.4
+offset_bottom = 708.6
+theme_override_styles/normal = SubResource("StyleBoxFlat_0iky6")
+toggle_mode = true
+
+[node name="Photo" type="TextureRect" parent="Design/desert" unique_id=1565013902]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 471.2
+offset_bottom = 321.0
+mouse_filter = 2
+texture = SubResource("AtlasTexture_i1gft")
+expand_mode = 1
+
+[node name="CaptionPanel" type="Panel" parent="Design/desert" unique_id=1425459812]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 279.0
+offset_right = 471.2
+offset_bottom = 393.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_n1dxm")
+
+[node name="Caption" type="Label" parent="Design/desert" unique_id=1806618836]
+layout_mode = 0
+offset_left = 25.0
+offset_top = 298.0
+offset_right = 460.0
+offset_bottom = 338.0
+theme_override_fonts/font = SubResource("SystemFont_jiqae")
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.9019608, 0.85882354, 0.7529412, 1)
+text = "ПУСТЫННЫЙ ПОЛИГОН"
+vertical_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Design/desert" unique_id=132015781]
+layout_mode = 0
+offset_left = 25.0
+offset_top = 342.0
+offset_right = 445.0
+offset_bottom = 367.0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.7137255, 0.69411767, 0.6039216, 1)
+text = "ЖАРКИЕ СРАЖЕНИЯ"
+vertical_alignment = 1
+
+[node name="Action" type="Label" parent="Design/desert" unique_id=308217764]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 395.0
+offset_right = 471.2
+offset_bottom = 456.0
+theme_override_fonts/font = SubResource("SystemFont_qmdce")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "ВЫБРАТЬ       →"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="winter" type="Button" parent="Design" unique_id=803405323]
+layout_mode = 0
+offset_left = 1095.2
+offset_top = 250.3
+offset_right = 1568.3999
+offset_bottom = 708.6
+theme_override_styles/normal = SubResource("StyleBoxFlat_1s30y")
+toggle_mode = true
+
+[node name="Photo" type="TextureRect" parent="Design/winter" unique_id=1771845253]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 471.2
+offset_bottom = 321.0
+mouse_filter = 2
+texture = SubResource("AtlasTexture_huanp")
+expand_mode = 1
+
+[node name="CaptionPanel" type="Panel" parent="Design/winter" unique_id=658950024]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 279.0
+offset_right = 471.2
+offset_bottom = 393.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7i7y5")
+
+[node name="Caption" type="Label" parent="Design/winter" unique_id=102048258]
+layout_mode = 0
+offset_left = 25.0
+offset_top = 298.0
+offset_right = 460.0
+offset_bottom = 338.0
+theme_override_fonts/font = SubResource("SystemFont_7mm8v")
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.9019608, 0.85882354, 0.7529412, 1)
+text = "ЗИМНИЙ ЗАВОД"
+vertical_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Design/winter" unique_id=351782220]
+layout_mode = 0
+offset_left = 25.0
+offset_top = 342.0
+offset_right = 445.0
+offset_bottom = 367.0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.7137255, 0.69411767, 0.6039216, 1)
+text = "ХОЛОД НЕ ПРОЩАЕТ ОШИБОК"
+vertical_alignment = 1
+
+[node name="Action" type="Label" parent="Design/winter" unique_id=1223757921]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 395.0
+offset_right = 471.2
+offset_bottom = 456.0
+theme_override_fonts/font = SubResource("SystemFont_dmr0a")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "ВЫБРАТЬ       →"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Back" type="Button" parent="Design" unique_id=1628265761]
+layout_mode = 0
+offset_left = 46.8
+offset_top = 828.0
+offset_right = 294.3
+offset_bottom = 888.2
+theme_override_styles/normal = SubResource("StyleBoxFlat_16drl")
+text = "← НАЗАД"
+
+[node name="Start" type="Button" parent="Design" unique_id=615654092]
+layout_mode = 0
+offset_left = 1389.4
+offset_top = 828.0
+offset_right = 1623.5
+offset_bottom = 888.2
+theme_override_styles/normal = SubResource("StyleBoxFlat_dlusi")
+theme_override_colors/font_color = Color(0.1254902, 0.16862746, 0.1254902, 1)
+text = "НАЧАТЬ БОЙ →"
+
+[node name="TeamSize" type="OptionButton" parent="Design" unique_id=1176905780]
+layout_mode = 0
+offset_left = 727.3
+offset_top = 828.0
+offset_right = 1019.9
+offset_bottom = 888.2
+theme_override_styles/normal = SubResource("StyleBoxFlat_rk3pw")
+selected = 0
+item_count = 3
+popup/item_0/text = "БОЙ 3 × 3"
+popup/item_0/id = 0
+popup/item_1/text = "БОЙ 5 × 5"
+popup/item_1/id = 1
+popup/item_2/text = "БОЙ 7 × 7"
+popup/item_2/id = 2
+
+[node name="Difficulty" type="OptionButton" parent="Design" unique_id=1826039781]
+layout_mode = 0
+offset_left = 1036.6
+offset_top = 828.0
+offset_right = 1362.6
+offset_bottom = 888.2
+theme_override_styles/normal = SubResource("StyleBoxFlat_d14d3")
+selected = 0
+item_count = 3
+popup/item_0/text = "БОТЫ: ЛЁГКИЕ"
+popup/item_0/id = 0
+popup/item_1/text = "БОТЫ: ОБЫЧНЫЕ"
+popup/item_1/id = 1
+popup/item_2/text = "БОТЫ: СЛОЖНЫЕ"
+popup/item_2/id = 2

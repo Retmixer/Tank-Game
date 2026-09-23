@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/brick-color.jpg" id="1_ex6at"]
+[ext_resource type="Texture2D" path="res://assets/textures/brick-normal.jpg" id="2_hhyor"]
+[ext_resource type="Texture2D" path="res://assets/textures/brick-rough.jpg" id="3_lb34q"]
+
+[resource]
+resource_name = "surface_8d0f7ca55b61"
+albedo_color = Color(0.71247613, 0.6652801, 0.5932677, 1)
+albedo_texture = ExtResource("1_ex6at")
+metallic = 0.02
+roughness = 0.95
+roughness_texture = ExtResource("3_lb34q")
+normal_enabled = true
+normal_scale = 0.4
+normal_texture = ExtResource("2_hhyor")

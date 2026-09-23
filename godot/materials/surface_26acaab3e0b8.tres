@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/road-color.jpg" id="1_5plwd"]
+[ext_resource type="Texture2D" path="res://assets/textures/road-normal.jpg" id="2_qnkhq"]
+[ext_resource type="Texture2D" path="res://assets/textures/road-rough.jpg" id="3_ydobe"]
+
+[resource]
+resource_name = "surface_26acaab3e0b8"
+albedo_color = Color(0.71247613, 0.6652801, 0.6052773, 1)
+albedo_texture = ExtResource("1_5plwd")
+metallic = 0.02
+roughness = 0.95
+roughness_texture = ExtResource("3_ydobe")
+normal_enabled = true
+normal_scale = 0.4
+normal_texture = ExtResource("2_qnkhq")

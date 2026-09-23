@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/winter-color.jpg" id="1_mw5ap"]
+[ext_resource type="Texture2D" path="res://assets/textures/winter-normal.jpg" id="2_mc7ti"]
+[ext_resource type="Texture2D" path="res://assets/textures/winter-rough.jpg" id="3_lwacl"]
+
+[resource]
+resource_name = "surface_1521f4279904"
+albedo_color = Color(0.90448844, 0.9226788, 0.93183124, 1)
+albedo_texture = ExtResource("1_mw5ap")
+metallic = 0.02
+roughness = 0.95
+roughness_texture = ExtResource("3_lwacl")
+normal_enabled = true
+normal_scale = 0.4
+normal_texture = ExtResource("2_mc7ti")

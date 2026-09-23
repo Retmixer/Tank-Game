@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://materials/vehicle_paint.gdshader" id="1_ypyvw"]
+[ext_resource type="Texture2D" path="res://assets/textures/paint-color.jpg" id="2_t65y3"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_ypyvw")
+shader_parameter/wear_map = ExtResource("2_t65y3")
+shader_parameter/paint_color = Color(0.4392157, 0.38039216, 0.2901961, 1)
+shader_parameter/texture_scale = 1.8
+shader_parameter/metalness = 0.13

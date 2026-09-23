@@ -1,0 +1,1228 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://scenes/ui/military_theme.tres" id="1_5diqg"]
+[ext_resource type="Script" path="res://scripts/browser_layout.gd" id="2_xa1nx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fllk6"]
+bg_color = Color(0.078431375, 0.11372549, 0.09411765, 0.92156863)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="SystemFont" id="SystemFont_pe0t5"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="SystemFont" id="SystemFont_shiy3"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pw8ab"]
+bg_color = Color(0.827451, 0.69803923, 0.4627451, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9411765, 0.8392157, 0.5764706, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xbbxb"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ekm6o"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n3l1s"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ii422"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8qo6s"]
+bg_color = Color(0.08235294, 0.12941177, 0.09803922, 0.92941177)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mkgyy"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gfrot"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6rk67"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="SystemFont" id="SystemFont_q402q"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="SystemFont" id="SystemFont_q2ek2"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="SystemFont" id="SystemFont_jxbql"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8sh7m"]
+bg_color = Color(0.20392157, 0.2509804, 0.1882353, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.34901962, 0.3764706, 0.2784314, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_axu6v"]
+bg_color = Color(0.87058824, 0.7529412, 0.5019608, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.87058824, 0.7529412, 0.5019608, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="SystemFont" id="SystemFont_phat1"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8uf0h"]
+bg_color = Color(0.20392157, 0.2509804, 0.1882353, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.34901962, 0.3764706, 0.2784314, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1sgp3"]
+bg_color = Color(0.87058824, 0.7529412, 0.5019608, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.87058824, 0.7529412, 0.5019608, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="SystemFont" id="SystemFont_cvkdu"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cmlhh"]
+bg_color = Color(0.20392157, 0.2509804, 0.1882353, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.34901962, 0.3764706, 0.2784314, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y232e"]
+bg_color = Color(0.87058824, 0.7529412, 0.5019608, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.87058824, 0.7529412, 0.5019608, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="SystemFont" id="SystemFont_x6ekd"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_aw7rd"]
+bg_color = Color(0.20392157, 0.2509804, 0.1882353, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.34901962, 0.3764706, 0.2784314, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1nlj7"]
+bg_color = Color(0.87058824, 0.7529412, 0.5019608, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.87058824, 0.7529412, 0.5019608, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="SystemFont" id="SystemFont_sh5y4"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2vtg3"]
+bg_color = Color(0.20392157, 0.2509804, 0.1882353, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.34901962, 0.3764706, 0.2784314, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xgal7"]
+bg_color = Color(0.87058824, 0.7529412, 0.5019608, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.87058824, 0.7529412, 0.5019608, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2bbwh"]
+bg_color = Color(0.078431375, 0.1254902, 0.09411765, 0.5019608)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0pb6q"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mhmku"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8fwhv"]
+bg_color = Color(0.08235294, 0.12941177, 0.09803922, 0.92941177)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5ekve"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1akpa"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hci0v"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fcsu2"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wub5p"]
+bg_color = Color(0.09411765, 0.13725491, 0.105882354, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ojx27"]
+bg_color = Color(0.20392157, 0.2509804, 0.1882353, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.34901962, 0.3764706, 0.2784314, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n031f"]
+bg_color = Color(0.87058824, 0.7529412, 0.5019608, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.87058824, 0.7529412, 0.5019608, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_62b2t"]
+bg_color = Color(0.827451, 0.69803923, 0.4627451, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9411765, 0.8392157, 0.5764706, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chtd0"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tadcd"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fs1jw"]
+bg_color = Color(0.08235294, 0.12941177, 0.09803922, 0.92941177)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_701i4"]
+bg_color = Color(0.827451, 0.69803923, 0.4627451, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9411765, 0.8392157, 0.5764706, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cqxkc"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="Hangar" type="Control" unique_id=320987601]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = ExtResource("1_5diqg")
+script = ExtResource("2_xa1nx")
+
+[node name="Design" type="Control" parent="." unique_id=1217187630]
+anchors_preset = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+
+[node name="Header" type="Panel" parent="Design" unique_id=965140370]
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 65.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_fllk6")
+
+[node name="BrandIcon" type="Label" parent="Design" unique_id=1689058121]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 5.0
+offset_right = 74.0
+offset_bottom = 57.0
+theme_override_fonts/font = SubResource("SystemFont_pe0t5")
+theme_override_font_sizes/font_size = 48
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "◇"
+vertical_alignment = 1
+
+[node name="Logo" type="Label" parent="Design" unique_id=1352549273]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 8.0
+offset_right = 340.0
+offset_bottom = 39.0
+theme_override_fonts/font = SubResource("SystemFont_shiy3")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.89411765, 0.84705883, 0.6784314, 1)
+text = "СТАЛЬНОЙ РУБЕЖ"
+vertical_alignment = 1
+
+[node name="Slogan" type="Label" parent="Design" unique_id=2031885415]
+layout_mode = 0
+offset_left = 82.0
+offset_top = 41.0
+offset_right = 380.0
+offset_bottom = 64.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "Т А К Т И К А .  Б Р О Н Я .  П О Б Е Д А ."
+vertical_alignment = 1
+
+[node name="HangarTab" type="Button" parent="Design" unique_id=2137897791]
+layout_mode = 0
+offset_left = 346.0
+offset_top = 11.0
+offset_right = 528.0
+offset_bottom = 57.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_pw8ab")
+theme_override_colors/font_color = Color(0.1254902, 0.16862746, 0.1254902, 1)
+text = "▰  АНГАР"
+
+[node name="Research" type="Button" parent="Design" unique_id=1301659659]
+layout_mode = 0
+offset_left = 533.0
+offset_top = 11.0
+offset_right = 738.0
+offset_bottom = 57.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_xbbxb")
+text = "♜  ИССЛЕДОВАНИЯ"
+
+[node name="Tasks" type="Button" parent="Design" unique_id=198081367]
+layout_mode = 0
+offset_left = 743.0
+offset_top = 11.0
+offset_right = 905.0
+offset_bottom = 57.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_ekm6o")
+text = "▤  ЗАДАЧИ"
+
+[node name="Currency" type="Label" parent="Design" unique_id=1813311442]
+layout_mode = 0
+offset_left = 936.0
+offset_top = 12.0
+offset_right = 1161.0
+offset_bottom = 36.0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "◉  99 999      ◆  99 999"
+vertical_alignment = 1
+
+[node name="CurrencyUnits" type="Label" parent="Design" unique_id=340975356]
+layout_mode = 0
+offset_left = 957.0
+offset_top = 36.0
+offset_right = 1147.0
+offset_bottom = 59.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.5372549, 0.5686275, 0.49411765, 1)
+text = "СЕРЕБРО                 ОПЫТ"
+vertical_alignment = 1
+
+[node name="Fullscreen" type="Button" parent="Design" unique_id=747120011]
+layout_mode = 0
+offset_left = 1160.0
+offset_top = 11.0
+offset_right = 1202.0
+offset_bottom = 53.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_n3l1s")
+text = "⛶"
+
+[node name="Settings" type="Button" parent="Design" unique_id=1745372064]
+layout_mode = 0
+offset_left = 1212.0
+offset_top = 11.0
+offset_right = 1254.0
+offset_bottom = 53.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_ii422")
+text = "⚙"
+
+[node name="VehicleInfo" type="Panel" parent="Design" unique_id=2027118504]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 86.0
+offset_right = 326.0
+offset_bottom = 562.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_8qo6s")
+
+[node name="Nation0" type="Button" parent="Design/VehicleInfo" unique_id=1537841508]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 105.0
+offset_bottom = 43.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_mkgyy")
+text = "СССР"
+
+[node name="Nation1" type="Button" parent="Design/VehicleInfo" unique_id=1438680286]
+layout_mode = 0
+offset_left = 108.0
+offset_top = 12.0
+offset_right = 197.0
+offset_bottom = 43.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_gfrot")
+text = "Германия"
+
+[node name="Nation2" type="Button" parent="Design/VehicleInfo" unique_id=1909200209]
+layout_mode = 0
+offset_left = 200.0
+offset_top = 12.0
+offset_right = 289.0
+offset_bottom = 43.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_6rk67")
+text = "Франция"
+
+[node name="Nation" type="Label" parent="Design/VehicleInfo" unique_id=176872030]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 45.0
+offset_right = 242.0
+offset_bottom = 68.0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.60784316, 0.64705884, 0.5411765, 1)
+text = "СРЕДНИЙ ТАНК"
+vertical_alignment = 1
+
+[node name="Tier" type="Label" parent="Design/VehicleInfo" unique_id=1691070475]
+layout_mode = 0
+offset_left = 259.0
+offset_top = 54.0
+offset_right = 290.0
+offset_bottom = 97.0
+theme_override_fonts/font = SubResource("SystemFont_q402q")
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "I"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VehicleName" type="Label" parent="Design/VehicleInfo" unique_id=1068089613]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 68.0
+offset_right = 255.0
+offset_bottom = 108.0
+theme_override_fonts/font = SubResource("SystemFont_q2ek2")
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.9254902, 0.8862745, 0.7411765, 1)
+text = "205 «ОПЛОТ»"
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="Design/VehicleInfo" unique_id=1369101498]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 113.0
+offset_right = 291.0
+offset_bottom = 142.0
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.57254905, 0.6117647, 0.5294118, 1)
+text = "Надёжность в каждом километре"
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="StatIcon0" type="Label" parent="Design/VehicleInfo" unique_id=82817676]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 150.0
+offset_right = 40.0
+offset_bottom = 177.0
+theme_override_fonts/font = SubResource("SystemFont_jxbql")
+theme_override_font_sizes/font_size = 23
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "♨"
+vertical_alignment = 1
+
+[node name="StatTitle0" type="Label" parent="Design/VehicleInfo" unique_id=729098818]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 150.0
+offset_right = 193.0
+offset_bottom = 173.0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "ОГНЕВАЯ МОЩЬ"
+vertical_alignment = 1
+
+[node name="StatValue0" type="Label" parent="Design/VehicleInfo" unique_id=389762441]
+layout_mode = 0
+offset_left = 190.0
+offset_top = 150.0
+offset_right = 285.0
+offset_bottom = 173.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.8901961, 0.8901961, 0.7921569, 1)
+text = "—"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="StatBar0" type="ProgressBar" parent="Design/VehicleInfo" unique_id=536407941]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 174.0
+offset_right = 283.0
+offset_bottom = 179.0
+theme_override_styles/background = SubResource("StyleBoxFlat_8sh7m")
+theme_override_styles/fill = SubResource("StyleBoxFlat_axu6v")
+value = 60.0
+show_percentage = false
+
+[node name="StatIcon1" type="Label" parent="Design/VehicleInfo" unique_id=863986453]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 188.0
+offset_right = 40.0
+offset_bottom = 215.0
+theme_override_fonts/font = SubResource("SystemFont_phat1")
+theme_override_font_sizes/font_size = 23
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "◇"
+vertical_alignment = 1
+
+[node name="StatTitle1" type="Label" parent="Design/VehicleInfo" unique_id=1374665255]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 188.0
+offset_right = 193.0
+offset_bottom = 211.0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "ПРОЧНОСТЬ"
+vertical_alignment = 1
+
+[node name="StatValue1" type="Label" parent="Design/VehicleInfo" unique_id=1474053831]
+layout_mode = 0
+offset_left = 190.0
+offset_top = 188.0
+offset_right = 285.0
+offset_bottom = 211.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.8901961, 0.8901961, 0.7921569, 1)
+text = "—"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="StatBar1" type="ProgressBar" parent="Design/VehicleInfo" unique_id=425822942]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 212.0
+offset_right = 283.0
+offset_bottom = 217.0
+theme_override_styles/background = SubResource("StyleBoxFlat_8uf0h")
+theme_override_styles/fill = SubResource("StyleBoxFlat_1sgp3")
+value = 60.0
+show_percentage = false
+
+[node name="StatIcon2" type="Label" parent="Design/VehicleInfo" unique_id=524890455]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 226.0
+offset_right = 40.0
+offset_bottom = 253.0
+theme_override_fonts/font = SubResource("SystemFont_cvkdu")
+theme_override_font_sizes/font_size = 23
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "◴"
+vertical_alignment = 1
+
+[node name="StatTitle2" type="Label" parent="Design/VehicleInfo" unique_id=2000848564]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 226.0
+offset_right = 193.0
+offset_bottom = 249.0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "СКОРОСТЬ"
+vertical_alignment = 1
+
+[node name="StatValue2" type="Label" parent="Design/VehicleInfo" unique_id=594221584]
+layout_mode = 0
+offset_left = 190.0
+offset_top = 226.0
+offset_right = 285.0
+offset_bottom = 249.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.8901961, 0.8901961, 0.7921569, 1)
+text = "—"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="StatBar2" type="ProgressBar" parent="Design/VehicleInfo" unique_id=176159624]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 250.0
+offset_right = 283.0
+offset_bottom = 255.0
+theme_override_styles/background = SubResource("StyleBoxFlat_cmlhh")
+theme_override_styles/fill = SubResource("StyleBoxFlat_y232e")
+value = 60.0
+show_percentage = false
+
+[node name="StatIcon3" type="Label" parent="Design/VehicleInfo" unique_id=1467801027]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 264.0
+offset_right = 40.0
+offset_bottom = 291.0
+theme_override_fonts/font = SubResource("SystemFont_x6ekd")
+theme_override_font_sizes/font_size = 23
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "▰"
+vertical_alignment = 1
+
+[node name="StatTitle3" type="Label" parent="Design/VehicleInfo" unique_id=925816613]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 264.0
+offset_right = 193.0
+offset_bottom = 287.0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "МАССА"
+vertical_alignment = 1
+
+[node name="StatValue3" type="Label" parent="Design/VehicleInfo" unique_id=560479922]
+layout_mode = 0
+offset_left = 190.0
+offset_top = 264.0
+offset_right = 285.0
+offset_bottom = 287.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.8901961, 0.8901961, 0.7921569, 1)
+text = "—"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="StatBar3" type="ProgressBar" parent="Design/VehicleInfo" unique_id=1930772596]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 288.0
+offset_right = 283.0
+offset_bottom = 293.0
+theme_override_styles/background = SubResource("StyleBoxFlat_aw7rd")
+theme_override_styles/fill = SubResource("StyleBoxFlat_1nlj7")
+value = 60.0
+show_percentage = false
+
+[node name="StatIcon4" type="Label" parent="Design/VehicleInfo" unique_id=1295259937]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 302.0
+offset_right = 40.0
+offset_bottom = 329.0
+theme_override_fonts/font = SubResource("SystemFont_sh5y4")
+theme_override_font_sizes/font_size = 23
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "▣"
+vertical_alignment = 1
+
+[node name="StatTitle4" type="Label" parent="Design/VehicleInfo" unique_id=887097672]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 302.0
+offset_right = 193.0
+offset_bottom = 325.0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "ДВИГАТЕЛЬ"
+vertical_alignment = 1
+
+[node name="StatValue4" type="Label" parent="Design/VehicleInfo" unique_id=701012605]
+layout_mode = 0
+offset_left = 190.0
+offset_top = 302.0
+offset_right = 285.0
+offset_bottom = 325.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.8901961, 0.8901961, 0.7921569, 1)
+text = "—"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="StatBar4" type="ProgressBar" parent="Design/VehicleInfo" unique_id=734270871]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 326.0
+offset_right = 283.0
+offset_bottom = 331.0
+theme_override_styles/background = SubResource("StyleBoxFlat_2vtg3")
+theme_override_styles/fill = SubResource("StyleBoxFlat_xgal7")
+value = 60.0
+show_percentage = false
+
+[node name="Passport" type="Panel" parent="Design/VehicleInfo" unique_id=766221266]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 350.0
+offset_right = 291.0
+offset_bottom = 420.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_2bbwh")
+
+[node name="Blueprint" type="TextureRect" parent="Design/VehicleInfo/Passport" unique_id=1622926839]
+modulate = Color(0.7, 0.73, 0.63, 0.65)
+layout_mode = 0
+offset_left = 6.0
+offset_top = 3.0
+offset_right = 168.0
+offset_bottom = 65.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Dimensions" type="Label" parent="Design/VehicleInfo/Passport" unique_id=304010849]
+layout_mode = 0
+offset_left = 171.0
+offset_top = 3.0
+offset_right = 271.0
+offset_bottom = 78.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.7254902, 0.7411765, 0.63529414, 1)
+text = "МАССА
+ОБЗОР
+БРОНЯ"
+vertical_alignment = 1
+
+[node name="Armor" type="Button" parent="Design/VehicleInfo" unique_id=225526792]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 429.0
+offset_right = 176.0
+offset_bottom = 460.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_0pb6q")
+text = "◈ МАСКА БРОНИ"
+
+[node name="PassportButton" type="Button" parent="Design/VehicleInfo" unique_id=871064179]
+layout_mode = 0
+offset_left = 183.0
+offset_top = 429.0
+offset_right = 291.0
+offset_bottom = 460.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_mhmku")
+text = "ПАСПОРТ ↗"
+
+[node name="Motto" type="Label" parent="Design/VehicleInfo" unique_id=2097576203]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 458.0
+offset_right = 314.0
+offset_bottom = 481.0
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "★   В Е Р Н Ы  Т А М ,  Г Д Е  Т Р У Д Н О"
+vertical_alignment = 1
+
+[node name="Modules" type="Panel" parent="Design" unique_id=601026000]
+layout_mode = 0
+offset_left = 954.0
+offset_top = 86.0
+offset_right = 1261.0
+offset_bottom = 562.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_8fwhv")
+
+[node name="ModulesTitle" type="Label" parent="Design/Modules" unique_id=634191127]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 13.0
+offset_right = 241.0
+offset_bottom = 36.0
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "⚒   МОДЕРНИЗАЦИЯ"
+vertical_alignment = 1
+
+[node name="VehicleCode" type="Label" parent="Design/Modules" unique_id=1005638728]
+layout_mode = 0
+offset_left = 249.0
+offset_top = 13.0
+offset_right = 293.0
+offset_bottom = 36.0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.5647059, 0.60784316, 0.52156866, 1)
+text = "P-205"
+vertical_alignment = 1
+
+[node name="Upgrade_gun" type="Button" parent="Design/Modules" unique_id=765574838]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 48.0
+offset_right = 149.0
+offset_bottom = 137.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_5ekve")
+toggle_mode = true
+text = "▰
+ОРУДИЕ
+УР. I"
+
+[node name="Upgrade_armor" type="Button" parent="Design/Modules" unique_id=420135855]
+layout_mode = 0
+offset_left = 158.0
+offset_top = 48.0
+offset_right = 291.0
+offset_bottom = 137.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_1akpa")
+toggle_mode = true
+text = "◇
+БРОНЯ
+УР. I"
+
+[node name="Upgrade_engine" type="Button" parent="Design/Modules" unique_id=1968577163]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 146.0
+offset_right = 149.0
+offset_bottom = 235.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_hci0v")
+toggle_mode = true
+text = "▣
+ДВИГАТЕЛЬ
+УР. I"
+
+[node name="Upgrade_tracks" type="Button" parent="Design/Modules" unique_id=2088890590]
+layout_mode = 0
+offset_left = 158.0
+offset_top = 146.0
+offset_right = 291.0
+offset_bottom = 235.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_fcsu2")
+toggle_mode = true
+text = "▱
+ХОДОВАЯ
+УР. I"
+
+[node name="ModuleDetail" type="Panel" parent="Design/Modules" unique_id=299874832]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 254.0
+offset_right = 291.0
+offset_bottom = 394.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_wub5p")
+
+[node name="ModuleName" type="Label" parent="Design/Modules/ModuleDetail" unique_id=1133666830]
+layout_mode = 0
+offset_left = 11.0
+offset_top = 8.0
+offset_right = 186.0
+offset_bottom = 31.0
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.88235295, 0.8745098, 0.7411765, 1)
+text = "ОРУДИЕ"
+vertical_alignment = 1
+
+[node name="ModuleLevel" type="Label" parent="Design/Modules/ModuleDetail" unique_id=803873987]
+layout_mode = 0
+offset_left = 192.0
+offset_top = 8.0
+offset_right = 262.0
+offset_bottom = 31.0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "УР. I / V"
+vertical_alignment = 1
+
+[node name="ModuleStats" type="Label" parent="Design/Modules/ModuleDetail" unique_id=929235505]
+layout_mode = 0
+offset_left = 11.0
+offset_top = 41.0
+offset_right = 262.0
+offset_bottom = 116.0
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.6431373, 0.6784314, 0.58431375, 1)
+text = "Средний урон
+Пробитие
+Скорострельность"
+vertical_alignment = 1
+
+[node name="ModuleProgress" type="ProgressBar" parent="Design/Modules/ModuleDetail" unique_id=932389363]
+layout_mode = 0
+offset_left = 11.0
+offset_top = 115.0
+offset_right = 262.0
+offset_bottom = 119.0
+theme_override_styles/background = SubResource("StyleBoxFlat_ojx27")
+theme_override_styles/fill = SubResource("StyleBoxFlat_n031f")
+value = 60.0
+show_percentage = false
+
+[node name="Hint" type="Label" parent="Design/Modules" unique_id=676290204]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 399.0
+offset_right = 355.0
+offset_bottom = 426.0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.6313726, 0.6784314, 0.57254905, 1)
+text = "Улучшайте технику перед выходом в бой"
+vertical_alignment = 1
+
+[node name="UpgradeConfirm" type="Button" parent="Design/Modules" unique_id=1754422024]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 432.0
+offset_right = 291.0
+offset_bottom = 464.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_62b2t")
+theme_override_colors/font_color = Color(0.1254902, 0.16862746, 0.1254902, 1)
+text = "⌃   УЛУЧШИТЬ     300 ◉"
+
+[node name="VehicleScroll" type="ScrollContainer" parent="Design" unique_id=602580840]
+layout_mode = 0
+offset_left = 350.0
+offset_top = 591.0
+offset_right = 930.0
+offset_bottom = 696.0
+
+[node name="Vehicles" type="HBoxContainer" parent="Design/VehicleScroll" unique_id=910815323]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ShelfPrev" type="Button" parent="Design" unique_id=304826325]
+layout_mode = 0
+offset_left = 319.0
+offset_top = 610.0
+offset_right = 345.0
+offset_bottom = 667.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_chtd0")
+text = "‹"
+
+[node name="ShelfNext" type="Button" parent="Design" unique_id=11146198]
+layout_mode = 0
+offset_left = 935.0
+offset_top = 610.0
+offset_right = 961.0
+offset_bottom = 667.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_tadcd")
+text = "›"
+
+[node name="PreviewHint" type="Label" parent="Design" unique_id=1837057292]
+layout_mode = 0
+offset_left = 433.0
+offset_top = 544.0
+offset_right = 847.0
+offset_bottom = 593.0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.8039216, 0.8156863, 0.70980394, 1)
+text = "+      ОБЗОР МАШИНЫ      +
+Перетащите мышью для вращения"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Operation" type="Panel" parent="Design" unique_id=209692765]
+layout_mode = 0
+offset_left = 954.0
+offset_top = 588.0
+offset_right = 1261.0
+offset_bottom = 658.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_fs1jw")
+
+[node name="Battle" type="Button" parent="Design/Operation" unique_id=1317811237]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 297.0
+offset_bottom = 60.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_701i4")
+theme_override_colors/font_color = Color(0.1254902, 0.16862746, 0.1254902, 1)
+theme_override_font_sizes/font_size = 24
+text = "В БОЙ     ⟶"
+
+[node name="SaveStatus" type="Label" parent="Design" unique_id=1867721232]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 701.0
+offset_right = 291.0
+offset_bottom = 724.0
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.6117647, 0.6666667, 0.62352943, 1)
+text = "● Локальное сохранение"
+vertical_alignment = 1
+
+[node name="Career" type="Label" parent="Design" unique_id=339541824]
+layout_mode = 0
+offset_left = 555.0
+offset_top = 701.0
+offset_right = 775.0
+offset_bottom = 724.0
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.6117647, 0.6666667, 0.62352943, 1)
+text = "0 боёв · 0 побед"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Help" type="Button" parent="Design" unique_id=1753312196]
+layout_mode = 0
+offset_left = 1030.0
+offset_top = 682.0
+offset_right = 1255.0
+offset_bottom = 713.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_cqxkc")
+theme_override_font_sizes/font_size = 10
+text = "Управление и обучение ↗"

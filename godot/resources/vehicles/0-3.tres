@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/vehicle_definition.gd" id="1_quncx"]
+
+[resource]
+script = ExtResource("1_quncx")
+vehicle_id = "0-3"
+display_name = "СУ-152 «Гром»"
+hit_points = 620.0
+damage = 430.0
+armor = 5.0
+reload_seconds = 10.5
+track_health = 100.0
+speed = 7.5
+reverse_speed = 2.5
+turn_speed = 0.65
+turret_speed = 0.75
+view_distance = 130.0
+dispersion = 0.021
+aim_seconds = 2.2
+zoom = 4.5

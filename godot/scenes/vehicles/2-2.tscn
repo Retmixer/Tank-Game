@@ -1,0 +1,603 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/tank.gd" id="1_bklla"]
+[ext_resource type="Resource" path="res://resources/vehicles/2-2.tres" id="2_4l474"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0005_Mesh.res" id="3_2grlg"]
+[ext_resource type="Material" path="res://materials/surface_2096268a9e0c.tres" id="4_q6uau"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0006_Mesh2.res" id="5_hhlo2"]
+[ext_resource type="Material" path="res://materials/surface_d7adcffc9575.tres" id="6_1nah2"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0007_Mesh3.res" id="7_dns6j"]
+[ext_resource type="Material" path="res://materials/surface_ecb3f790bc6a.tres" id="8_d14s4"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0009_Mesh4.res" id="9_lp6yu"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0010_Mesh5.res" id="10_6lsds"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0011_Mesh6.res" id="11_5g68i"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0013_Mesh7.res" id="12_m2ve8"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0014_Mesh8.res" id="13_pmj83"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0015_Mesh9.res" id="14_akm58"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0017_Mesh10.res" id="15_j8ljx"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0018_Mesh11.res" id="16_rdfcf"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0019_Mesh12.res" id="17_pu4cb"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0021_Mesh13.res" id="18_aesx4"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0022_Mesh14.res" id="19_3lf2w"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0023_Mesh15.res" id="20_cv151"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0025_Mesh16.res" id="21_mgwde"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0026_Mesh17.res" id="22_yrh01"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0027_Mesh18.res" id="23_yop2b"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0029_Mesh19.res" id="24_clknp"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0030_Mesh20.res" id="25_12e6t"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0031_Mesh21.res" id="26_24cik"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0033_Mesh22.res" id="27_pdpur"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0034_Mesh23.res" id="28_44qmg"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0035_Mesh24.res" id="29_6jh7j"]
+[ext_resource type="MultiMesh" path="res://assets/native/2-2/0037_Instances_Mesh.res" id="30_xa766"]
+[ext_resource type="MultiMesh" path="res://assets/native/2-2/0038_Instances_Mesh2.res" id="31_lk7re"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0039_Mesh25.res" id="32_ru6wl"]
+[ext_resource type="Material" path="res://materials/surface_0aecb2d5dc8c.tres" id="33_l02ke"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0041_Mesh26.res" id="34_fw8qm"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0042_Mesh27.res" id="35_o3o2c"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0043_Mesh28.res" id="36_tchvh"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0045_Mesh29.res" id="37_5rrt0"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0046_Mesh30.res" id="38_054uj"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0047_Mesh31.res" id="39_7j1vy"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0049_Mesh32.res" id="40_thpu8"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0050_Mesh33.res" id="41_ojqq3"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0051_Mesh34.res" id="42_oi0hg"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0053_Mesh35.res" id="43_vrswh"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0054_Mesh36.res" id="44_sar3c"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0055_Mesh37.res" id="45_n3afi"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0057_Mesh38.res" id="46_hnknl"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0058_Mesh39.res" id="47_r8nch"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0059_Mesh40.res" id="48_wq17s"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0061_Mesh41.res" id="49_2w4ua"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0062_Mesh42.res" id="50_ial57"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0063_Mesh43.res" id="51_8h4gm"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0065_Mesh44.res" id="52_jlbow"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0066_Mesh45.res" id="53_rxux0"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0067_Mesh46.res" id="54_5ej4s"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0069_Mesh47.res" id="55_6ntyf"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0070_Mesh48.res" id="56_eluuf"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0071_Mesh49.res" id="57_0giqq"]
+[ext_resource type="MultiMesh" path="res://assets/native/2-2/0073_Instances_Mesh3.res" id="58_0e17x"]
+[ext_resource type="MultiMesh" path="res://assets/native/2-2/0074_Instances_Mesh4.res" id="59_lrwo4"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0075_Mesh50.res" id="60_13nas"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0077_Mesh51.res" id="61_5gid2"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0078_Mesh52.res" id="62_k8al3"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0081_Mesh53.res" id="63_y6rm2"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0082_Mesh54.res" id="64_73y7t"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0083_Mesh55.res" id="65_t8jxa"]
+[ext_resource type="Material" path="res://materials/surface_32fcf1616f07.tres" id="66_aor0y"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0084_Mesh56.res" id="67_b227l"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0086_Mesh57.res" id="68_g8rog"]
+[ext_resource type="Material" path="res://materials/surface_ae5f68a4ceb0.tres" id="69_tf88g"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0087_Mesh58.res" id="70_7fisj"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0088_Mesh59.res" id="71_dehxo"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0089_Mesh60.res" id="72_mxub2"]
+[ext_resource type="Material" path="res://materials/surface_a09242618718.tres" id="73_nk0up"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0090_Mesh61.res" id="74_ctndi"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0091_Mesh62.res" id="75_7rqgl"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0092_Mesh63.res" id="76_u08rd"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0093_Mesh64.res" id="77_f1pny"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0094_Mesh65.res" id="78_k0g5b"]
+[ext_resource type="Material" path="res://materials/surface_45a556888827.tres" id="79_doq7c"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0095_Mesh66.res" id="80_rgxvx"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0096_Mesh67.res" id="81_3vy2k"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0097_Mesh68.res" id="82_6jgq7"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0098_Mesh69.res" id="83_g7lqw"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0099_Mesh70.res" id="84_lsrry"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0100_Mesh71.res" id="85_6e0pm"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0101_Mesh72.res" id="86_nxfc3"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0102_Mesh73.res" id="87_ln4w1"]
+[ext_resource type="ArrayMesh" path="res://assets/native/2-2/0103_Mesh74.res" id="88_pxddh"]
+[ext_resource type="Shape3D" path="res://assets/native/2-2/0104_HullCollision.res" id="89_wxq38"]
+[ext_resource type="AudioStream" path="res://assets/audio/engine.ogg" id="90_oh4oj"]
+
+[node name="Tank_2_2" type="CharacterBody3D" unique_id=1068032765]
+floor_max_angle = 0.6632251
+floor_snap_length = 0.8
+script = ExtResource("1_bklla")
+definition = ExtResource("2_4l474")
+
+[node name="Visual" type="Node3D" parent="." unique_id=1346175883]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+
+[node name="TankVisual" type="Node3D" parent="Visual" unique_id=658933142]
+
+[node name="Wheel_0" type="Node3D" parent="Visual/TankVisual" unique_id=2053624832]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.775, 0.64, -2.691)
+
+[node name="Mesh" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_0" unique_id=265743676]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("3_2grlg")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh2" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_0" unique_id=938948789]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("5_hhlo2")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh3" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_0" unique_id=462271287]
+mesh = ExtResource("7_dns6j")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_1" type="Node3D" parent="Visual/TankVisual" unique_id=1020329083]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.775, 0.64, -1.9221429)
+
+[node name="Mesh4" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_1" unique_id=548192588]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("9_lp6yu")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh5" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_1" unique_id=352297062]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("10_6lsds")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh6" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_1" unique_id=482476153]
+mesh = ExtResource("11_5g68i")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_2" type="Node3D" parent="Visual/TankVisual" unique_id=1789426575]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.775, 0.64, -1.1532857)
+
+[node name="Mesh7" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_2" unique_id=1889747797]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("12_m2ve8")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh8" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_2" unique_id=1149057625]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("13_pmj83")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh9" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_2" unique_id=243388272]
+mesh = ExtResource("14_akm58")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_3" type="Node3D" parent="Visual/TankVisual" unique_id=1072715515]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.775, 0.64, -0.38442856)
+
+[node name="Mesh10" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_3" unique_id=1317854845]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("15_j8ljx")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh11" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_3" unique_id=455502069]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("16_rdfcf")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh12" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_3" unique_id=1662790390]
+mesh = ExtResource("17_pu4cb")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_4" type="Node3D" parent="Visual/TankVisual" unique_id=2019332181]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.775, 0.64, 0.38442856)
+
+[node name="Mesh13" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_4" unique_id=56323051]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("18_aesx4")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh14" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_4" unique_id=720779670]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("19_3lf2w")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh15" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_4" unique_id=1899537388]
+mesh = ExtResource("20_cv151")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_5" type="Node3D" parent="Visual/TankVisual" unique_id=457684369]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.775, 0.64, 1.1532857)
+
+[node name="Mesh16" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_5" unique_id=1532085946]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("21_mgwde")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh17" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_5" unique_id=1100090278]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("22_yrh01")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh18" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_5" unique_id=2140998470]
+mesh = ExtResource("23_yop2b")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_6" type="Node3D" parent="Visual/TankVisual" unique_id=818261890]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.775, 0.64, 1.9221429)
+
+[node name="Mesh19" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_6" unique_id=1817604647]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("24_clknp")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh20" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_6" unique_id=12997972]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("25_12e6t")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh21" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_6" unique_id=1361634522]
+mesh = ExtResource("26_24cik")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_7" type="Node3D" parent="Visual/TankVisual" unique_id=132046288]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.775, 0.64, 2.691)
+
+[node name="Mesh22" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_7" unique_id=291970440]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("27_pdpur")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh23" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_7" unique_id=618500345]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("28_44qmg")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh24" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_7" unique_id=286603384]
+mesh = ExtResource("29_6jh7j")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Group" type="Node3D" parent="Visual/TankVisual" unique_id=1511688568]
+
+[node name="Instances_Mesh" type="MultiMeshInstance3D" parent="Visual/TankVisual/Group" unique_id=603644744]
+multimesh = ExtResource("30_xa766")
+
+[node name="Instances_Mesh2" type="MultiMeshInstance3D" parent="Visual/TankVisual/Group" unique_id=165444304]
+multimesh = ExtResource("31_lk7re")
+
+[node name="Mesh25" type="MeshInstance3D" parent="Visual/TankVisual" unique_id=1818093413]
+transform = Transform3D(1, 0, 0, 0, 2.220446e-16, -1, 0, 1, 2.220446e-16, -1.173, 1.54, 2.84)
+mesh = ExtResource("32_ru6wl")
+surface_material_override/0 = ExtResource("33_l02ke")
+surface_material_override/1 = ExtResource("33_l02ke")
+surface_material_override/2 = ExtResource("33_l02ke")
+
+[node name="Wheel_8" type="Node3D" parent="Visual/TankVisual" unique_id=1760887186]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.775, 0.64, -2.691)
+
+[node name="Mesh26" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_8" unique_id=826871900]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("34_fw8qm")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh27" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_8" unique_id=412429823]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("35_o3o2c")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh28" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_8" unique_id=1667345127]
+mesh = ExtResource("36_tchvh")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_9" type="Node3D" parent="Visual/TankVisual" unique_id=1477841805]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.775, 0.64, -1.9221429)
+
+[node name="Mesh29" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_9" unique_id=1009749563]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("37_5rrt0")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh30" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_9" unique_id=187206384]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("38_054uj")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh31" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_9" unique_id=1111583160]
+mesh = ExtResource("39_7j1vy")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_10" type="Node3D" parent="Visual/TankVisual" unique_id=2117645679]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.775, 0.64, -1.1532857)
+
+[node name="Mesh32" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_10" unique_id=795560632]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("40_thpu8")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh33" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_10" unique_id=826640263]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("41_ojqq3")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh34" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_10" unique_id=1320831618]
+mesh = ExtResource("42_oi0hg")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_11" type="Node3D" parent="Visual/TankVisual" unique_id=752922376]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.775, 0.64, -0.38442856)
+
+[node name="Mesh35" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_11" unique_id=1020212884]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("43_vrswh")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh36" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_11" unique_id=220721914]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("44_sar3c")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh37" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_11" unique_id=1353028364]
+mesh = ExtResource("45_n3afi")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_12" type="Node3D" parent="Visual/TankVisual" unique_id=1346467926]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.775, 0.64, 0.38442856)
+
+[node name="Mesh38" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_12" unique_id=1972345110]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("46_hnknl")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh39" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_12" unique_id=433501289]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("47_r8nch")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh40" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_12" unique_id=1537661077]
+mesh = ExtResource("48_wq17s")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_13" type="Node3D" parent="Visual/TankVisual" unique_id=952204643]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.775, 0.64, 1.1532857)
+
+[node name="Mesh41" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_13" unique_id=1483577501]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("49_2w4ua")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh42" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_13" unique_id=4118944]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("50_ial57")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh43" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_13" unique_id=1939970991]
+mesh = ExtResource("51_8h4gm")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_14" type="Node3D" parent="Visual/TankVisual" unique_id=409046217]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.775, 0.64, 1.9221429)
+
+[node name="Mesh44" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_14" unique_id=1044046293]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("52_jlbow")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh45" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_14" unique_id=924514846]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("53_rxux0")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh46" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_14" unique_id=146240349]
+mesh = ExtResource("54_5ej4s")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Wheel_15" type="Node3D" parent="Visual/TankVisual" unique_id=1775378453]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.775, 0.64, 2.691)
+
+[node name="Mesh47" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_15" unique_id=1602729654]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("55_6ntyf")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="Mesh48" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_15" unique_id=1170829096]
+transform = Transform3D(2.220446e-16, -1, 0, 1, 2.220446e-16, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("56_eluuf")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh49" type="MeshInstance3D" parent="Visual/TankVisual/Wheel_15" unique_id=917449348]
+mesh = ExtResource("57_0giqq")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Group2" type="Node3D" parent="Visual/TankVisual" unique_id=1489596199]
+
+[node name="Instances_Mesh3" type="MultiMeshInstance3D" parent="Visual/TankVisual/Group2" unique_id=4414244]
+multimesh = ExtResource("58_0e17x")
+
+[node name="Instances_Mesh4" type="MultiMeshInstance3D" parent="Visual/TankVisual/Group2" unique_id=651760764]
+multimesh = ExtResource("59_lrwo4")
+
+[node name="Mesh50" type="MeshInstance3D" parent="Visual/TankVisual" unique_id=876935948]
+transform = Transform3D(1, 0, 0, 0, 2.220446e-16, -1, 0, 1, 2.220446e-16, 1.173, 1.54, 2.84)
+mesh = ExtResource("60_13nas")
+surface_material_override/0 = ExtResource("33_l02ke")
+surface_material_override/1 = ExtResource("33_l02ke")
+surface_material_override/2 = ExtResource("33_l02ke")
+
+[node name="Turret" type="Node3D" parent="Visual/TankVisual" unique_id=91513866]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.77, 0.48)
+
+[node name="Mesh51" type="MeshInstance3D" parent="Visual/TankVisual/Turret" unique_id=1531434998]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, 0.93, -0.29)
+mesh = ExtResource("61_5gid2")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+surface_material_override/2 = ExtResource("6_1nah2")
+
+[node name="Mesh52" type="MeshInstance3D" parent="Visual/TankVisual/Turret" unique_id=1466784962]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.759, 0.83, -0.62)
+mesh = ExtResource("62_k8al3")
+surface_material_override/0 = ExtResource("4_q6uau")
+surface_material_override/1 = ExtResource("4_q6uau")
+surface_material_override/2 = ExtResource("4_q6uau")
+
+[node name="GunPivot" type="Node3D" parent="Visual/TankVisual/Turret" unique_id=1879834405]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.37, 0.63)
+
+[node name="Recoil" type="Node3D" parent="Visual/TankVisual/Turret/GunPivot" unique_id=2075440319]
+
+[node name="Mesh53" type="MeshInstance3D" parent="Visual/TankVisual/Turret/GunPivot/Recoil" unique_id=1229671933]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.14)
+mesh = ExtResource("63_y6rm2")
+surface_material_override/0 = ExtResource("6_1nah2")
+surface_material_override/1 = ExtResource("6_1nah2")
+
+[node name="Mesh54" type="MeshInstance3D" parent="Visual/TankVisual/Turret/GunPivot/Recoil" unique_id=1185237350]
+mesh = ExtResource("64_73y7t")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Mesh55" type="MeshInstance3D" parent="Visual/TankVisual/Turret/GunPivot/Recoil" unique_id=400020406]
+mesh = ExtResource("65_t8jxa")
+surface_material_override/0 = ExtResource("66_aor0y")
+
+[node name="Mesh56" type="MeshInstance3D" parent="Visual/TankVisual/Turret/GunPivot/Recoil" unique_id=1148414882]
+mesh = ExtResource("67_b227l")
+surface_material_override/0 = ExtResource("4_q6uau")
+
+[node name="Muzzle" type="Marker3D" parent="Visual/TankVisual/Turret/GunPivot" unique_id=92767335]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.95)
+
+[node name="Mesh57" type="MeshInstance3D" parent="Visual/TankVisual/Turret" unique_id=1174881831]
+transform = Transform3D(2.220446e-16, 0, -1, 0, 1, 0, 1, 0, 2.220446e-16, -1.25925, 0.46, -0.18)
+mesh = ExtResource("68_g8rog")
+surface_material_override/0 = ExtResource("69_tf88g")
+
+[node name="Mesh58" type="MeshInstance3D" parent="Visual/TankVisual/Turret" unique_id=1718490893]
+transform = Transform3D(2.220446e-16, 0, 1, 0, 1, 0, -1, 0, 2.220446e-16, 1.25925, 0.46, -0.18)
+mesh = ExtResource("70_7fisj")
+surface_material_override/0 = ExtResource("69_tf88g")
+
+[node name="Mesh59" type="MeshInstance3D" parent="Visual/TankVisual/Turret" unique_id=1356236621]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.36, 1.03, 0.37)
+mesh = ExtResource("71_dehxo")
+surface_material_override/0 = ExtResource("66_aor0y")
+surface_material_override/1 = ExtResource("66_aor0y")
+
+[node name="Mesh60" type="MeshInstance3D" parent="Visual/TankVisual/Turret" unique_id=878605321]
+transform = Transform3D(0.25, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.82, 1.42, -0.25)
+mesh = ExtResource("72_mxub2")
+surface_material_override/0 = ExtResource("73_nk0up")
+surface_material_override/1 = ExtResource("73_nk0up")
+surface_material_override/2 = ExtResource("73_nk0up")
+surface_material_override/3 = ExtResource("73_nk0up")
+surface_material_override/4 = ExtResource("73_nk0up")
+surface_material_override/5 = ExtResource("73_nk0up")
+
+[node name="Mesh61" type="MeshInstance3D" parent="Visual/TankVisual/Turret" unique_id=1201950622]
+mesh = ExtResource("74_ctndi")
+surface_material_override/0 = ExtResource("66_aor0y")
+
+[node name="Mesh62" type="MeshInstance3D" parent="Visual/TankVisual/Turret" unique_id=1375342913]
+mesh = ExtResource("75_7rqgl")
+surface_material_override/0 = ExtResource("6_1nah2")
+
+[node name="Mesh63" type="MeshInstance3D" parent="Visual/TankVisual/Turret" unique_id=662313077]
+mesh = ExtResource("76_u08rd")
+surface_material_override/0 = ExtResource("6_1nah2")
+
+[node name="Mesh64" type="MeshInstance3D" parent="Visual/TankVisual/Turret" unique_id=272463679]
+mesh = ExtResource("77_f1pny")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Mesh65" type="MeshInstance3D" parent="Visual/TankVisual/Turret" unique_id=1087078826]
+mesh = ExtResource("78_k0g5b")
+surface_material_override/0 = ExtResource("79_doq7c")
+
+[node name="Mesh66" type="MeshInstance3D" parent="Visual/TankVisual/Turret" unique_id=1582335270]
+mesh = ExtResource("80_rgxvx")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Mesh67" type="MeshInstance3D" parent="Visual/TankVisual" unique_id=913063736]
+mesh = ExtResource("81_3vy2k")
+surface_material_override/0 = ExtResource("6_1nah2")
+
+[node name="Mesh68" type="MeshInstance3D" parent="Visual/TankVisual" unique_id=990170513]
+mesh = ExtResource("82_6jgq7")
+surface_material_override/0 = ExtResource("6_1nah2")
+
+[node name="Mesh69" type="MeshInstance3D" parent="Visual/TankVisual" unique_id=330808423]
+mesh = ExtResource("83_g7lqw")
+surface_material_override/0 = ExtResource("6_1nah2")
+
+[node name="Mesh70" type="MeshInstance3D" parent="Visual/TankVisual" unique_id=1500668966]
+mesh = ExtResource("84_lsrry")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Mesh71" type="MeshInstance3D" parent="Visual/TankVisual" unique_id=628979954]
+mesh = ExtResource("85_6e0pm")
+surface_material_override/0 = ExtResource("8_d14s4")
+
+[node name="Mesh72" type="MeshInstance3D" parent="Visual/TankVisual" unique_id=1409171846]
+mesh = ExtResource("86_nxfc3")
+surface_material_override/0 = ExtResource("66_aor0y")
+
+[node name="Mesh73" type="MeshInstance3D" parent="Visual/TankVisual" unique_id=19379291]
+mesh = ExtResource("87_ln4w1")
+surface_material_override/0 = ExtResource("4_q6uau")
+
+[node name="Mesh74" type="MeshInstance3D" parent="Visual/TankVisual" unique_id=972090331]
+mesh = ExtResource("88_pxddh")
+surface_material_override/0 = ExtResource("73_nk0up")
+
+[node name="HullCollision" type="CollisionShape3D" parent="." unique_id=297086026]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.03, 0)
+shape = ExtResource("89_wxq38")
+
+[node name="EngineAudio" type="AudioStreamPlayer3D" parent="." unique_id=282269738]
+stream = ExtResource("90_oh4oj")
+unit_size = 16.0
+max_distance = 90.0

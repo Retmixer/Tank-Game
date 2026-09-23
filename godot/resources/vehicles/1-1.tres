@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/vehicle_definition.gd" id="1_6cey0"]
+
+[resource]
+script = ExtResource("1_6cey0")
+vehicle_id = "1-1"
+display_name = "M-24 «Клин»"
+hit_points = 860.0
+damage = 165.0
+armor = 19.0
+reload_seconds = 3.75
+speed = 8.055555555555555
+reverse_speed = 2.7777777777777777
+view_distance = 115.0
+zoom = 3.35

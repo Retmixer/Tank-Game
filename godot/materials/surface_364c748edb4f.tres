@@ -1,0 +1,12 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/atlas_692a3ef432f6.png" id="1_e2yjk"]
+
+[resource]
+resource_name = "surface_364c748edb4f"
+transparency = 2
+alpha_scissor_threshold = 0.4
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_color = Color(0.7607843, 0.6784314, 0.44705883, 1)
+albedo_texture = ExtResource("1_e2yjk")

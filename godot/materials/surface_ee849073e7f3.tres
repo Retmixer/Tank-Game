@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://materials/vehicle_paint.gdshader" id="1_g642j"]
+[ext_resource type="Texture2D" path="res://assets/textures/paint-color.jpg" id="2_uocub"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_g642j")
+shader_parameter/wear_map = ExtResource("2_uocub")
+shader_parameter/paint_color = Color(0.44705883, 0.50980395, 0.4117647, 1)
+shader_parameter/texture_scale = 1.8
+shader_parameter/metalness = 0.13

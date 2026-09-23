@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=3]
+
+[sub_resource type="StandardMaterial3D" id="DustMaterial"]
+shading_mode = 0
+transparency = 1
+albedo_color = Color(0.85, 0.73, 0.5, 0.6)
+[sub_resource type="SphereMesh" id="DustMesh"]
+material = SubResource("DustMaterial")
+radius = 0.12
+height = 0.24
+radial_segments = 8
+rings = 4
+[sub_resource type="ParticleProcessMaterial" id="Process"]
+resource_local_to_scene = true
+direction = Vector3(0, 1, 0)
+spread = 100.0
+initial_velocity_min = 0.4
+initial_velocity_max = 3.0
+gravity = Vector3(0, -1, 0)
+scale_min = 0.5
+scale_max = 2.0
+
+[node name="Impact" type="GPUParticles3D"]
+emitting = false
+amount = 16
+one_shot = true
+lifetime = 0.6
+explosiveness = 1.0
+process_material = SubResource("Process")
+draw_pass_1 = SubResource("DustMesh")

@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/leaf-color.jpg" id="1_pr8w0"]
+[ext_resource type="Texture2D" path="res://assets/textures/leaf-normal.jpg" id="2_mlhxc"]
+[ext_resource type="Texture2D" path="res://assets/textures/leaf-rough.jpg" id="3_nkbts"]
+
+[resource]
+resource_name = "surface_cceda5b27aea"
+albedo_color = Color(0.5992069, 0.6534936, 0.64199734, 1)
+albedo_texture = ExtResource("1_pr8w0")
+metallic = 0.02
+roughness = 0.95
+roughness_texture = ExtResource("3_nkbts")
+normal_enabled = true
+normal_scale = 0.4
+normal_texture = ExtResource("2_mlhxc")

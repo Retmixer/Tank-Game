@@ -3,9 +3,9 @@ extends Node3D
 enum Screen { HANGAR, BATTLE, PAUSE, SETTINGS, RESULT, LAN_LOBBY }
 enum Page { GARAGE, RESEARCH }
 
-const TankScript = preload("res://scripts/tank.gd")
-const ShellScript = preload("res://scripts/shell.gd")
-const ArenaScript = preload("res://scripts/arena.gd")
+
+const ShellScene = preload("res://scenes/projectiles/shell.tscn")
+
 const PALETTE := {
 	"background": Color("081013"), "panel": Color("11191c"), "line": Color("303a3a"),
 	"gold": Color("e3bd73"), "gold_dark": Color("92713d"), "text": Color("e7e4da"),
@@ -13,6 +13,7 @@ const PALETTE := {
 	"green": Color("82c8a7")
 }
 
+@onready var interface: CanvasLayer = $Interface
 var screen := Screen.HANGAR
 var garage_page := Page.GARAGE
 var arena: BattleArena
@@ -48,6 +49,7 @@ var fire_clock := 0.0
 var damage_events: Array[Dictionary] = []
 var latest_results: Array[Dictionary] = []
 var runtime_settings: Dictionary
+var camera_trauma := 0.0
 var lan_peer: ENetMultiplayerPeer
 var lan_host := false
 var remote_tank: BattleTank
@@ -59,6 +61,7 @@ var labels: Dictionary = {}
 var reticle: Control
 
 func _ready() -> void:
+	interface.game = self
 	runtime_settings = GameData.save.settings.duplicate(true)
 	selected_map = GameData.save.map
 	selected_tank_id = GameData.save.selected
@@ -67,6 +70,8 @@ func _ready() -> void:
 	set_process(true)
 
 func _process(delta: float) -> void:
+	if interface.busy:
+		return
 	if screen == Screen.LAN_LOBBY and lan_peer != null:
 		if lan_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTING:
 			lan_wait_seconds -= delta
@@ -82,7 +87,7 @@ func _process(delta: float) -> void:
 		elapsed += delta
 		duration_left = maxf(0.0, duration_left - delta)
 		countdown -= delta
-		if countdown <= 0.0 and not countdown_label.visible:
+		if countdown <= 0.0 and countdown + delta > 0.0:
 			countdown_label.show()
 			countdown_label.text = "БОЙ НАЧАЛСЯ"
 			get_tree().create_timer(.9).timeout.connect(func() -> void:
@@ -104,13 +109,15 @@ func _process(delta: float) -> void:
 			_finish_battle(false, "Противник захватил базу")
 
 func _physics_process(_delta: float) -> void:
+	if interface.busy:
+		return
 	if screen != Screen.BATTLE or player == null or not is_instance_valid(player) or player.destroyed:
 		return
 	var movement := Vector2(Input.get_axis("turn_left", "turn_right"), Input.get_axis("backward", "forward"))
 	var hit_point := aim_point
 	if hit_point.is_zero_approx():
 		hit_point = player.global_position + Vector3.FORWARD * 100.0
-	player.set_controls(movement, hit_point, firing and battle_live and countdown <= 0.0)
+	player.set_controls(movement if countdown <= 0.0 else Vector2.ZERO, hit_point, firing and battle_live and countdown <= 0.0)
 	if lan_peer != null and not lan_host and remote_tank != null:
 		rpc_id(1, "submit_remote_state", player.global_position, player.rotation.y, player.turret.rotation.y, player.cannon.rotation.x, player.hp, movement, hit_point, firing)
 
@@ -152,110 +159,28 @@ func _show_hangar() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_clear_panel()
 	hud.hide()
+	reticle.hide()
 	if not is_instance_valid(arena):
 		_build_hangar_world()
-	root_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	var backdrop := _panel(root_panel, Rect2(Vector2.ZERO, get_viewport().get_visible_rect().size), Color("080c0ddd"), false)
-	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var top := HBoxContainer.new()
-	top.position = Vector2(36, 22)
-	top.size = Vector2(get_viewport().get_visible_rect().size.x - 72, 70)
-	root_panel.add_child(top)
-	var logo := _label(top, "◇  СТАЛЬНОЙ РУБЕЖ\n    ТАКТИКА · БРОНЯ · ПОБЕДА", 26, PALETTE.text)
-	logo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var money := _label(top, "◉  %s   ✦  %s" % [GameData.save.silver, GameData.save.xp], 17, PALETTE.gold, HORIZONTAL_ALIGNMENT_RIGHT)
-	money.custom_minimum_size.x = 300
-	var content := HBoxContainer.new()
-	content.position = Vector2(36, 117)
-	content.size = Vector2(get_viewport().get_visible_rect().size.x - 72, get_viewport().get_visible_rect().size.y - 220)
-	content.add_theme_constant_override("separation", 20)
-	root_panel.add_child(content)
-	var left := _panel(content, Rect2(Vector2.ZERO, Vector2.ZERO), Color("10171aeb"), true)
-	left.custom_minimum_size = Vector2(310, 0)
-	left.size_flags_horizontal = Control.SIZE_FILL
-	var left_col := VBoxContainer.new()
-	left_col.position = Vector2(20, 18)
-	left_col.size = Vector2(270, content.size.y - 36)
-	left.add_child(left_col)
-	_label(left_col, "БОЕВОЙ ПАРК", 12, PALETTE.gold)
-	var page_row := HBoxContainer.new()
-	left_col.add_child(page_row)
-	_button(page_row, "АНГАР", func() -> void: garage_page = Page.GARAGE; _show_hangar(), garage_page == Page.GARAGE)
-	_button(page_row, "ИССЛЕДОВАНИЯ", func() -> void: garage_page = Page.RESEARCH; _show_hangar(), garage_page == Page.RESEARCH)
-	if garage_page == Page.RESEARCH:
-		_build_research(left_col)
-	else:
-		_build_hangar_tanks(left_col)
-	var preview := VBoxContainer.new()
-	preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	preview.add_theme_constant_override("separation", 8)
-	content.add_child(preview)
-	_label(preview, "ОБЗОР МАШИНЫ · ПЕРЕТАЩИТЕ МЫШЬЮ ДЛЯ ПОВОРОТА", 11, PALETTE.muted, HORIZONTAL_ALIGNMENT_CENTER)
-	var spec := GameData.stats(GameData.tank_by_id(selected_tank_id), GameData.save.modules[selected_tank_id])
-	_label(preview, spec.name, 32, PALETTE.text, HORIZONTAL_ALIGNMENT_CENTER)
-	_label(preview, "%s · %d HP · %d мм брони · %.1f× оптика" % [spec.cls.to_upper(), spec.hp, spec.armor, spec.zoom], 14, PALETTE.gold, HORIZONTAL_ALIGNMENT_CENTER)
-	var stats := _panel(preview, Rect2(Vector2.ZERO, Vector2.ZERO), Color("0b1116cb"), true)
-	stats.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	stats.custom_minimum_size.y = 64
-	var stat_line := _label(stats, "  ОРУДИЕ   %d ед.     │     ПРОЧНОСТЬ   %d HP     │     СКОРОСТЬ   %d км/ч     │     МАССА   %d т     │     ДВИГАТЕЛЬ   %d л.с." % [spec.damage, spec.hp, roundi(spec.speed * 3.6), spec.mass, spec.power], 13, PALETTE.text)
-	stat_line.set_anchors_and_offsets_preset(Control.PRESET_CENTER_LEFT)
-	stat_line.offset_left = 14
-	stat_line.offset_right = -8
-	var bottom := HBoxContainer.new()
-	bottom.position = Vector2(36, get_viewport().get_visible_rect().size.y - 82)
-	bottom.size = Vector2(get_viewport().get_visible_rect().size.x - 72, 56)
-	bottom.add_theme_constant_override("separation", 10)
-	root_panel.add_child(bottom)
-	var armor := _button(bottom, "МАСКА БРОНИ", _show_armor_preview)
-	armor.custom_minimum_size.x = 160
-	var map_picker := OptionButton.new()
-	map_picker.custom_minimum_size = Vector2(245, 48)
-	for id in GameData.maps:
-		map_picker.add_item(GameData.maps[id].name)
-		map_picker.set_item_metadata(map_picker.item_count - 1, id)
-		if id == selected_map:
-			map_picker.select(map_picker.item_count - 1)
-	map_picker.item_selected.connect(func(index: int) -> void:
-		selected_map = str(map_picker.get_item_metadata(index))
-		GameData.save.map = selected_map
-		GameData.persist())
-	bottom.add_child(map_picker)
-	var team_picker := OptionButton.new()
-	team_picker.custom_minimum_size = Vector2(142, 48)
-	for team_count in [3, 5, 7]:
-		team_picker.add_item("БОЙ %d × %d" % [team_count, team_count])
-		if team_count == GameData.save.team_size:
-			team_picker.select(team_picker.item_count - 1)
-	team_picker.item_selected.connect(func(index: int) -> void:
-		GameData.save.team_size = [3, 5, 7][index]
-		GameData.persist())
-	bottom.add_child(team_picker)
-	var mode_picker := OptionButton.new()
-	mode_picker.custom_minimum_size = Vector2(205, 48)
-	mode_picker.add_item("КОМАНДНЫЙ БОЙ · БОТЫ")
-	mode_picker.add_item("ЛОКАЛЬНАЯ СЕТЬ · 1 × 1")
-	mode_picker.select(0 if battle_mode == "solo" else 1)
-	mode_picker.item_selected.connect(func(index: int) -> void: battle_mode = "solo" if index == 0 else "lan")
-	bottom.add_child(mode_picker)
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bottom.add_child(spacer)
-	_button(bottom, "⚙ НАСТРОЙКИ", _show_settings).custom_minimum_size = Vector2(150, 48)
-	_button(bottom, "В  Б О Й   →", _open_selected_mode, true).custom_minimum_size = Vector2(210, 48)
+	_freeze_vehicles(true)
+	interface.hangar()
 
 func _build_hangar_world() -> void:
-	arena = ArenaScript.new()
-	arena.build("training", "low")
-	add_child(arena)
+	arena = get_node_or_null("Hangar") as BattleArena
+	if arena == null:
+		arena = load("res://scenes/levels/hangar.tscn").instantiate() as BattleArena
+		add_child(arena)
 	_create_camera()
 	var preview_spec := GameData.stats(GameData.tank_by_id(selected_tank_id), GameData.save.modules[selected_tank_id])
-	var preview_tank := TankScript.new() as BattleTank
+	var preview_tank := load("res://scenes/vehicles/%s.tscn" % selected_tank_id).instantiate() as BattleTank
 	preview_tank.configure(preview_spec, 0, false)
 	preview_tank.name = "TankPreview"
-	preview_tank.position = Vector3(0, arena.height_at(0, 0) + .5, 0)
+	preview_tank.position = Vector3.ZERO
+	preview_tank.rotation.y = PI - .7
 	add_child(preview_tank)
 	tanks.append(preview_tank)
-	view_camera.global_position = Vector3(9, 7, 16)
+	view_camera.fov = 45
+	view_camera.global_position = Vector3(8, 5, 12)
 	view_camera.look_at(Vector3(0, 2, 0))
 
 func _build_hangar_tanks(parent: VBoxContainer) -> void:
@@ -307,10 +232,11 @@ func _rebuild_hangar() -> void:
 		if is_instance_valid(tank):
 			tank.queue_free()
 	tanks.clear()
-	var chosen := TankScript.new() as BattleTank
+	var chosen := load("res://scenes/vehicles/%s.tscn" % selected_tank_id).instantiate() as BattleTank
 	chosen.configure(GameData.stats(GameData.tank_by_id(selected_tank_id), GameData.save.modules[selected_tank_id]), 0, false)
 	chosen.name = "TankPreview"
-	chosen.position = Vector3(0, arena.height_at(0, 0) + .5, 0)
+	chosen.position = Vector3.ZERO
+	chosen.rotation.y = PI - .7
 	add_child(chosen)
 	tanks.append(chosen)
 	_show_hangar()
@@ -347,8 +273,7 @@ func _start_battle() -> void:
 	shells.clear()
 	if is_instance_valid(arena):
 		arena.queue_free()
-	arena = ArenaScript.new()
-	arena.build(selected_map, str(runtime_settings.get("quality", "high")))
+	arena = load("res://scenes/levels/%s.tscn" % selected_map).instantiate() as BattleArena
 	add_child(arena)
 	if not is_instance_valid(view_camera):
 		_create_camera()
@@ -383,14 +308,10 @@ func _spawn_lan_roster() -> void:
 	var enemy_name := "Соперник · Гость" if lan_host else "Соперник · Хост"
 	player = _make_tank(local_spec, home_team, true, home_name)
 	remote_tank = _make_tank(opposing_spec, 1 - home_team, false, enemy_name)
-	var player_spawn := home if lan_host else away
-	var enemy_spawn := away if lan_host else home
-	player.position = Vector3(player_spawn.x, arena.height_at(player_spawn.x, player_spawn.y) + .55, player_spawn.y)
-	remote_tank.position = Vector3(enemy_spawn.x, arena.height_at(enemy_spawn.x, enemy_spawn.y) + .55, enemy_spawn.y)
-	player.hull_heading = PI / 4.0 if lan_host else -3.0 * PI / 4.0
-	remote_tank.hull_heading = -player.hull_heading
-	player.rotation.y = player.hull_heading
-	remote_tank.rotation.y = remote_tank.hull_heading
+	player.transform = arena.spawn_transform(home_team, 0)
+	remote_tank.transform = arena.spawn_transform(1 - home_team, 0)
+	player.hull_heading = player.rotation.y
+	remote_tank.hull_heading = remote_tank.rotation.y
 	tanks = [player, remote_tank] if lan_host else [remote_tank, player]
 	ai_tanks.clear()
 
@@ -412,13 +333,8 @@ func _spawn_solo_roster() -> void:
 			if not is_player:
 				roster_index += 1
 			var tank := _make_tank(spec, team_id, is_player, "Вы" if is_player else team_names[slot])
-			var side := -1.0 if team_id == 0 else 1.0
-			var lateral := (float(slot) - float(team_count - 1) * .5) * 10.0
-			var x: float = side * arena.world_size * .39 + lateral
-			var z: float = side * arena.world_size * .39 - lateral
-			tank.position = Vector3(x, arena.height_at(x, z) + .55, z)
-			tank.hull_heading = PI / 4.0 if team_id == 0 else -3.0 * PI / 4.0
-			tank.rotation.y = tank.hull_heading
+			tank.transform = arena.spawn_transform(team_id, slot)
+			tank.hull_heading = tank.rotation.y
 			tanks.append(tank)
 			if is_player:
 				player = tank
@@ -431,7 +347,7 @@ func _spawn_solo_roster() -> void:
 			ai_tanks.append(tank)
 
 func _make_tank(spec: Dictionary, team: int, player_controlled: bool, callsign := "Командир") -> BattleTank:
-	var tank := TankScript.new() as BattleTank
+	var tank := load("res://scenes/vehicles/%s.tscn" % spec.id).instantiate() as BattleTank
 	tank.name = "Tank_%s" % spec.id
 	tank.configure(spec, team, player_controlled)
 	tank.set_meta("callsign", "Вы" if player_controlled else callsign)
@@ -450,10 +366,10 @@ func _fire_shell(source: BattleTank, _sequence: int) -> void:
 	if lan_peer != null and not lan_host and source == remote_tank:
 		return
 	var direction := _aim_direction(source)
-	var shell := ShellScript.new() as BattleShell
+	var shell := ShellScene.instantiate() as BattleShell
+	add_child(shell)
 	shell.launch(source, float(source.spec.damage), direction)
 	shell.impact_event = _on_impact
-	add_child(shell)
 	shells.append(shell)
 	if source == player or source.team == 1:
 		_play_one_shot("shot", source.global_position, .8)
@@ -475,6 +391,8 @@ func _aim_direction(source: BattleTank) -> Vector3:
 	return direction
 
 func _on_impact(point: Vector3, vehicle: bool, outcome: Dictionary) -> void:
+	if is_instance_valid(player) and player.global_position.distance_to(point)<8.0:
+		camera_trauma = .4
 	_effect(point, Color("efb66d") if vehicle else Color("b9a681"), 16 if vehicle else 8)
 	if not outcome.is_empty() and not outcome.get("ricochet", false):
 		_notify("ПРОБИТИЕ · %d%%" % roundi(outcome.chance * 100.0) if outcome.chance >= .3 else "НЕ ПРОБИТО")
@@ -570,6 +488,11 @@ func _update_camera(delta: float) -> void:
 	view_camera.global_position = view_camera.global_position.lerp(desired, 1.0 - exp(-delta * 8.0))
 	var look := player.global_position + Vector3(0, 2.0 + tan(camera_pitch) * target_distance * .6, 0) - Vector3(sin(yaw) * 2.0, 0, cos(yaw) * 2.0)
 	view_camera.look_at(look)
+	camera_trauma = maxf(0.0,camera_trauma-delta)
+	if runtime_settings.get("camera_shake",true) and camera_trauma>0.0:
+		var amplitude := camera_trauma*.025
+		view_camera.rotation.x += sin(Time.get_ticks_msec()*.065)*amplitude
+		view_camera.rotation.z += cos(Time.get_ticks_msec()*.049)*amplitude
 	view_camera.fov = lerpf(view_camera.fov, target_fov, 1.0 - exp(-delta * 7.0))
 	view_camera.force_update_transform()
 
@@ -602,6 +525,7 @@ func _update_hud() -> void:
 		labels.speed.text = "ГУСЕНИЦА · %d с" % ceili(player.repair_left) if player.tracks_broken else "%d КМ/Ч" % roundi(Vector2(player.velocity.x, player.velocity.z).length() * 3.6)
 		labels.reload.text = "ГУСЕНИЦА · РЕМОНТ %d С" % ceili(player.repair_left) if player.tracks_broken else "ГОТОВО" if player.reload_left <= 0.0 else "ПЕРЕЗАРЯДКА %.1f С" % player.reload_left
 		labels.objective.text = "ВАША КОМАНДА · БАЗА A %d%%" % roundi(capture_progress) if capture_progress > 1.0 else "ПРОТИВНИК · БАЗА A %d%%" % roundi(absf(capture_progress)) if capture_progress < -1.0 else "ЗАХВАТИТЕ БАЗУ A"
+		labels.sight.visible = scoped
 		labels.sight.text = "%d М · СВЕДЕНИЕ %d%%" % [roundi(player.global_position.distance_to(aim_point)), roundi((1.0 - player.aim_spread) * 100.0)]
 		labels.score.text = "%d   :   %d" % [_alive_count(player.team), _alive_count(1 - player.team)]
 
@@ -621,47 +545,22 @@ func _update_effects(delta: float) -> void:
 		if not is_instance_valid(tank) or tank.destroyed or Vector2(tank.velocity.x, tank.velocity.z).length() < 1.1:
 			continue
 		var rear := tank.global_position + tank.global_transform.basis.z * 2.5
-		var dust := _effect(rear, Color("ddd2b4") if selected_map == "winter" else Color("a89b7b"), 3, .72)
-		if dust:
-			var puff := dust.get_child(0) as MeshInstance3D
-			if puff:
-				puff.scale = Vector3(.15, .15, .15)
+		_effect(rear, Color("ddd2b4") if selected_map == "winter" else Color("a89b7b"), 3, .72)
 
 func _effect(at: Vector3, color: Color, amount: int, lifetime := .45) -> Node3D:
-	var effect := Node3D.new()
+	var effect := preload("res://scenes/effects/impact.tscn").instantiate() as GPUParticles3D
 	effect.position = at
+	effect.amount = amount
+	effect.lifetime = lifetime
+	(effect.process_material as ParticleProcessMaterial).color = color
 	add_child(effect)
-	for i in amount:
-		var puff := MeshInstance3D.new()
-		var mesh := SphereMesh.new()
-		mesh.radius = randf_range(.11, .28)
-		mesh.height = mesh.radius * 1.7
-		mesh.radial_segments = 8
-		puff.mesh = mesh
-		var material := StandardMaterial3D.new()
-		material.albedo_color = color
-		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		puff.material_override = material
-		puff.position = Vector3(randf_range(-.35, .35), randf_range(-.05, .3), randf_range(-.35, .35))
-		effect.add_child(puff)
-	var flash := OmniLight3D.new()
-	flash.light_color = color
-	flash.light_energy = 1.4
-	flash.omni_range = 4.5
-	flash.shadow_enabled = false
-	effect.add_child(flash)
-	var tween := create_tween()
-	tween.tween_property(effect, "scale", Vector3(2.2, 2.2, 2.2), lifetime)
-	for child in effect.get_children():
-		if child is GeometryInstance3D:
-			tween.parallel().tween_property(child, "transparency", 1.0, lifetime)
-		elif child is OmniLight3D:
-			tween.parallel().tween_property(child, "light_energy", 0.0, lifetime)
-	tween.tween_callback(effect.queue_free)
+	effect.emitting = true
+	get_tree().create_timer(lifetime + .1).timeout.connect(effect.queue_free)
 	return effect
 
 func _play_one_shot(kind: String, at: Vector3, volume := .8) -> void:
+	if DisplayServer.get_name() == "headless":
+		return
 	var path := "res://assets/audio/%s.ogg" % kind
 	if not ResourceLoader.exists(path):
 		return
@@ -702,40 +601,11 @@ func _finish_battle(won: bool, reason: String) -> void:
 
 func _show_result(won: bool, reason: String, own: Dictionary) -> void:
 	_clear_panel()
-	root_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	var backdrop := _panel(root_panel, Rect2(Vector2.ZERO, get_viewport().get_visible_rect().size), Color("090e12df"), false)
-	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_label(root_panel, "РЕЗУЛЬТАТЫ БОЯ                    ЛИЧНЫЙ РЕЗУЛЬТАТ       КОМАНДНЫЙ РЕЗУЛЬТАТ        СТАТИСТИКА", 12, PALETTE.muted).position = Vector2(40, 26)
-	_label(root_panel, "ПОБЕДА!" if won else "ПОРАЖЕНИЕ", 76, PALETTE.gold if won else PALETTE.text).position = Vector2(46, 119)
-	_label(root_panel, reason, 17, PALETTE.text).position = Vector2(50, 217)
-	var reward: Dictionary = own.get("reward", {"silver": 0, "xp": 0, "parts": {}})
-	var line := _panel(root_panel, Rect2(40, 294, get_viewport().get_visible_rect().size.x - 80, 80), Color("10171ddd"), true)
-	_label(line, "◉  %d         ✦  %d         ♜  %d         ◎  %d" % [reward.silver, reward.xp, own.kills, own.damage], 25, PALETTE.text).position = Vector2(24, 12)
-	_label(line, "СЕРЕБРО                       ОПЫТ                        УНИЧТОЖЕНО                 НАНЕСЕНО УРОНА", 11, PALETTE.muted).position = Vector2(26, 49)
-	var columns := HBoxContainer.new()
-	columns.position = Vector2(45, 410)
-	columns.size = Vector2(get_viewport().get_visible_rect().size.x - 90, 250)
-	columns.add_theme_constant_override("separation", 30)
-	root_panel.add_child(columns)
-	var personal := _panel(columns, Rect2(Vector2.ZERO, Vector2.ZERO), Color("10171ac9"), true)
-	personal.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_label(personal, "БОЕВОЙ РЕЗУЛЬТАТ\n\n%d МЕСТО ИЗ %d\n\nНАНЕСЕНО УРОНА  %d\nУНИЧТОЖЕНО  %d" % [own.place, latest_results.size(), own.damage, own.kills], 19, PALETTE.text).position = Vector2(22, 18)
-	var awards := _panel(columns, Rect2(Vector2.ZERO, Vector2.ZERO), Color("10171ac9"), true)
-	awards.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var award_text := "НАГРАДЫ\n"
-	for key in reward.parts:
-		if reward.parts[key] > 0:
-			award_text += "\n%s  +%d ◉" % [str(key).to_upper(), reward.parts[key]]
-	_label(awards, award_text, 14, PALETTE.text).position = Vector2(22, 18)
-	var table_button := _button(root_panel, "КОМАНДНЫЙ РЕЗУЛЬТАТ", func() -> void: _show_team_results())
-	table_button.position = Vector2(44, 694)
-	table_button.size = Vector2(210, 50)
-	var garage_button := _button(root_panel, "ВЕРНУТЬСЯ В АНГАР", func() -> void: _return_to_hangar())
-	garage_button.position = Vector2(44, get_viewport().get_visible_rect().size.y - 80)
-	garage_button.size = Vector2(240, 50)
-	var replay_button := _button(root_panel, "СЫГРАТЬ ЕЩЁ РАЗ", func() -> void: _start_battle(), true)
-	replay_button.position = Vector2(298, get_viewport().get_visible_rect().size.y - 80)
-	replay_button.size = Vector2(220, 50)
+	hud.hide()
+	reticle.hide()
+	countdown_label.hide()
+	_freeze_vehicles(true)
+	interface.results(won, reason, own)
 
 func _show_team_results() -> void:
 	if screen != Screen.RESULT:
@@ -758,28 +628,24 @@ func _show_team_results() -> void:
 		_show_result(bool(own.get("win", false)), "Бой завершён", own)).position = Vector2(42, get_viewport().get_visible_rect().size.y - 82)
 
 func _show_pause() -> void:
-	if screen != Screen.BATTLE or not battle_live or lan_peer != null:
+	if screen != Screen.BATTLE or not battle_live:
 		return
 	screen = Screen.PAUSE
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_clear_panel()
-	var bg := _panel(root_panel, Rect2(Vector2.ZERO, get_viewport().get_visible_rect().size), Color("080d11c9"), false)
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_label(root_panel, "ПОЛЕ БОЯ\n%s  ·  %s" % [GameData.maps[selected_map].name, "КОМАНДНЫЙ БОЙ"], 12, PALETTE.muted).position = Vector2(24, 18)
-	_label(root_panel, "ПАУЗА", 76, PALETTE.text, HORIZONTAL_ALIGNMENT_CENTER).position = Vector2(get_viewport().get_visible_rect().size.x * .5 - 260, 132)
-	_label(root_panel, "ИГРА ПРИОСТАНОВЛЕНА", 16, PALETTE.muted, HORIZONTAL_ALIGNMENT_CENTER).position = Vector2(get_viewport().get_visible_rect().size.x * .5 - 260, 220)
-	var choices := VBoxContainer.new()
-	choices.position = Vector2(get_viewport().get_visible_rect().size.x * .5 - 165, 294)
-	choices.size = Vector2(330, 234)
-	choices.add_theme_constant_override("separation", 10)
-	root_panel.add_child(choices)
-	_button(choices, "ПРОДОЛЖИТЬ ИГРУ", _resume_battle, true)
-	_button(choices, "НАСТРОЙКИ", _show_settings)
-	_button(choices, "ВЕРНУТЬСЯ В АНГАР", func() -> void: _finish_battle(false, "Бой прерван"); _return_to_hangar())
-	_button(choices, "ПОКИНУТЬ БОЙ", func() -> void: _finish_battle(false, "Досрочный выход из боя"))
-	_button(root_panel, "ESC   Назад", _resume_battle).position = Vector2(24, get_viewport().get_visible_rect().size.y - 63)
+	_freeze_vehicles(true)
+	interface.pause()
+
+func _freeze_vehicles(frozen: bool) -> void:
+	for vehicle in tanks:
+		if is_instance_valid(vehicle):
+			vehicle.set_physics_process(not frozen)
+	for shell in shells:
+		if is_instance_valid(shell):
+			shell.set_physics_process(not frozen)
 
 func _resume_battle() -> void:
+	_freeze_vehicles(false)
 	if screen != Screen.PAUSE and screen != Screen.SETTINGS:
 		return
 	screen = Screen.BATTLE
@@ -793,47 +659,8 @@ func _show_settings() -> void:
 	screen = Screen.SETTINGS
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_clear_panel()
-	var viewport := get_viewport().get_visible_rect().size
-	var bg := _panel(root_panel, Rect2(Vector2.ZERO, viewport), Color("080d10f0"), false)
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_label(root_panel, "⚙  НАСТРОЙКИ", 34, PALETTE.text).position = Vector2(36, 22)
-	_label(root_panel, "НАСТРОЙ СВОЮ БИТВУ", 11, PALETTE.muted, HORIZONTAL_ALIGNMENT_RIGHT).position = Vector2(viewport.x - 290, 35)
-	var content := HBoxContainer.new()
-	content.position = Vector2(34, 100)
-	content.size = Vector2(viewport.x - 68, viewport.y - 188)
-	content.add_theme_constant_override("separation", 20)
-	root_panel.add_child(content)
-	var nav := VBoxContainer.new()
-	nav.custom_minimum_size.x = 205
-	content.add_child(nav)
-	var body := VBoxContainer.new()
-	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	content.add_child(body)
-	var preview := _panel(content, Rect2(Vector2.ZERO, Vector2.ZERO), Color("12191be0"), true)
-	preview.custom_minimum_size = Vector2(225, 275)
-	_label(preview, "ЯЗЫК\nРусский\n\nИНТЕРФЕЙС\nТёмный металл\n\nКАЖДЫЙ БОЙ\nДЕЛАЕТ ТЕБЯ\nСИЛЬНЕЕ.", 18, PALETTE.text).position = Vector2(22, 28)
-	for section in ["ГРАФИКА", "ЗВУК", "УПРАВЛЕНИЕ", "ИГРОВОЙ ПРОЦЕСС"]:
-		_button(nav, "▣   " + section, func() -> void: _fill_settings(section, body))
-	_fill_settings("ГРАФИКА", body)
-	var footer := HBoxContainer.new()
-	footer.position = Vector2(34, viewport.y - 72)
-	footer.size = Vector2(viewport.x - 68, 48)
-	footer.add_theme_constant_override("separation", 10)
-	root_panel.add_child(footer)
-	_button(footer, "ПО УМОЛЧАНИЮ", func() -> void:
-		runtime_settings = {"volume": .45, "quality": "high", "render_scale": 1.0, "shadows": true, "difficulty": "normal", "sensitivity": 1.0}
-		GameData.save.settings = runtime_settings.duplicate(true)
-		GameData.persist()
-		_show_settings()).custom_minimum_size.x = 185
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	footer.add_child(spacer)
-	_button(footer, "ПРИМЕНИТЬ", func() -> void:
-		GameData.save.settings = runtime_settings.duplicate(true)
-		GameData.persist()
-		_apply_settings()
-		_close_settings(), true).custom_minimum_size.x = 170
-	_button(footer, "НАЗАД", _close_settings).custom_minimum_size.x = 120
+	_freeze_vehicles(true)
+	interface.settings()
 
 func _fill_settings(section: String, body: VBoxContainer) -> void:
 	for child in body.get_children():
@@ -896,6 +723,7 @@ func _option(parent: Control, label_text: String, options: Array) -> OptionButto
 
 func _close_settings() -> void:
 	if paused_from == Screen.PAUSE:
+		screen = Screen.BATTLE
 		_show_pause()
 	elif paused_from == Screen.BATTLE:
 		screen = Screen.BATTLE
@@ -1022,7 +850,7 @@ func request_remote_shot(sequence: int, shot_power: int, origin: Vector3, direct
 	if sender == 0 or sender != lan_peer.get_peers()[0] or sequence <= remote_last_shot:
 		return
 	remote_last_shot = sequence
-	var shell := ShellScript.new() as BattleShell
+	var shell := ShellScene.instantiate() as BattleShell
 	shell.owner_tank = remote_tank
 	shell.power = shot_power
 	shell.global_position = origin
@@ -1053,7 +881,7 @@ func server_broadcast_state(snapshot: Array) -> void:
 func server_shot(origin: Vector3, direction: Vector3, shot_power: int, sequence: int) -> void:
 	if lan_peer == null or not lan_host:
 		var source := remote_tank if remote_tank else player
-		var shell := ShellScript.new() as BattleShell
+		var shell := ShellScene.instantiate() as BattleShell
 		shell.owner_tank = source
 		shell.power = shot_power
 		shell.global_position = origin
@@ -1110,52 +938,18 @@ func _return_to_hangar() -> void:
 
 func _create_hud() -> void:
 	hud.show()
-	hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	for child in hud.get_children():
 		child.queue_free()
+	var screen_ui := preload("res://scenes/ui/hud.tscn").instantiate()
+	hud.add_child(screen_ui)
 	labels.clear()
-	var top := _panel(hud, Rect2(0, 0, get_viewport().get_visible_rect().size.x, 68), Color("081014cc"), false)
-	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	labels.score = _label(top, "3   :   3", 23, PALETTE.text, HORIZONTAL_ALIGNMENT_CENTER)
-	labels.score.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	labels.score.offset_left = -120
-	labels.score.offset_right = 120
-	labels.score.offset_top = 10
-	labels.score.offset_bottom = 50
-	labels.timer = _label(top, "08:00", 20, PALETTE.text, HORIZONTAL_ALIGNMENT_CENTER)
-	labels.timer.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	labels.timer.offset_left = -40
-	labels.timer.offset_right = 40
-	labels.timer.offset_top = 36
-	labels.timer.offset_bottom = 66
-	labels.objective = _label(top, "ЗАХВАТИТЕ БАЗУ A", 12, PALETTE.gold, HORIZONTAL_ALIGNMENT_CENTER)
-	labels.objective.position = Vector2(12, 20)
-	labels.objective.size = Vector2(get_viewport().get_visible_rect().size.x - 24, 25)
-	var bottom := _panel(hud, Rect2(26, get_viewport().get_visible_rect().size.y - 113, 325, 88), Color("0b1115dc"), true)
-	bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	labels.hp = _label(bottom, "", 17, PALETTE.text)
-	labels.hp.position = Vector2(14, 9)
-	labels.hp.size = Vector2(300, 30)
-	labels.health = ColorRect.new()
-	labels.health.color = PALETTE.green
-	labels.health.position = Vector2(14, 43)
-	labels.health.size = Vector2(250, 7)
-	bottom.add_child(labels.health)
-	labels.reload = _label(bottom, "", 11, PALETTE.gold)
-	labels.reload.position = Vector2(14, 56)
-	labels.reload.size = Vector2(280, 23)
-	labels.speed = _label(hud, "0 КМ/Ч", 12, PALETTE.text)
-	labels.speed.position = Vector2(get_viewport().get_visible_rect().size.x - 166, get_viewport().get_visible_rect().size.y - 55)
-	labels.sight = _label(hud, "", 10, PALETTE.text, HORIZONTAL_ALIGNMENT_CENTER)
-	labels.sight.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	labels.sight.offset_left = -115
-	labels.sight.offset_right = 115
-	labels.sight.offset_top = -42
-	labels.sight.offset_bottom = -17
-	_button(hud, "Ⅱ", _show_pause).position = Vector2(get_viewport().get_visible_rect().size.x - 64, 20)
-	reticle.hide()
+	for pair in [["timer","Timer"],["hp","HP"],["health","Health"],["speed","Speed"],["reload","Reload"],["objective","Objective"],["sight","Sight"],["score","Score"]]:
+		labels[pair[0]] = screen_ui.find_child(pair[1],true,false)
+	screen_ui.find_child("Pause",true,false).pressed.connect(_show_pause)
+	reticle.show()
 	_add_touch_controls()
 	_update_hud()
+
 
 func _add_touch_controls() -> void:
 	if not DisplayServer.is_touchscreen_available():
@@ -1181,7 +975,7 @@ func _add_touch_controls() -> void:
 		reticle.show())
 	aim_button.button_up.connect(func() -> void:
 		scoped = false
-		reticle.hide())
+		reticle.show())
 
 func _touch_button(parent: Control, title: String, at: Vector2, dimensions: Vector2, primary := false) -> Button:
 	var control := _button(parent, title, func() -> void: pass, primary)
@@ -1194,28 +988,15 @@ func _touch_button(parent: Control, title: String, at: Vector2, dimensions: Vect
 	return control
 
 func _build_reticle() -> void:
-	reticle = Control.new()
-	reticle.name = "Reticle"
-	reticle.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	reticle.offset_left = -75
-	reticle.offset_right = 75
-	reticle.offset_top = -75
-	reticle.offset_bottom = 75
-	reticle.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	reticle.draw.connect(func() -> void:
-		if not scoped and screen != Screen.BATTLE:
-			return
-		var center := reticle.size * .5
-		var radius: float = 21.0 + (player.aim_spread * 31.0 if is_instance_valid(player) else 18.0)
-		reticle.draw_arc(center, radius, 0.0, TAU, 60, aim_color, 1.5, true)
-		reticle.draw_circle(center, 2.6, aim_color)
-		for angle in [0.0, PI * .5, PI, PI * 1.5]:
-			var point := center + Vector2(cos(angle), sin(angle)) * (radius + 10.0)
-			reticle.draw_line(center + Vector2(cos(angle), sin(angle)) * (radius - 6.0), point, aim_color, 1.2, true))
+	reticle = preload("res://scenes/ui/reticle.tscn").instantiate()
+	reticle.game = self
 	root_panel.add_child(reticle)
 	reticle.hide()
 
+
 func _input(event: InputEvent) -> void:
+	if interface.busy:
+		return
 	if event.is_action_pressed("pause"):
 		if screen == Screen.BATTLE:
 			_show_pause()
@@ -1232,7 +1013,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_released("aim"):
 		scoped = false
 		if screen == Screen.BATTLE:
-			reticle.hide()
+			reticle.show()
 	if event is InputEventMouseMotion:
 		if screen == Screen.BATTLE and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			camera_yaw -= event.relative.x * .0028 * float(runtime_settings.sensitivity)
@@ -1272,6 +1053,7 @@ func _show_scoreboard(visible: bool) -> void:
 				y += 24
 
 func _clear_panel() -> void:
+	interface.close()
 	for child in root_panel.get_children():
 		if child == hud or child == countdown_label or child == notice_label or child == reticle:
 			continue

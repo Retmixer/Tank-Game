@@ -14,22 +14,6 @@ func launch(source: BattleTank, shot_power: float, direction: Vector3) -> void:
 	power = shot_power
 	global_transform = source.muzzle_transform()
 	velocity = direction.normalized() * 285.0
-	var mesh_instance := MeshInstance3D.new()
-	var shell_mesh := CylinderMesh.new()
-	shell_mesh.top_radius = .075
-	shell_mesh.bottom_radius = .12
-	shell_mesh.height = .62
-	shell_mesh.radial_segments = 12
-	mesh_instance.mesh = shell_mesh
-	mesh_instance.rotation_degrees.x = 90
-	var material := StandardMaterial3D.new()
-	material.albedo_color = Color("e8b868")
-	material.metallic = .72
-	material.roughness = .33
-	material.emission_enabled = true
-	material.emission = Color("c47d34")
-	mesh_instance.material_override = material
-	add_child(mesh_instance)
 	look_at(global_position + velocity.normalized(), Vector3.UP)
 
 func _physics_process(delta: float) -> void:

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/vehicle_definition.gd" id="1_afcxt"]
+
+[resource]
+script = ExtResource("1_afcxt")
+vehicle_id = "1-2"
+display_name = "S-36 «Монолит»"
+hit_points = 1200.0
+damage = 236.0
+armor = 30.0
+reload_seconds = 5.050000000000001
+track_health = 170.0
+speed = 6.666666666666666
+reverse_speed = 1.9444444444444444
+turn_speed = 0.73
+turret_speed = 1.08
+view_distance = 101.0
+dispersion = 0.018
+aim_seconds = 1.5
+zoom = 4.3

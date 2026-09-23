@@ -1,0 +1,389 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://scenes/ui/military_theme.tres" id="1_dinrm"]
+[ext_resource type="Script" path="res://scripts/browser_layout.gd" id="2_d48qy"]
+
+[sub_resource type="SystemFont" id="SystemFont_cthlj"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yk7kc"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v3rv2"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mib6f"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vnbmr"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ubq55"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qva2s"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ueepy"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="SystemFont" id="SystemFont_kl17f"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="SystemFont" id="SystemFont_tgptd"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="SystemFont" id="SystemFont_bqe6a"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bouf6"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="Research" type="Control" unique_id=984983588]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = ExtResource("1_dinrm")
+script = ExtResource("2_d48qy")
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=307663830]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02745098, 0.047058824, 0.043137256, 0.8156863)
+
+[node name="Design" type="Control" parent="." unique_id=1379562071]
+anchors_preset = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="Design" unique_id=1200526447]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 25.0
+offset_right = 740.0
+offset_bottom = 75.0
+theme_override_fonts/font = SubResource("SystemFont_cthlj")
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "ИССЛЕДОВАНИЯ ТЕХНИКИ"
+vertical_alignment = 1
+
+[node name="Currency" type="Label" parent="Design" unique_id=17249751]
+layout_mode = 0
+offset_left = 935.0
+offset_top = 25.0
+offset_right = 1235.0
+offset_bottom = 75.0
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+vertical_alignment = 1
+
+[node name="Nation0" type="Button" parent="Design" unique_id=1900070911]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 87.0
+offset_right = 250.0
+offset_bottom = 129.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_yk7kc")
+toggle_mode = true
+text = "СССР"
+
+[node name="Nation1" type="Button" parent="Design" unique_id=1716284775]
+layout_mode = 0
+offset_left = 265.0
+offset_top = 87.0
+offset_right = 475.0
+offset_bottom = 129.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_v3rv2")
+toggle_mode = true
+text = "ГЕРМАНИЯ"
+
+[node name="Nation2" type="Button" parent="Design" unique_id=1407024359]
+layout_mode = 0
+offset_left = 490.0
+offset_top = 87.0
+offset_right = 700.0
+offset_bottom = 129.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_mib6f")
+toggle_mode = true
+text = "ФРАНЦИЯ"
+
+[node name="Tank0" type="Button" parent="Design" unique_id=1315164256]
+layout_mode = 0
+offset_left = 105.0
+offset_top = 160.0
+offset_right = 430.0
+offset_bottom = 385.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_vnbmr")
+
+[node name="Portrait" type="TextureRect" parent="Design/Tank0" unique_id=1959543907]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = 315.0
+offset_bottom = 138.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Caption" type="Label" parent="Design/Tank0" unique_id=752220403]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 144.0
+offset_right = 312.0
+offset_bottom = 171.0
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+vertical_alignment = 1
+
+[node name="Price" type="Label" parent="Design/Tank0" unique_id=10314524]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 181.0
+offset_right = 312.0
+offset_bottom = 206.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+vertical_alignment = 1
+
+[node name="Tank1" type="Button" parent="Design" unique_id=152818836]
+layout_mode = 0
+offset_left = 475.0
+offset_top = 160.0
+offset_right = 800.0
+offset_bottom = 385.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_ubq55")
+
+[node name="Portrait" type="TextureRect" parent="Design/Tank1" unique_id=1434980582]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = 315.0
+offset_bottom = 138.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Caption" type="Label" parent="Design/Tank1" unique_id=1680287397]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 144.0
+offset_right = 312.0
+offset_bottom = 171.0
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+vertical_alignment = 1
+
+[node name="Price" type="Label" parent="Design/Tank1" unique_id=1861405407]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 181.0
+offset_right = 312.0
+offset_bottom = 206.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+vertical_alignment = 1
+
+[node name="Tank2" type="Button" parent="Design" unique_id=418006214]
+layout_mode = 0
+offset_left = 845.0
+offset_top = 160.0
+offset_right = 1170.0
+offset_bottom = 385.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_qva2s")
+
+[node name="Portrait" type="TextureRect" parent="Design/Tank2" unique_id=425724252]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = 315.0
+offset_bottom = 138.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Caption" type="Label" parent="Design/Tank2" unique_id=2024448774]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 144.0
+offset_right = 312.0
+offset_bottom = 171.0
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+vertical_alignment = 1
+
+[node name="Price" type="Label" parent="Design/Tank2" unique_id=435315817]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 181.0
+offset_right = 312.0
+offset_bottom = 206.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+vertical_alignment = 1
+
+[node name="Tank3" type="Button" parent="Design" unique_id=1552170391]
+layout_mode = 0
+offset_left = 475.0
+offset_top = 416.0
+offset_right = 800.0
+offset_bottom = 641.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_ueepy")
+
+[node name="Portrait" type="TextureRect" parent="Design/Tank3" unique_id=1003791099]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = 315.0
+offset_bottom = 138.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Caption" type="Label" parent="Design/Tank3" unique_id=305865145]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 144.0
+offset_right = 312.0
+offset_bottom = 171.0
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+vertical_alignment = 1
+
+[node name="Price" type="Label" parent="Design/Tank3" unique_id=1994690920]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 181.0
+offset_right = 312.0
+offset_bottom = 206.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+vertical_alignment = 1
+
+[node name="Arrow0" type="Label" parent="Design" unique_id=483729663]
+layout_mode = 0
+offset_left = 435.0
+offset_top = 242.0
+offset_right = 473.0
+offset_bottom = 290.0
+theme_override_fonts/font = SubResource("SystemFont_kl17f")
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "→"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Arrow1" type="Label" parent="Design" unique_id=1604018152]
+layout_mode = 0
+offset_left = 805.0
+offset_top = 242.0
+offset_right = 843.0
+offset_bottom = 290.0
+theme_override_fonts/font = SubResource("SystemFont_tgptd")
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "→"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Branch" type="Label" parent="Design" unique_id=925475052]
+layout_mode = 0
+offset_left = 605.0
+offset_top = 382.0
+offset_right = 670.0
+offset_bottom = 414.0
+theme_override_fonts/font = SubResource("SystemFont_bqe6a")
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "↓"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Back" type="Button" parent="Design" unique_id=2083057816]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 661.0
+offset_right = 270.0
+offset_bottom = 701.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_bouf6")
+text = "← НАЗАД В АНГАР"

@@ -1,0 +1,40 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://scenes/ui/military_theme.tres" id="1_w4r8a"]
+
+[node name="VehicleCard" type="Button" unique_id=1885052394]
+custom_minimum_size = Vector2(184, 100)
+theme = ExtResource("1_w4r8a")
+toggle_mode = true
+
+[node name="Portrait" type="TextureRect" parent="." unique_id=1812945426]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = 179.0
+offset_bottom = 79.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Caption" type="Label" parent="." unique_id=670533611]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 78.0
+offset_right = 179.0
+offset_bottom = 101.0
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "205 «Оплот»"
+vertical_alignment = 1
+
+[node name="Tier" type="Label" parent="." unique_id=1037551198]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 4.0
+offset_right = 39.0
+offset_bottom = 27.0
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+text = "I"
+vertical_alignment = 1

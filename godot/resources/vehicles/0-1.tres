@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/vehicle_definition.gd" id="1_eiyrj"]
+
+[resource]
+script = ExtResource("1_eiyrj")
+vehicle_id = "0-1"
+display_name = "205 «Оплот»"
+speed = 8.055555555555555
+reverse_speed = 3.0555555555555554
+zoom = 3.1999999999999997

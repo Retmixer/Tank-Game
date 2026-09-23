@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/fabric-color.jpg" id="1_6nngo"]
+[ext_resource type="Texture2D" path="res://assets/textures/fabric-normal.jpg" id="2_0nppa"]
+[ext_resource type="Texture2D" path="res://assets/textures/fabric-rough.jpg" id="3_mb2x1"]
+
+[resource]
+resource_name = "surface_d38919a3d252"
+albedo_color = Color(0.63524497, 0.62641776, 0.5726659, 1)
+albedo_texture = ExtResource("1_6nngo")
+metallic = 0.02
+roughness = 0.95
+roughness_texture = ExtResource("3_mb2x1")
+normal_enabled = true
+normal_scale = 0.4
+normal_texture = ExtResource("2_0nppa")

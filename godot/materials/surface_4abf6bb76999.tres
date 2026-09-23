@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/atlas_1b8773e0d22f.png" id="1_0gp7d"]
+
+[resource]
+resource_name = "surface_4abf6bb76999"
+transparency = 1
+albedo_texture = ExtResource("1_0gp7d")

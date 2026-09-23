@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/native/tree_oak/0003_Mesh.res" id="1_lx7gm"]
+[ext_resource type="Material" path="res://materials/surface_04939f8b8618.tres" id="2_jh3ei"]
+[ext_resource type="Shape3D" path="res://assets/native/tree_oak/0005_Shape.res" id="3_mm1my"]
+[ext_resource type="ArrayMesh" path="res://assets/native/tree_oak/0006_Mesh2.res" id="4_bge0s"]
+[ext_resource type="Material" path="res://materials/surface_177d24b6cdc5.tres" id="5_c5ef2"]
+[ext_resource type="Shape3D" path="res://assets/native/tree_oak/0008_Shape.res" id="6_52dwi"]
+
+[node name="tree_oak" type="Node3D" unique_id=658483338]
+
+[node name="tree_oak" type="Node3D" parent="." unique_id=180331817]
+
+[node name="Mesh" type="MeshInstance3D" parent="tree_oak" unique_id=1615515789]
+mesh = ExtResource("1_lx7gm")
+surface_material_override/0 = ExtResource("2_jh3ei")
+
+[node name="Collision" type="StaticBody3D" parent="tree_oak/Mesh" unique_id=473993859]
+
+[node name="Shape" type="CollisionShape3D" parent="tree_oak/Mesh/Collision" unique_id=153593060]
+shape = ExtResource("3_mm1my")
+
+[node name="Mesh2" type="MeshInstance3D" parent="tree_oak" unique_id=1980088619]
+mesh = ExtResource("4_bge0s")
+surface_material_override/0 = ExtResource("5_c5ef2")
+
+[node name="Collision" type="StaticBody3D" parent="tree_oak/Mesh2" unique_id=2102840102]
+
+[node name="Shape" type="CollisionShape3D" parent="tree_oak/Mesh2/Collision" unique_id=265476274]
+shape = ExtResource("6_52dwi")

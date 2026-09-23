@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/vehicle_definition.gd" id="1_0hniu"]
+
+[resource]
+script = ExtResource("1_0hniu")
+vehicle_id = "2-1"
+display_name = "B-14 «Порыв»"
+hit_points = 800.0
+damage = 153.0
+armor = 16.0
+reload_seconds = 3.45
+speed = 8.055555555555555
+reverse_speed = 3.611111111111111
+view_distance = 123.0
+zoom = 3.5

@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/atlas_8abfcd211ea9.png" id="1_tiecy"]
+
+[resource]
+resource_name = "surface_88c97fbb0a88"
+albedo_texture = ExtResource("1_tiecy")

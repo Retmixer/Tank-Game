@@ -1,0 +1,529 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://scenes/ui/military_theme.tres" id="1_h175o"]
+[ext_resource type="Script" path="res://scripts/browser_layout.gd" id="2_ptynm"]
+[ext_resource type="Texture2D" path="res://assets/ui/loading-screen.png" id="3_ncfhn"]
+
+[sub_resource type="SystemFont" id="SystemFont_ob3hf"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4xk3x"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jw8st"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d4m38"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mn4ci"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2vpyc"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n58ha"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ofdip"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b0ygv"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7d8i4"]
+atlas = ExtResource("3_ncfhn")
+region = Rect2(570, 285, 800, 400)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sft54"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jmdun"]
+bg_color = Color(0.827451, 0.69803923, 0.4627451, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9411765, 0.8392157, 0.5764706, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0lxx6"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="Settings" type="Control" unique_id=1317306628]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = ExtResource("1_h175o")
+script = ExtResource("2_ptynm")
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=354970804]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02745098, 0.047058824, 0.043137256, 0.9607843)
+
+[node name="Design" type="Control" parent="." unique_id=1577519415]
+anchors_preset = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="Design" unique_id=1924873301]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 24.0
+offset_right = 636.0
+offset_bottom = 72.0
+theme_override_fonts/font = SubResource("SystemFont_ob3hf")
+theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(0.8666667, 0.87058824, 0.85490197, 1)
+text = "⚙  НАСТРОЙКИ"
+vertical_alignment = 1
+
+[node name="Motto" type="Label" parent="Design" unique_id=1626762609]
+layout_mode = 0
+offset_left = 1050.0
+offset_top = 33.0
+offset_right = 1244.0
+offset_bottom = 57.0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.4745098, 0.5137255, 0.52156866, 1)
+text = "НАСТРОЙ СВОЮ БИТВУ"
+vertical_alignment = 1
+
+[node name="TabGraphics" type="Button" parent="Design" unique_id=1598303101]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 110.0
+offset_right = 241.0
+offset_bottom = 172.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_4xk3x")
+toggle_mode = true
+text = "▣   ГРАФИКА"
+
+[node name="TabSound" type="Button" parent="Design" unique_id=748940788]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 179.0
+offset_right = 241.0
+offset_bottom = 241.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_jw8st")
+toggle_mode = true
+text = "♫   ЗВУК"
+
+[node name="TabControls" type="Button" parent="Design" unique_id=893864604]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 248.0
+offset_right = 241.0
+offset_bottom = 310.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_d4m38")
+toggle_mode = true
+text = "⌘   УПРАВЛЕНИЕ"
+
+[node name="TabGameplay" type="Button" parent="Design" unique_id=300870396]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 317.0
+offset_right = 241.0
+offset_bottom = 379.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_mn4ci")
+toggle_mode = true
+text = "⚙   ИГРОВОЙ ПРОЦЕСС"
+
+[node name="Graphics" type="Control" parent="Design" unique_id=1456473916]
+anchors_preset = 0
+offset_left = 280.0
+offset_top = 110.0
+offset_right = 820.0
+offset_bottom = 560.0
+
+[node name="Heading" type="Label" parent="Design/Graphics" unique_id=1057612242]
+layout_mode = 0
+offset_right = 500.0
+offset_bottom = 26.0
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "ГРАФИКА"
+vertical_alignment = 1
+
+[node name="QualityLabel" type="Label" parent="Design/Graphics" unique_id=1258435428]
+layout_mode = 0
+offset_top = 50.0
+offset_right = 260.0
+offset_bottom = 85.0
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "Качество графики"
+vertical_alignment = 1
+
+[node name="Quality" type="OptionButton" parent="Design/Graphics" unique_id=779860853]
+layout_mode = 0
+offset_left = 280.0
+offset_top = 50.0
+offset_right = 520.0
+offset_bottom = 85.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_2vpyc")
+selected = 0
+item_count = 2
+popup/item_0/text = "Высокое"
+popup/item_0/id = 0
+popup/item_1/text = "Производительность"
+popup/item_1/id = 1
+
+[node name="RenderScaleLabel" type="Label" parent="Design/Graphics" unique_id=687392256]
+layout_mode = 0
+offset_top = 100.0
+offset_right = 260.0
+offset_bottom = 135.0
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "Масштаб рендеринга"
+vertical_alignment = 1
+
+[node name="RenderScale" type="OptionButton" parent="Design/Graphics" unique_id=884035766]
+layout_mode = 0
+offset_left = 280.0
+offset_top = 100.0
+offset_right = 520.0
+offset_bottom = 135.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_n58ha")
+selected = 0
+item_count = 5
+popup/item_0/text = "50%"
+popup/item_0/id = 0
+popup/item_1/text = "75%"
+popup/item_1/id = 1
+popup/item_2/text = "100%"
+popup/item_2/id = 2
+popup/item_3/text = "125%"
+popup/item_3/id = 3
+popup/item_4/text = "150%"
+popup/item_4/id = 4
+
+[node name="Shadows" type="CheckButton" parent="Design/Graphics" unique_id=671583576]
+layout_mode = 0
+offset_top = 155.0
+offset_right = 520.0
+offset_bottom = 190.0
+text = "Динамические тени"
+
+[node name="Postprocessing" type="CheckButton" parent="Design/Graphics" unique_id=642721265]
+layout_mode = 0
+offset_top = 205.0
+offset_right = 520.0
+offset_bottom = 240.0
+text = "Постобработка / AO"
+
+[node name="Fullscreen" type="Button" parent="Design/Graphics" unique_id=1160795755]
+layout_mode = 0
+offset_top = 260.0
+offset_right = 250.0
+offset_bottom = 304.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_ofdip")
+text = "ПОЛНЫЙ ЭКРАН ↗"
+
+[node name="Note" type="Label" parent="Design/Graphics" unique_id=1701516526]
+layout_mode = 0
+offset_top = 335.0
+offset_right = 535.0
+offset_bottom = 425.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.53333336, 0.58431375, 0.5764706, 1)
+text = "Масштаб меняет чёткость 3D-сцены, не интерфейса.
+В режиме производительности постобработка отключена."
+vertical_alignment = 1
+
+[node name="Sound" type="Control" parent="Design" unique_id=1084120574]
+anchors_preset = 0
+offset_left = 280.0
+offset_top = 110.0
+offset_right = 820.0
+offset_bottom = 560.0
+
+[node name="Heading" type="Label" parent="Design/Sound" unique_id=1200110037]
+layout_mode = 0
+offset_right = 500.0
+offset_bottom = 26.0
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "ЗВУК"
+vertical_alignment = 1
+
+[node name="VolumeLabel" type="Label" parent="Design/Sound" unique_id=1679579254]
+layout_mode = 0
+offset_top = 56.0
+offset_right = 500.0
+offset_bottom = 86.0
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "Общая громкость"
+vertical_alignment = 1
+
+[node name="Volume" type="HSlider" parent="Design/Sound" unique_id=1394418379]
+layout_mode = 0
+offset_top = 102.0
+offset_right = 520.0
+offset_bottom = 132.0
+max_value = 1.0
+step = 0.05
+
+[node name="Controls" type="Control" parent="Design" unique_id=1027248563]
+anchors_preset = 0
+offset_left = 280.0
+offset_top = 110.0
+offset_right = 820.0
+offset_bottom = 560.0
+
+[node name="Heading" type="Label" parent="Design/Controls" unique_id=998548805]
+layout_mode = 0
+offset_right = 500.0
+offset_bottom = 26.0
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "УПРАВЛЕНИЕ"
+vertical_alignment = 1
+
+[node name="SensitivityLabel" type="Label" parent="Design/Controls" unique_id=624900097]
+layout_mode = 0
+offset_top = 50.0
+offset_right = 500.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "Чувствительность мыши и касаний"
+vertical_alignment = 1
+
+[node name="Sensitivity" type="HSlider" parent="Design/Controls" unique_id=1177438056]
+layout_mode = 0
+offset_top = 93.0
+offset_right = 520.0
+offset_bottom = 123.0
+min_value = 0.25
+max_value = 2.5
+step = 0.05
+value = 0.25
+
+[node name="CameraShake" type="CheckButton" parent="Design/Controls" unique_id=691117107]
+layout_mode = 0
+offset_top = 146.0
+offset_right = 520.0
+offset_bottom = 181.0
+text = "Тряска камеры при попаданиях"
+
+[node name="Keys" type="Label" parent="Design/Controls" unique_id=643443851]
+layout_mode = 0
+offset_top = 205.0
+offset_right = 520.0
+offset_bottom = 410.0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.654902, 0.7058824, 0.7058824, 1)
+text = "W A S D     Движение
+Мышь         Башня и камера
+ЛКМ          Выстрел
+Shift          Оптика
+Tab           Состав команд
+Esc           Пауза / назад"
+vertical_alignment = 1
+
+[node name="Gameplay" type="Control" parent="Design" unique_id=269430091]
+anchors_preset = 0
+offset_left = 280.0
+offset_top = 110.0
+offset_right = 820.0
+offset_bottom = 560.0
+
+[node name="Heading" type="Label" parent="Design/Gameplay" unique_id=1906374187]
+layout_mode = 0
+offset_right = 500.0
+offset_bottom = 26.0
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "ИГРОВОЙ ПРОЦЕСС"
+vertical_alignment = 1
+
+[node name="DifficultyLabel" type="Label" parent="Design/Gameplay" unique_id=723960406]
+layout_mode = 0
+offset_top = 55.0
+offset_right = 260.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+text = "Сложность ботов"
+vertical_alignment = 1
+
+[node name="Difficulty" type="OptionButton" parent="Design/Gameplay" unique_id=1964079818]
+layout_mode = 0
+offset_left = 280.0
+offset_top = 55.0
+offset_right = 520.0
+offset_bottom = 90.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_b0ygv")
+selected = 0
+item_count = 3
+popup/item_0/text = "Лёгкие"
+popup/item_0/id = 0
+popup/item_1/text = "Обычные"
+popup/item_1/id = 1
+popup/item_2/text = "Сложные"
+popup/item_2/id = 2
+
+[node name="Note" type="Label" parent="Design/Gameplay" unique_id=607602396]
+layout_mode = 0
+offset_top = 130.0
+offset_right = 520.0
+offset_bottom = 280.0
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.53333336, 0.58431375, 0.5764706, 1)
+text = "Применяется со следующего боя с ботами.
+
+Язык интерфейса: русский."
+vertical_alignment = 1
+
+[node name="Preview" type="TextureRect" parent="Design" unique_id=1674094839]
+layout_mode = 0
+offset_left = 858.0
+offset_top = 110.0
+offset_right = 1244.0
+offset_bottom = 450.0
+mouse_filter = 2
+texture = SubResource("AtlasTexture_7d8i4")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="PreviewCaption" type="Label" parent="Design" unique_id=661153311]
+layout_mode = 0
+offset_left = 858.0
+offset_top = 458.0
+offset_right = 1244.0
+offset_bottom = 503.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.7647059, 0.78431374, 0.7372549, 1)
+text = "КРАСИВЫЙ МИР. БОЛЬШИЕ СРАЖЕНИЯ."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Defaults" type="Button" parent="Design" unique_id=423371036]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 644.0
+offset_right = 246.0
+offset_bottom = 688.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_sft54")
+text = "ПО УМОЛЧАНИЮ"
+
+[node name="Apply" type="Button" parent="Design" unique_id=935685332]
+layout_mode = 0
+offset_left = 892.0
+offset_top = 644.0
+offset_right = 1062.0
+offset_bottom = 688.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_jmdun")
+theme_override_colors/font_color = Color(0.1254902, 0.16862746, 0.1254902, 1)
+text = "ПРИМЕНИТЬ"
+
+[node name="Back" type="Button" parent="Design" unique_id=137523413]
+layout_mode = 0
+offset_left = 1074.0
+offset_top = 644.0
+offset_right = 1244.0
+offset_bottom = 688.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_0lxx6")
+text = "НАЗАД"

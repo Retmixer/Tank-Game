@@ -1,0 +1,117 @@
+[gd_resource type="Theme" format=3]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xcvi0"]
+bg_color = Color(1, 1, 1, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r004y"]
+bg_color = Color(0.21568628, 0.25882354, 0.21568628, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x4ycf"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 0.93333334)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a1cfd"]
+bg_color = Color(0.28235295, 0.2784314, 0.18431373, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o2ru5"]
+bg_color = Color(1, 1, 1, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kg0n5"]
+bg_color = Color(0.21568628, 0.25882354, 0.21568628, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_osxv3"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 0.93333334)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d5sbv"]
+bg_color = Color(0.28235295, 0.2784314, 0.18431373, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8745098, 0.75686276, 0.5058824, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="SystemFont" id="SystemFont_lhw8m"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+
+[resource]
+default_font = SubResource("SystemFont_lhw8m")
+default_font_size = 13
+Button/colors/font_color = Color(0.8509804, 0.8235294, 0.7058824, 1)
+Button/colors/font_pressed_color = Color(1, 0.94509804, 0.80784315, 1)
+Button/styles/focus = SubResource("StyleBoxFlat_xcvi0")
+Button/styles/hover = SubResource("StyleBoxFlat_r004y")
+Button/styles/normal = SubResource("StyleBoxFlat_x4ycf")
+Button/styles/pressed = SubResource("StyleBoxFlat_a1cfd")
+Label/colors/font_color = Color(0.84313726, 0.8392157, 0.7607843, 1)
+OptionButton/colors/font_color = Color(0.8509804, 0.8235294, 0.7058824, 1)
+OptionButton/colors/font_pressed_color = Color(1, 0.94509804, 0.80784315, 1)
+OptionButton/styles/focus = SubResource("StyleBoxFlat_o2ru5")
+OptionButton/styles/hover = SubResource("StyleBoxFlat_kg0n5")
+OptionButton/styles/normal = SubResource("StyleBoxFlat_osxv3")
+OptionButton/styles/pressed = SubResource("StyleBoxFlat_d5sbv")

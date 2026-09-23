@@ -1,0 +1,182 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://scenes/ui/military_theme.tres" id="1_k23cl"]
+[ext_resource type="Script" path="res://scripts/browser_layout.gd" id="2_qgos8"]
+
+[sub_resource type="SystemFont" id="SystemFont_5834a"]
+font_names = PackedStringArray("Arial Narrow", "Roboto Condensed", "Arial")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4x8ym"]
+bg_color = Color(0.827451, 0.69803923, 0.4627451, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9411765, 0.8392157, 0.5764706, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eq7dk"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_arkwq"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jq7is"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hi21p"]
+bg_color = Color(0.09411765, 0.14509805, 0.11764706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.654902, 0.60784316, 0.38431373, 0.3764706)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="Pause" type="Control" unique_id=1323602721]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = ExtResource("1_k23cl")
+script = ExtResource("2_qgos8")
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=422291074]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02745098, 0.047058824, 0.043137256, 0.8156863)
+
+[node name="Design" type="Control" parent="." unique_id=301395448]
+anchors_preset = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+
+[node name="Meta" type="Label" parent="Design" unique_id=1748535750]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 25.0
+offset_right = 502.0
+offset_bottom = 65.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.6156863, 0.64705884, 0.6431373, 1)
+text = "ПОЛЕ БОЯ"
+vertical_alignment = 1
+
+[node name="Title" type="Label" parent="Design" unique_id=521754539]
+layout_mode = 0
+offset_left = 350.0
+offset_top = 169.0
+offset_right = 930.0
+offset_bottom = 254.0
+theme_override_fonts/font = SubResource("SystemFont_5834a")
+theme_override_font_sizes/font_size = 74
+theme_override_colors/font_color = Color(0.9254902, 0.92156863, 0.8980392, 1)
+text = "ПАУЗА"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Design" unique_id=1835671472]
+layout_mode = 0
+offset_left = 350.0
+offset_top = 260.0
+offset_right = 930.0
+offset_bottom = 288.0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.7254902, 0.7490196, 0.7294118, 1)
+text = "ИГРА ПРИОСТАНОВЛЕНА"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Resume" type="Button" parent="Design" unique_id=569919939]
+layout_mode = 0
+offset_left = 460.0
+offset_top = 317.0
+offset_right = 820.0
+offset_bottom = 361.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_4x8ym")
+theme_override_colors/font_color = Color(0.1254902, 0.16862746, 0.1254902, 1)
+text = "ПРОДОЛЖИТЬ ИГРУ"
+
+[node name="Settings" type="Button" parent="Design" unique_id=730434270]
+layout_mode = 0
+offset_left = 460.0
+offset_top = 371.0
+offset_right = 820.0
+offset_bottom = 415.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_eq7dk")
+text = "НАСТРОЙКИ"
+
+[node name="Hangar" type="Button" parent="Design" unique_id=1519915689]
+layout_mode = 0
+offset_left = 460.0
+offset_top = 425.0
+offset_right = 820.0
+offset_bottom = 469.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_arkwq")
+text = "ВЕРНУТЬСЯ В АНГАР"
+
+[node name="Leave" type="Button" parent="Design" unique_id=464955012]
+layout_mode = 0
+offset_left = 460.0
+offset_top = 479.0
+offset_right = 820.0
+offset_bottom = 523.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_jq7is")
+text = "ПОКИНУТЬ БОЙ"
+
+[node name="Back" type="Button" parent="Design" unique_id=2030433593]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 652.0
+offset_right = 157.0
+offset_bottom = 692.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_hi21p")
+text = "Esc  Назад"
+
+[node name="Motto" type="Label" parent="Design" unique_id=1843837222]
+layout_mode = 0
+offset_left = 840.0
+offset_top = 656.0
+offset_right = 1248.0
+offset_bottom = 686.0
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.5254902, 0.5568628, 0.5568628, 1)
+text = "СРАЖАЙСЯ ДАЛЬШЕ. ПОБЕДА БЛИЖЕ."
+vertical_alignment = 1

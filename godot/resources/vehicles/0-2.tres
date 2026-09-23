@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/vehicle_definition.gd" id="1_or0xp"]
+
+[resource]
+script = ExtResource("1_or0xp")
+vehicle_id = "0-2"
+display_name = "305 «Гранит»"
+hit_points = 1160.0
+damage = 232.0
+armor = 28.0
+reload_seconds = 4.9
+track_health = 170.0
+speed = 6.666666666666666
+reverse_speed = 2.2222222222222223
+turn_speed = 0.73
+turret_speed = 1.08
+view_distance = 104.0
+dispersion = 0.018
+aim_seconds = 1.5
+zoom = 4.1499999999999995

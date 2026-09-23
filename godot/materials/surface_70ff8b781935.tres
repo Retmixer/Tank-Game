@@ -1,0 +1,15 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/rubber-color.jpg" id="1_qr83p"]
+[ext_resource type="Texture2D" path="res://assets/textures/rubber-normal.jpg" id="2_7mnqo"]
+[ext_resource type="Texture2D" path="res://assets/textures/rubber-rough.jpg" id="3_i431n"]
+
+[resource]
+resource_name = "surface_70ff8b781935"
+albedo_color = Color(0.5015794, 0.50397533, 0.50235873, 1)
+albedo_texture = ExtResource("1_qr83p")
+metallic = 0.02
+roughness_texture = ExtResource("3_i431n")
+normal_enabled = true
+normal_scale = 0.4
+normal_texture = ExtResource("2_7mnqo")

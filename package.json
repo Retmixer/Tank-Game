@@ -3,6 +3,8 @@
   "private": true,
   "version": "0.3.0",
   "scripts": {
+    "godot:export-assets": "node tools/export-godot.cjs",
+    "test:godot-assets": "node tests/godot-assets.cjs",
     "test": "node tests/menu-settings.cjs && node tests/collection.cjs && node tests/economy.cjs && node tests/models.cjs && node tests/physics.cjs && node tests/tank-contact.cjs && node tests/roads-crates.cjs && node tests/terrain-aim-regression.cjs && node tests/visual-world.cjs && node tests/map-layout.cjs && node tests/simulation.cjs",
     "build:web": "node tools/build-web.cjs",
     "mobile:add": "npx cap add android",
@@ -14,5 +16,8 @@
     "@capacitor/android": "^6.2.1",
     "@capacitor/cli": "^6.2.1",
     "@capacitor/core": "^6.2.1"
+  },
+  "devDependencies": {
+    "@napi-rs/canvas": "^1.0.9"
   }
 }

@@ -1,0 +1,12 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/steel-color.jpg" id="1_nijck"]
+[ext_resource type="Texture2D" path="res://assets/textures/steel-rough.jpg" id="2_h4025"]
+
+[resource]
+resource_name = "surface_379bf3385195"
+albedo_color = Color(0.36078432, 0.40784314, 0.40784314, 1)
+albedo_texture = ExtResource("1_nijck")
+metallic = 0.58
+roughness = 0.72
+roughness_texture = ExtResource("2_h4025")

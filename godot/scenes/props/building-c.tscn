@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/native/building-c/0003_Mesh.res" id="1_uiw0v"]
+[ext_resource type="Material" path="res://materials/surface_c5a0376ca707.tres" id="2_epdaa"]
+[ext_resource type="Shape3D" path="res://assets/native/building-c/0005_Shape.res" id="3_umef6"]
+[ext_resource type="ArrayMesh" path="res://assets/native/building-c/0006_Mesh2.res" id="4_0jcjp"]
+[ext_resource type="Shape3D" path="res://assets/native/building-c/0008_Shape.res" id="5_eg1j7"]
+
+[node name="building-c" type="Node3D" unique_id=1492708886]
+
+[node name="building-c" type="Node3D" parent="." unique_id=1551009320]
+
+[node name="Mesh" type="MeshInstance3D" parent="building-c" unique_id=1421996682]
+mesh = ExtResource("1_uiw0v")
+surface_material_override/0 = ExtResource("2_epdaa")
+
+[node name="Collision" type="StaticBody3D" parent="building-c/Mesh" unique_id=1300294643]
+
+[node name="Shape" type="CollisionShape3D" parent="building-c/Mesh/Collision" unique_id=937290367]
+shape = ExtResource("3_umef6")
+
+[node name="Mesh2" type="MeshInstance3D" parent="building-c" unique_id=1010237991]
+mesh = ExtResource("4_0jcjp")
+surface_material_override/0 = ExtResource("2_epdaa")
+
+[node name="Collision" type="StaticBody3D" parent="building-c/Mesh2" unique_id=112851865]
+
+[node name="Shape" type="CollisionShape3D" parent="building-c/Mesh2/Collision" unique_id=172402660]
+shape = ExtResource("5_eg1j7")

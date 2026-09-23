@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/vehicle_definition.gd" id="1_4cq24"]
+
+[resource]
+script = ExtResource("1_4cq24")
+vehicle_id = "2-2"
+display_name = "C-21 «Редут»"
+hit_points = 1140.0
+damage = 224.0
+armor = 27.0
+reload_seconds = 4.75
+track_health = 170.0
+speed = 6.666666666666666
+reverse_speed = 2.2222222222222223
+turn_speed = 0.73
+turret_speed = 1.08
+view_distance = 109.0
+dispersion = 0.018
+aim_seconds = 1.5
+zoom = 4.449999999999999

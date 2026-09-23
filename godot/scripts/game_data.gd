@@ -6,6 +6,7 @@ var tanks: Array[Dictionary] = []
 var maps: Dictionary = {}
 var armor_zones: Array = []
 var save: Dictionary = {}
+var persistence_enabled := true
 
 func _ready() -> void:
 	var file := FileAccess.open(DATA_PATH, FileAccess.READ)
@@ -17,6 +18,11 @@ func _ready() -> void:
 		push_error("Invalid game_data.json")
 		return
 	tanks.assign(parsed.get("tanks", []))
+	for i in tanks.size():
+		var resource_path := "res://resources/vehicles/%s.tres" % tanks[i].id
+		if ResourceLoader.exists(resource_path):
+			var definition := load(resource_path) as VehicleDefinition
+			tanks[i] = definition.apply_to(tanks[i])
 	maps = parsed.get("maps", {})
 	armor_zones = parsed.get("armorZones", [])
 	save = _load_save()
@@ -59,6 +65,8 @@ func _load_save() -> Dictionary:
 	return result
 
 func persist() -> void:
+	if not persistence_enabled:
+		return
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
 		file.store_string(JSON.stringify(save, "\t"))

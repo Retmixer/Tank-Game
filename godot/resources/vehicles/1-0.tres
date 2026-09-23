@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/vehicle_definition.gd" id="1_m2c2d"]
+
+[resource]
+script = ExtResource("1_m2c2d")
+vehicle_id = "1-0"
+display_name = "L-12 «Искра»"
+hit_points = 620.0
+damage = 113.0
+armor = 10.0
+reload_seconds = 2.65
+track_health = 90.0
+speed = 9.72222222222222
+reverse_speed = 3.333333333333333
+turn_speed = 1.25
+turret_speed = 1.65
+view_distance = 132.0
+dispersion = 0.019
+aim_seconds = 0.85
+zoom = 2.4000000000000004

@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/rock-color.jpg" id="1_g4sd8"]
+[ext_resource type="Texture2D" path="res://assets/textures/rock-normal.jpg" id="2_xxy8i"]
+[ext_resource type="Texture2D" path="res://assets/textures/rock-rough.jpg" id="3_vlj3k"]
+
+[resource]
+resource_name = "surface_c8035f1588c5"
+albedo_color = Color(0.7712015, 0.6946696, 0.6093955, 1)
+albedo_texture = ExtResource("1_g4sd8")
+metallic = 0.02
+roughness = 0.95
+roughness_texture = ExtResource("3_vlj3k")
+normal_enabled = true
+normal_scale = 0.4
+normal_texture = ExtResource("2_xxy8i")

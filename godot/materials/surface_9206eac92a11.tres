@@ -1,0 +1,15 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/desert-color.jpg" id="1_4u21e"]
+[ext_resource type="Texture2D" path="res://assets/textures/desert-normal.jpg" id="2_b5i4x"]
+[ext_resource type="Texture2D" path="res://assets/textures/desert-rough.jpg" id="3_88dtf"]
+
+[resource]
+resource_name = "surface_9206eac92a11"
+albedo_color = Color(0.9098039, 0.77254903, 0.50980395, 1)
+albedo_texture = ExtResource("1_4u21e")
+roughness_texture = ExtResource("3_88dtf")
+normal_enabled = true
+normal_scale = 0.4
+normal_texture = ExtResource("2_b5i4x")
+uv1_scale = Vector3(62, 62, 1)
