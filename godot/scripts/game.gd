@@ -161,6 +161,8 @@ func _create_ui() -> void:
 	hud.hide()
 
 func _show_hangar() -> void:
+	for effect in get_tree().get_nodes_in_group("combat_effects"):
+		effect.queue_free()
 	screen = Screen.HANGAR
 	battle_live = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -403,13 +405,16 @@ func _fire_shell(source: BattleTank, _sequence: int) -> void:
 		return
 	var direction := _aim_direction(source)
 	source.aim_spread=minf(1.0,source.aim_spread+.48)
+	source.recoil_amount=.38 if int(source.spec.c)==3 else .24
+	_combat_burst(source.muzzle_transform().origin,"muzzle",direction)
+	if source==player:
+		camera_trauma=.18 if scoped else .28
 	var shell := ShellScene.instantiate() as BattleShell
 	add_child(shell)
 	shell.launch(source, float(source.spec.damage), direction)
 	shell.impact_event = _on_impact
 	shells.append(shell)
-	if source == player or source.team == 1:
-		_play_one_shot("shot", source.global_position, .8)
+	_play_one_shot("shot",source.global_position,.9,randf_range(.94,1.06))
 	if lan_peer != null and lan_host and source == player:
 		rpc("server_shot", source.global_position, direction, source.spec.damage, source.shot_sequence)
 
@@ -430,9 +435,29 @@ func _aim_direction(source: BattleTank) -> Vector3:
 func _on_impact(point: Vector3, vehicle: bool, outcome: Dictionary) -> void:
 	if is_instance_valid(player) and player.global_position.distance_to(point)<8.0:
 		camera_trauma = .4
-	_effect(point, Color("efb66d") if vehicle else Color("b9a681"), 16 if vehicle else 8)
-	if not outcome.is_empty() and not outcome.get("ricochet", false):
-		_notify("ПРОБИТИЕ · %d%%" % roundi(outcome.chance * 100.0) if outcome.chance >= .3 else "НЕ ПРОБИТО")
+	var normal: Vector3=outcome.get("normal",Vector3.UP)
+	var ricochet: bool=outcome.get("ricochet",false)
+	var penetrated: bool=vehicle and float(outcome.get("chance",0))>=.3 and not ricochet
+	var kind := "ricochet" if ricochet else "penetration" if penetrated else "blocked" if vehicle else "ground"
+	var direction: Vector3=Vector3(outcome.get("incoming",Vector3.DOWN)).bounce(normal) if ricochet else normal
+	_combat_burst(point+normal*.08,kind,direction)
+	_play_one_shot("hit" if vehicle else "boom",point,.65 if vehicle else .4,1.7 if ricochet else randf_range(.9,1.08))
+	if outcome.get("shooter_player",false) and vehicle and outcome.get("hit",false):
+		_notify("РИКОШЕТ" if ricochet else "ПРОБИТИЕ" if penetrated else "НЕ ПРОБИТО")
+
+func _combat_burst(at: Vector3,kind: String,direction: Vector3) -> Node3D:
+	if get_tree().get_nodes_in_group("combat_effects").size()>=32:
+		return null
+	if is_instance_valid(view_camera) and view_camera.global_position.distance_to(at)>260:
+		var in_scope: bool=scoped and not view_camera.is_position_behind(at) and get_viewport().get_visible_rect().has_point(view_camera.unproject_position(at))
+		if not in_scope:
+			return null
+	var effect := preload("res://scenes/effects/combat_burst.tscn").instantiate() as Node3D
+	effect.position=at
+	add_child(effect)
+	effect.add_to_group("combat_effects")
+	effect.configure(kind,direction,selected_map=="winter")
+	return effect
 
 func _ai_process(delta: float) -> void:
 	if ai_navigation!=null:
@@ -505,6 +530,7 @@ func _update_camera(delta: float) -> void:
 		view_camera.look_at(origin+direction*100)
 		view_camera.fov=lerpf(view_camera.fov,clampf(60.0/(float(player.spec.zoom)*scope_zoom),8,40),1-exp(-delta*14))
 		view_camera.near=.05
+		_apply_camera_feedback(delta)
 		view_camera.force_update_transform()
 		return
 	var target_distance := camera_distance
@@ -522,13 +548,16 @@ func _update_camera(delta: float) -> void:
 	view_camera.global_position = view_camera.global_position.lerp(desired, 1.0 - exp(-delta * 8.0))
 	var look := player.global_position + Vector3(0, 2.0 + tan(camera_pitch) * target_distance * .6, 0) - Vector3(sin(yaw) * 2.0, 0, cos(yaw) * 2.0)
 	view_camera.look_at(look)
-	camera_trauma = maxf(0.0,camera_trauma-delta)
-	if runtime_settings.get("camera_shake",true) and camera_trauma>0.0:
-		var amplitude := camera_trauma*.025
-		view_camera.rotation.x += sin(Time.get_ticks_msec()*.065)*amplitude
-		view_camera.rotation.z += cos(Time.get_ticks_msec()*.049)*amplitude
+	_apply_camera_feedback(delta)
 	view_camera.fov = lerpf(view_camera.fov, target_fov, 1.0 - exp(-delta * 7.0))
 	view_camera.force_update_transform()
+
+func _apply_camera_feedback(delta: float) -> void:
+	camera_trauma=maxf(0,camera_trauma-delta)
+	if runtime_settings.get("camera_shake",true) and camera_trauma>0:
+		var amplitude := camera_trauma*(.018 if scoped else .035)
+		view_camera.rotation.x+=sin(Time.get_ticks_msec()*.065)*amplitude
+		view_camera.rotation.z+=cos(Time.get_ticks_msec()*.049)*amplitude
 
 func _set_scoped(value: bool) -> void:
 	if value and not scoped and is_instance_valid(view_camera):
@@ -634,8 +663,10 @@ func _effect(at: Vector3, color: Color, amount: int, lifetime := .45) -> Node3D:
 	get_tree().create_timer(lifetime + .1).timeout.connect(effect.queue_free)
 	return effect
 
-func _play_one_shot(kind: String, at: Vector3, volume := .8) -> void:
+func _play_one_shot(kind: String, at: Vector3, volume := .8, pitch := 1.0) -> void:
 	if DisplayServer.get_name() == "headless":
+		return
+	if get_tree().get_nodes_in_group("combat_audio").size()>=20:
 		return
 	var path := "res://assets/audio/%s.ogg" % kind
 	if not ResourceLoader.exists(path):
@@ -643,9 +674,11 @@ func _play_one_shot(kind: String, at: Vector3, volume := .8) -> void:
 	var audio := AudioStreamPlayer3D.new()
 	audio.stream = load(path)
 	audio.volume_db = linear_to_db(volume)
+	audio.pitch_scale=pitch
 	audio.position = at
-	audio.max_distance = 130.0
+	audio.max_distance = 230.0
 	add_child(audio)
+	audio.add_to_group("combat_audio")
 	audio.finished.connect(audio.queue_free)
 	audio.play()
 
@@ -713,6 +746,10 @@ func _show_pause() -> void:
 	interface.pause()
 
 func _freeze_vehicles(frozen: bool) -> void:
+	for effect in get_tree().get_nodes_in_group("combat_effects"):
+		effect.set_process(not frozen)
+		for particles in effect.find_children("*","GPUParticles3D",true,false):
+			particles.speed_scale=0.0 if frozen else 1.0
 	for vehicle in tanks:
 		if is_instance_valid(vehicle):
 			vehicle.set_physics_process(not frozen)

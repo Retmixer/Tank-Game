@@ -32,14 +32,18 @@ func _physics_process(delta: float) -> void:
 		var outcome := {}
 		if collider is BattleTank and is_instance_valid(owner_tank):
 			outcome = collider.apply_shell_hit(power, velocity.normalized(), hit.position, hit.normal, owner_tank)
+		outcome["normal"]=hit.normal
+		outcome["incoming"]=velocity.normalized()
+		outcome["shooter_player"]=is_instance_valid(owner_tank) and owner_tank.is_player
+		if impact_event.is_valid():
+			impact_event.call(hit.position,collider is BattleTank,outcome)
+		if collider is BattleTank:
 			if outcome.get("ricochet", false) and ricochets < 2:
 				velocity = velocity.bounce(hit.normal) * .58
 				power *= .58
 				global_position = hit.position + hit.normal * .16
 				ricochets += 1
 				return
-		if impact_event.is_valid():
-			impact_event.call(hit.position, collider is BattleTank, outcome)
 		queue_free()
 		return
 	traveled += global_position.distance_to(destination)

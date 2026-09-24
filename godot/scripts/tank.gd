@@ -32,6 +32,9 @@ var hull_heading := 0.0
 var running_gear: Node
 var previous_aim_yaw := 0.0
 var previous_hull_yaw := 0.0
+var recoil: Node3D
+var recoil_rest := Vector3.ZERO
+var recoil_amount := 0.0
 
 func configure(vehicle: Dictionary, side: int, player_controlled: bool) -> void:
 	spec = vehicle
@@ -43,6 +46,9 @@ func configure(vehicle: Dictionary, side: int, player_controlled: bool) -> void:
 	turret = find_child("Turret", true, false) as Node3D
 	cannon = find_child("GunPivot", true, false) as Node3D
 	muzzle = find_child("Muzzle", true, false) as Marker3D
+	recoil=find_child("Recoil",true,false) as Node3D
+	if recoil:
+		recoil_rest=recoil.position
 	wheel_nodes = find_children("Wheel_*","Node3D",true,false)
 	engine_audio = get_node("EngineAudio")
 	assert(turret != null and cannon != null and muzzle != null, "Use the authored vehicle scene, not BattleTank.new()")
@@ -67,6 +73,9 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 	reload_left = maxf(0.0, reload_left - delta)
+	if recoil:
+		recoil_amount=move_toward(recoil_amount,0,delta*1.6)
+		recoil.position=recoil_rest-Vector3(0,0,recoil_amount)
 	if tracks_broken:
 		repair_left -= delta
 		if repair_left <= 0.0:
