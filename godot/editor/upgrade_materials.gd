@@ -8,9 +8,13 @@ func _initialize() -> void:
 		var mat := load(path) as Material
 		var changed := false
 		if mat is ShaderMaterial and mat.shader.resource_path.ends_with("vehicle_paint.gdshader"):
-			mat.set_shader_parameter("wear_map",load("res://assets/textures/armor-worn-color.jpg"))
-			mat.set_shader_parameter("normal_map",load("res://assets/textures/armor-worn-normal.jpg"))
-			mat.set_shader_parameter("roughness_map",load("res://assets/textures/armor-worn-rough.jpg"))
+			# Preserve national texture assignments when rerunning the migration.
+			var stem := "res://assets/textures/armor-worn"
+			if file=="surface_7ed8764aa1c3.tres": stem="res://assets/textures/armor-german"
+			if file=="surface_d7adcffc9575.tres": stem="res://assets/textures/armor-french"
+			mat.set_shader_parameter("wear_map",load(stem+"-color.jpg"))
+			mat.set_shader_parameter("normal_map",load(stem+"-normal.jpg"))
+			mat.set_shader_parameter("roughness_map",load(stem+"-rough.jpg"))
 			mat.set_shader_parameter("texture_scale",.75)
 			changed=true
 		elif mat is ShaderMaterial and mat.shader.resource_path.ends_with("terrain.gdshader"):

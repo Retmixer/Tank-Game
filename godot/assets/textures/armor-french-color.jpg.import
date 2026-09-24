@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cabqegrxj6px6"
-path="res://.godot/imported/armor-worn-color.jpg-2617a73c5d4313788ff33ea2266f63d3.ctex"
+uid="uid://cvgw5o217bvil"
+path="res://.godot/imported/armor-french-color.jpg-a3a440c570b5895ccff424f849104fdd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/armor-worn-color.jpg"
-dest_files=["res://.godot/imported/armor-worn-color.jpg-2617a73c5d4313788ff33ea2266f63d3.ctex"]
+source_file="res://assets/textures/armor-french-color.jpg"
+dest_files=["res://.godot/imported/armor-french-color.jpg-a3a440c570b5895ccff424f849104fdd.ctex"]
 
 [params]
 
