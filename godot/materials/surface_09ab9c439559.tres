@@ -1,6 +1,7 @@
 [gd_resource type="StandardMaterial3D" format=3]
 
 [ext_resource type="Texture2D" path="res://assets/textures/steel-color.jpg" id="1_311jq"]
+[ext_resource type="Texture2D" path="res://assets/textures/steel-normal.jpg" id="2_cuv3c"]
 [ext_resource type="Texture2D" path="res://assets/textures/steel-rough.jpg" id="2_n250h"]
 
 [resource]
@@ -10,3 +11,7 @@ albedo_texture = ExtResource("1_311jq")
 metallic = 0.58
 roughness = 0.72
 roughness_texture = ExtResource("2_n250h")
+normal_enabled = true
+normal_scale = 0.35
+normal_texture = ExtResource("2_cuv3c")
+texture_filter = 5

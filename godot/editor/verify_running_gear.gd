@@ -18,7 +18,7 @@ func run() -> void:
 	await process_frame
 	var ui: Node=game.interface
 	var shelf: ScrollContainer=ui.field("VehicleScroll")
-	check(ui.field("Vehicles").get_child_count()==12,"Owned collection")
+	check(ui.field("Vehicles").get_child_count()==13,"12 owned vehicles plus research shortcut")
 	shelf.scroll_horizontal=900
 	ui.select_vehicle("2-3")
 	await process_frame

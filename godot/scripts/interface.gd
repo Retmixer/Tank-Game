@@ -5,6 +5,10 @@ var page: Control
 var busy := false
 var selected_module := "gun"
 var research_nation := 0
+var research_selection := 0
+var research_filter := 0
+var research_owned_only := false
+var research_info := 0
 var shelf_offset := 0
 var armor_visible := false
 const MODULES := {"gun":"ОРУДИЕ","armor":"БРОНЯ","engine":"ДВИГАТЕЛЬ","tracks":"ХОДОВАЯ"}
@@ -13,6 +17,8 @@ const DIFFICULTIES := ["easy","normal","hard"]
 
 func close() -> void:
 	if is_instance_valid(page):
+		if page.name in ["Hangar","Research"] and is_instance_valid(game.view_camera):
+			game.view_camera.cull_mask=1048575
 		var shelf := page.find_child("VehicleScroll",true,false) as ScrollContainer
 		if shelf:
 			shelf_offset=shelf.scroll_horizontal
@@ -33,43 +39,56 @@ func bind(id: String, action: Callable) -> void:
 func fullscreen() -> void:
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else DisplayServer.WINDOW_MODE_FULLSCREEN)
 
+func wallet() -> void:
+	field("Currency").text="%d ◉    %d ◆" % [GameData.save.silver,GameData.save.xp]
+	field("Silver").text="◉ %d" % GameData.save.silver
+	field("XP").text="◆ %d" % GameData.save.xp
+
+func header_actions() -> void:
+	bind("Settings",game._show_settings)
+	bind("HangarTab",hangar)
+	bind("Research",research)
+	bind("Profile",func() -> void: game._show_message("ПОСЛУЖНОЙ СПИСОК","Бои: %d\nПобеды: %d\nМашин в ангаре: %d" % [GameData.save.battles,GameData.save.wins,GameData.save.owned.values().count(true)],game._rebuild_hangar))
+	bind("Tasks",func() -> void: game._show_message("БОЕВЫЕ ЗАДАЧИ","Наносите урон, обнаруживайте противников и захватывайте базу.\nЗа каждый вклад начисляются серебро и опыт.\nПодробный расчёт — на итоговом экране боя.",game._rebuild_hangar))
+
+func vehicle_portrait(id: String) -> Texture2D:
+	var path := "res://assets/ui/portraits/%s.png" % id
+	if not ResourceLoader.exists(path): path="res://assets/ui/vehicles/%s.png" % id
+	return load(path) if ResourceLoader.exists(path) else null
+
 func hangar() -> void:
 	game.screen = game.Screen.HANGAR
 	show_page("hangar")
 	var spec: Dictionary = GameData.stats(GameData.tank_by_id(game.selected_tank_id),GameData.save.modules[game.selected_tank_id])
-	field("Currency").text = "◉ %d     ◆ %d" % [GameData.save.silver,GameData.save.xp]
+	game.view_camera.cull_mask=1048575
+	wallet()
+	header_actions()
 	field("VehicleName").text = spec.name
 	field("Nation").text = "%s · %s" % [spec.nation,spec.cls]
-	field("Tier").text = str(spec.get("tier",1))
+	field("Tier").text = ["I","II","III","IV"][int(spec.c)]
 	field("Description").text = spec.get("description","ТАКТИКА. БРОНЯ. ПОБЕДА.")
 	var values := [spec.damage,spec.hp,roundi(spec.speed*3.6),spec.mass,spec.get("power",520)]
 	for i in 5:
 		field("StatValue%d" % i).text = "%s %s" % [values[i],["ед.","HP","км/ч","т","л.с."][i]]
 		field("StatBar%d" % i).value = clampf(float(values[i])/float([400,1800,65,85,1000][i])*100,0,100)
-	var portrait := "res://assets/ui/vehicles/%s.png" % spec.id
-	if ResourceLoader.exists(portrait):
-		field("Blueprint").texture = load(portrait)
-	field("Dimensions").text = "МАССА   %s т\nОБЗОР   %s м\nБРОНЯ   %s мм" % [spec.mass,spec.view,spec.armor]
 	field("Career").text = "%d боёв · %d побед" % [GameData.save.battles,GameData.save.wins]
 	field("VehicleCode").text = spec.id
-	bind("Settings",game._show_settings)
-	bind("Fullscreen",fullscreen)
-	bind("HangarTab",hangar)
-	bind("Research",research)
 	bind("Armor",game._show_armor_preview)
-	field("Armor").text="◈ МАСКА: ВКЛ" if armor_visible else "◈ МАСКА БРОНИ"
+	field("Armor").text="     МАСКА: ВКЛ" if armor_visible else "     СХЕМА БРОНИ"
+	field("Armor").button_pressed=armor_visible
 	if armor_visible:
 		field("Description").text="Зелёный — пробивается · жёлтый — риск\nКрасный — не пробивается. Зависит от угла обзора."
 	bind("PassportButton",game._show_armor_report)
 	bind("Battle",setup)
-	bind("Tasks",func() -> void: game._show_message("БОЕВЫЕ ЗАДАЧИ","Участвуйте в боях, наносите урон и захватывайте базу.\nНаграда рассчитывается по вашему вкладу в бой.",game._rebuild_hangar))
 	bind("Help",func() -> void: game._show_message("УПРАВЛЕНИЕ","WASD — движение · Мышь — башня\nЛКМ — выстрел · Shift — оптика · Esc — пауза",game._rebuild_hangar))
 	for nation in 3:
+		field("Nation%d" % nation).button_pressed=int(spec.n)==nation
 		bind("Nation%d" % nation,func() -> void:
 			for id in GameData.save.owned:
 				if GameData.save.owned[id] and str(id).begins_with(str(nation)+"-"):
 					select_vehicle(id)
 					return
+			research_nation=nation
 			research())
 	var selected_card: Control
 	for id in GameData.save.owned:
@@ -78,10 +97,9 @@ func hangar() -> void:
 		var vehicle := GameData.tank_by_id(id)
 		var card := load("res://scenes/ui/vehicle_card.tscn").instantiate() as Button
 		card.get_node("Caption").text = vehicle.name
-		card.get_node("Tier").text = str(vehicle.get("tier",1))
-		var image_path := "res://assets/ui/vehicles/%s.png" % id
-		if ResourceLoader.exists(image_path):
-			card.get_node("Portrait").texture = load(image_path)
+		card.get_node("Tier").text = ["I","II","III","IV"][int(vehicle.c)]
+		card.get_node("Portrait").texture = vehicle_portrait(id)
+		card.get_node("Icon_star").symbol=["star","cross","lily"][int(vehicle.n)]
 		card.button_pressed = id == game.selected_tank_id
 		field("Vehicles").add_child(card)
 		field("VehicleScroll").attach(card)
@@ -90,6 +108,13 @@ func hangar() -> void:
 				select_vehicle(id))
 		if id==game.selected_tank_id:
 			selected_card=card
+	var buy := Button.new()
+	buy.text="+\nКУПИТЬ ТЕХНИКУ"
+	buy.custom_minimum_size=Vector2(205,118)
+	field("Vehicles").add_child(buy)
+	field("VehicleScroll").attach(buy)
+	buy.pressed.connect(func() -> void:
+		if not field("VehicleScroll").suppress_click: research())
 	field("VehicleScroll").restore(shelf_offset,selected_card)
 	bind("ShelfPrev",func() -> void: field("VehicleScroll").scroll_horizontal -= 192)
 	bind("ShelfNext",func() -> void: field("VehicleScroll").scroll_horizontal += 192)
@@ -120,7 +145,8 @@ func select_vehicle(id: String) -> void:
 func module_details(spec: Dictionary) -> void:
 	for module in MODULES:
 		field("Upgrade_"+module).button_pressed = selected_module == module
-		field("Upgrade_"+module).text = "%s\nУР. %d" % [MODULES[module],GameData.save.modules[spec.id][module]]
+		field("Upgrade_"+module).get_node("ModuleRank").text = "УРОВЕНЬ %d" % GameData.save.modules[spec.id][module]
+		field("Upgrade_"+module).get_node("ModuleBar").value = int(GameData.save.modules[spec.id][module])*20
 	var level := int(GameData.save.modules[spec.id][selected_module])
 	field("ModuleName").text = MODULES[selected_module]
 	field("ModuleLevel").text = "УР. %d / V" % level
@@ -169,7 +195,9 @@ func load_battle() -> void:
 
 func research() -> void:
 	show_page("research")
-	field("Currency").text = "%d ◉    %d ✦" % [GameData.save.silver,GameData.save.xp]
+	game.view_camera.cull_mask=0
+	wallet()
+	header_actions()
 	for nation in 3:
 		field("Nation%d" % nation).button_pressed=research_nation==nation
 		bind("Nation%d" % nation,func() -> void:
@@ -185,10 +213,63 @@ func research() -> void:
 		var portrait := "res://assets/ui/vehicles/%s.png" % vehicle.id
 		if ResourceLoader.exists(portrait):
 			card.get_node("Portrait").texture=load(portrait)
-		card.disabled=owned or GameData.save.silver<price.silver or GameData.save.xp<price.xp
+		card.get_node("Portrait").texture=vehicle_portrait(vehicle.id)
+		card.get_node("Icon_star").symbol=["star","cross","lily"][research_nation]
+		card.get_node("State").text="✓" if owned else "·"
+		card.button_pressed=tier==research_selection
+		var matches: bool=research_filter==0 or (research_filter==1 and tier==0) or (research_filter==2 and tier==1) or (research_filter==3 and tier>=2)
+		card.visible=matches and (not research_owned_only or owned)
 		card.pressed.connect(func() -> void:
-			GameData.unlock(vehicle.id)
+			research_selection=tier
 			research())
+	for i in 4:
+		field("Filter%d"%i).button_pressed=research_filter==i
+		bind("Filter%d"%i,func() -> void:
+			research_filter=i
+			research())
+	field("OwnedFilter").text="ТОЛЬКО ПРИОБРЕТЁННЫЕ" if research_owned_only else "ВСЕ МАШИНЫ"
+	field("OwnedFilter").button_pressed=research_owned_only
+	bind("OwnedFilter",func() -> void:
+		research_owned_only=not research_owned_only
+		research())
+	for i in 3:
+		field("Arrow%d"%i).visible=field("Tank%d"%i).visible and field("Tank%d"%(i+1)).visible
+	var vehicle := GameData.tank_by_id("%d-%d"%[research_nation,research_selection])
+	var spec := GameData.stats(vehicle,GameData.save.modules[vehicle.id])
+	var price := GameData.tank_price(vehicle)
+	var owned: bool=GameData.save.owned.get(vehicle.id,false)
+	field("VehicleName").text=vehicle.name
+	field("Nation").text="%s  ·  %s"%[vehicle.cls,vehicle.nation]
+	field("Tier").text=["I","II","III","IV"][research_selection]
+	field("Preview").texture=vehicle_portrait(vehicle.id)
+	field("Description").text=vehicle.get("description","")
+	field("BranchTitle").text="ВЕТКА "+["СССР","ГЕРМАНИИ","ФРАНЦИИ"][research_nation]
+	field("BranchDescription").text=["Сбалансированная техника для поддержки союзников и удержания направления.","Мощное вооружение и тяжёлая броня. Выбирайте позицию и прикрывайте фланги.","Подвижность и манёвр. Используйте обзор, укрытия и смену направления."][research_nation]
+	var values := [spec.damage,spec.hp,roundi(spec.speed*3.6),spec.mass]
+	for i in 4:
+		field("StatValue%d"%i).text="%s %s"%[values[i],["ед.","HP","км/ч","т"][i]]
+		field("StatBar%d"%i).value=float(values[i])/float([400,1800,65,85][i])*100
+	field("ResearchPrice").text="МАШИНА ПРИОБРЕТЕНА" if owned else "◉  %d       ◆  %d"%[price.silver,price.xp]
+	var affordable: bool=GameData.save.silver>=price.silver and GameData.save.xp>=price.xp
+	field("Unlock").text="ВЫБРАТЬ В АНГАРЕ" if owned else "ИССЛЕДОВАТЬ" if affordable else "НЕДОСТАТОЧНО РЕСУРСОВ"
+	field("Unlock").disabled=not owned and not affordable
+	bind("Unlock",func() -> void:
+		if GameData.save.owned.get(vehicle.id,false): select_vehicle(vehicle.id)
+		elif GameData.unlock(vehicle.id): research())
+	bind("Previous",func() -> void:
+		research_selection=posmod(research_selection-1,4)
+		research())
+	bind("Next",func() -> void:
+		research_selection=posmod(research_selection+1,4)
+		research())
+	for i in 3:
+		field("InfoTab%d"%i).button_pressed=research_info==i
+		bind("InfoTab%d"%i,func() -> void:
+			research_info=i
+			research())
+	field("StatContent").visible=research_info==0
+	field("InfoContent").visible=research_info!=0
+	field("InfoContent").text="ОРУДИЕ — уровень %d\nБРОНЯ — уровень %d\nДВИГАТЕЛЬ — уровень %d\nХОДОВАЯ — уровень %d\n\nМодернизация доступна в ангаре." % [spec.modules.gun,spec.modules.armor,spec.modules.engine,spec.modules.tracks] if research_info==1 else "%s\n\nОбзор: %d м · Перезарядка: %.1f с\nМасса: %s т · Броня: %s мм"%[vehicle.get("description",""),spec.view,spec.reload,spec.mass,spec.armor]
 	bind("Back",hangar)
 
 func pause() -> void:

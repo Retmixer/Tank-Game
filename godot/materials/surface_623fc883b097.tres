@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" path="res://assets/textures/steel-color.jpg" id="1_cuuep"]
 [ext_resource type="Texture2D" path="res://assets/textures/steel-rough.jpg" id="2_5ljxy"]
+[ext_resource type="Texture2D" path="res://assets/textures/steel-normal.jpg" id="2_crj1w"]
 
 [resource]
 resource_name = "surface_623fc883b097"
@@ -10,3 +11,7 @@ albedo_texture = ExtResource("1_cuuep")
 metallic = 0.58
 roughness = 0.72
 roughness_texture = ExtResource("2_5ljxy")
+normal_enabled = true
+normal_scale = 0.35
+normal_texture = ExtResource("2_crj1w")
+texture_filter = 5

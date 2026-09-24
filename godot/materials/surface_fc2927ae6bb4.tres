@@ -1,12 +1,16 @@
 [gd_resource type="ShaderMaterial" format=3]
 
 [ext_resource type="Shader" path="res://materials/vehicle_paint.gdshader" id="1_21rtc"]
-[ext_resource type="Texture2D" path="res://assets/textures/paint-color.jpg" id="2_jvp66"]
+[ext_resource type="Texture2D" path="res://assets/textures/armor-worn-normal.jpg" id="2_a3mak"]
+[ext_resource type="Texture2D" path="res://assets/textures/armor-worn-rough.jpg" id="3_ix5da"]
+[ext_resource type="Texture2D" path="res://assets/textures/armor-worn-color.jpg" id="4_6x1ww"]
 
 [resource]
 render_priority = 0
 shader = ExtResource("1_21rtc")
-shader_parameter/wear_map = ExtResource("2_jvp66")
+shader_parameter/wear_map = ExtResource("4_6x1ww")
+shader_parameter/normal_map = ExtResource("2_a3mak")
+shader_parameter/roughness_map = ExtResource("3_ix5da")
 shader_parameter/paint_color = Color(0.3019608, 0.40392157, 0.4392157, 1)
-shader_parameter/texture_scale = 1.8
+shader_parameter/texture_scale = 0.75
 shader_parameter/metalness = 0.13

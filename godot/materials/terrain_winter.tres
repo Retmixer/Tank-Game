@@ -2,12 +2,18 @@
 
 [ext_resource type="Shader" path="res://materials/terrain.gdshader" id="1_it1eq"]
 [ext_resource type="Texture2D" path="res://assets/textures/winter-color.jpg" id="2_kw0bu"]
+[ext_resource type="Texture2D" path="res://assets/textures/winter-normal.jpg" id="3_6mow2"]
 [ext_resource type="Texture2D" path="res://assets/textures/rock-color.jpg" id="3_nxdoj"]
+[ext_resource type="Texture2D" path="res://assets/textures/winter-rough.jpg" id="4_wk30k"]
+[ext_resource type="Texture2D" path="res://assets/textures/rock-normal.jpg" id="6_n3jwd"]
 
 [resource]
 render_priority = 0
 shader = ExtResource("1_it1eq")
 shader_parameter/ground_map = ExtResource("2_kw0bu")
 shader_parameter/rock_map = ExtResource("3_nxdoj")
+shader_parameter/ground_normal = ExtResource("3_6mow2")
+shader_parameter/ground_roughness = ExtResource("4_wk30k")
+shader_parameter/rock_normal = ExtResource("6_n3jwd")
 shader_parameter/tint = Color(1, 1, 1, 1)
 shader_parameter/texture_scale = 0.12

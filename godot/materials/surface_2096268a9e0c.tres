@@ -11,5 +11,6 @@ albedo_texture = ExtResource("1_p3pvt")
 metallic = 0.02
 roughness_texture = ExtResource("3_251gg")
 normal_enabled = true
-normal_scale = 0.4
+normal_scale = 0.35
 normal_texture = ExtResource("2_3cwyc")
+texture_filter = 5

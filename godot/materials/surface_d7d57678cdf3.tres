@@ -12,5 +12,6 @@ metallic = 0.02
 roughness = 0.95
 roughness_texture = ExtResource("3_8u33j")
 normal_enabled = true
-normal_scale = 0.4
+normal_scale = 0.65
 normal_texture = ExtResource("2_7uygn")
+texture_filter = 5

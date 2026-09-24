@@ -18,7 +18,12 @@ func run() -> void:
 	game._freeze_vehicles(true)
 	var tank: Node=game.player
 	game._update_camera(.2)
+	var entry_position: Vector3=game.view_camera.global_position
+	var entry_fov: float=game.view_camera.fov
 	game._set_scoped(true)
+	game._update_camera(1.0/60)
+	check(game.view_camera.global_position.distance_to(entry_position)<.2,"Scope entry must not teleport in first frame")
+	check(absf(game.view_camera.fov-entry_fov)<1.0,"Scope FOV starts smoothly")
 	var toward: Vector3=-tank.global_position
 	game.camera_yaw=atan2(-toward.x,-toward.z)
 	game.camera_pitch=0
@@ -65,9 +70,13 @@ func run() -> void:
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("res://../work/godot-sniper-settled.png")
 	game._set_scoped(false)
+	var exit_position: Vector3=game.view_camera.global_position
+	game._update_camera(1.0/60)
+	check(game.view_camera.global_position.distance_to(exit_position)<.2,"Scope exit starts smoothly")
+	game._update_camera(1)
+	game._set_scope_model_visibility()
 	for mesh in tank.find_children("*","GeometryInstance3D",true,false):
 		check(mesh.layers==int(mesh.get_meta("normal_layers")),"Restore tank render layers")
-	game._update_camera(1)
 	check(game.view_camera.global_position.distance_to(tank.global_position)>8,"Return to third person")
 	game.free()
 	await process_frame

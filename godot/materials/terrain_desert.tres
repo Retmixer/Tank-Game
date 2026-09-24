@@ -3,11 +3,17 @@
 [ext_resource type="Shader" path="res://materials/terrain.gdshader" id="1_8stcn"]
 [ext_resource type="Texture2D" path="res://assets/textures/desert-color.jpg" id="2_ktfd3"]
 [ext_resource type="Texture2D" path="res://assets/textures/rock-color.jpg" id="3_53j8m"]
+[ext_resource type="Texture2D" path="res://assets/textures/desert-normal.jpg" id="3_krulg"]
+[ext_resource type="Texture2D" path="res://assets/textures/desert-rough.jpg" id="4_oeirk"]
+[ext_resource type="Texture2D" path="res://assets/textures/rock-normal.jpg" id="6_d6lka"]
 
 [resource]
 render_priority = 0
 shader = ExtResource("1_8stcn")
 shader_parameter/ground_map = ExtResource("2_ktfd3")
 shader_parameter/rock_map = ExtResource("3_53j8m")
+shader_parameter/ground_normal = ExtResource("3_krulg")
+shader_parameter/ground_roughness = ExtResource("4_oeirk")
+shader_parameter/rock_normal = ExtResource("6_d6lka")
 shader_parameter/tint = Color(1, 1, 1, 1)
 shader_parameter/texture_scale = 0.12

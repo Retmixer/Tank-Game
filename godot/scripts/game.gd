@@ -42,6 +42,12 @@ var camera_pitch := -.22
 var camera_distance := 22.0
 var scoped := false
 var scope_zoom := 1.0
+@export_range(.2,1.2,.05) var scope_enter_seconds := .55
+@export_range(.2,1.2,.05) var scope_exit_seconds := .45
+var scope_transition_elapsed := 1.0
+var scope_transition_duration := 0.0
+var scope_transition_from := Transform3D.IDENTITY
+var scope_transition_fov := 60.0
 var gun_aim_point := Vector3.ZERO
 var scope_layer_tank := 0
 var scope_layers_applied := false
@@ -74,6 +80,7 @@ func _ready() -> void:
 	selected_tank_id = GameData.save.selected
 	_create_ui()
 	_show_hangar()
+	_apply_settings()
 	set_process(true)
 
 func _process(delta: float) -> void:
@@ -323,6 +330,7 @@ func _start_battle() -> void:
 	capture_progress = 0.0
 	countdown = 5.0
 	scoped = false
+	scope_transition_duration=0.0
 	firing = false
 	camera_yaw = player.rotation.y
 	camera_pitch = -.16
@@ -330,7 +338,7 @@ func _start_battle() -> void:
 	_create_hud()
 	countdown_label.show()
 	countdown_label.text = "ПРИГОТОВИТЬСЯ\n5"
-	AudioServer.set_bus_volume_db(0, linear_to_db(float(runtime_settings.volume)))
+	_apply_settings()
 
 func _spawn_lan_roster() -> void:
 	var local_spec := GameData.stats(GameData.tank_by_id(selected_tank_id), GameData.save.modules[selected_tank_id])
@@ -528,7 +536,8 @@ func _update_camera(delta: float) -> void:
 		var origin := player.cannon.global_position+Vector3.UP*.22
 		view_camera.global_position=origin
 		view_camera.look_at(origin+direction*100)
-		view_camera.fov=lerpf(view_camera.fov,clampf(60.0/(float(player.spec.zoom)*scope_zoom),8,40),1-exp(-delta*14))
+		var target_fov := clampf(60.0/(float(player.spec.zoom)*scope_zoom),8,40)
+		_blend_scope_camera(delta,target_fov)
 		view_camera.near=.05
 		_apply_camera_feedback(delta)
 		view_camera.force_update_transform()
@@ -545,12 +554,22 @@ func _update_camera(delta: float) -> void:
 	var obstruction := get_world_3d().direct_space_state.intersect_ray(query)
 	if obstruction:
 		desired = obstruction.position + obstruction.normal * .65
-	view_camera.global_position = view_camera.global_position.lerp(desired, 1.0 - exp(-delta * 8.0))
+	view_camera.global_position = desired if scope_transition_elapsed<scope_transition_duration else view_camera.global_position.lerp(desired, 1.0 - exp(-delta * 8.0))
 	var look := player.global_position + Vector3(0, 2.0 + tan(camera_pitch) * target_distance * .6, 0) - Vector3(sin(yaw) * 2.0, 0, cos(yaw) * 2.0)
 	view_camera.look_at(look)
+	_blend_scope_camera(delta,target_fov)
 	_apply_camera_feedback(delta)
-	view_camera.fov = lerpf(view_camera.fov, target_fov, 1.0 - exp(-delta * 7.0))
 	view_camera.force_update_transform()
+
+func _blend_scope_camera(delta: float,target_fov: float) -> void:
+	if scope_transition_elapsed<scope_transition_duration:
+		scope_transition_elapsed=minf(scope_transition_duration,scope_transition_elapsed+delta)
+		var t := scope_transition_elapsed/scope_transition_duration
+		var eased := t*t*(3.0-2.0*t)
+		view_camera.global_transform=scope_transition_from.interpolate_with(view_camera.global_transform,eased)
+		view_camera.fov=lerpf(scope_transition_fov,target_fov,eased)
+	else:
+		view_camera.fov=lerpf(view_camera.fov,target_fov,1-exp(-delta*6.0))
 
 func _apply_camera_feedback(delta: float) -> void:
 	camera_trauma=maxf(0,camera_trauma-delta)
@@ -560,6 +579,13 @@ func _apply_camera_feedback(delta: float) -> void:
 		view_camera.rotation.z+=cos(Time.get_ticks_msec()*.049)*amplitude
 
 func _set_scoped(value: bool) -> void:
+	if value==scoped:
+		return
+	if is_instance_valid(view_camera):
+		scope_transition_from=view_camera.global_transform
+		scope_transition_fov=view_camera.fov
+		scope_transition_elapsed=0.0
+		scope_transition_duration=scope_enter_seconds if value else scope_exit_seconds
 	if value and not scoped and is_instance_valid(view_camera):
 		var direction := -view_camera.global_basis.z
 		camera_yaw=atan2(-direction.x,-direction.z)
@@ -570,16 +596,19 @@ func _set_scoped(value: bool) -> void:
 func _set_scope_model_visibility() -> void:
 	if not is_instance_valid(player):
 		return
-	if scope_layer_tank==player.get_instance_id() and scope_layers_applied==scoped:
+	var near_hull: bool=view_camera.global_position.distance_to(player.cannon.global_position)<5.0
+	var transitioning := scope_transition_elapsed<scope_transition_duration
+	var hide_hull: bool=(scoped and (near_hull or not transitioning)) or (not scoped and transitioning and near_hull)
+	if scope_layer_tank==player.get_instance_id() and scope_layers_applied==hide_hull:
 		return
 	scope_layer_tank=player.get_instance_id()
-	scope_layers_applied=scoped
+	scope_layers_applied=hide_hull
 	# Hide the local tank only for this camera, retaining its world shadows.
 	view_camera.set_cull_mask_value(20,false)
 	for mesh in player.find_children("*","GeometryInstance3D",true,false):
 		if not mesh.has_meta("normal_layers"):
 			mesh.set_meta("normal_layers",mesh.layers)
-		mesh.layers=(1<<19) if scoped else int(mesh.get_meta("normal_layers"))
+		mesh.layers=(1<<19) if hide_hull else int(mesh.get_meta("normal_layers"))
 
 func _update_aim() -> void:
 	if not is_instance_valid(player) or view_camera == null:
@@ -849,6 +878,7 @@ func _close_settings() -> void:
 func _apply_settings() -> void:
 	AudioServer.set_bus_volume_db(0, linear_to_db(float(runtime_settings.volume)))
 	get_viewport().scaling_3d_scale = float(runtime_settings.get("render_scale", 1.0))
+	get_viewport().msaa_3d=Viewport.MSAA_2X if runtime_settings.quality=="high" else Viewport.MSAA_DISABLED
 	for light in find_children("*", "DirectionalLight3D", true, false):
 		light.shadow_enabled = bool(runtime_settings.shadows) and runtime_settings.quality == "high"
 	for world in find_children("*", "WorldEnvironment", true, false):
@@ -856,7 +886,7 @@ func _apply_settings() -> void:
 			var postprocessing: bool = runtime_settings.quality == "high" and bool(runtime_settings.get("postprocessing", true))
 			world.environment.ssao_enabled = postprocessing
 			world.environment.ssil_enabled = postprocessing
-			world.environment.ssr_enabled = postprocessing
+			world.environment.ssr_enabled = postprocessing and not world.get_viewport().transparent_bg
 
 func _show_lan_lobby() -> void:
 	screen = Screen.LAN_LOBBY
