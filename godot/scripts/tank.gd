@@ -29,6 +29,7 @@ var trigger := false
 var shot_request: Callable
 var move_speed := 0.0
 var hull_heading := 0.0
+var running_gear: Node
 
 func configure(vehicle: Dictionary, side: int, player_controlled: bool) -> void:
 	spec = vehicle
@@ -47,6 +48,9 @@ func configure(vehicle: Dictionary, side: int, player_controlled: bool) -> void:
 func _ready() -> void:
 	if spec.is_empty() and definition:
 		configure(GameData.tank_by_id(definition.vehicle_id), 0, false)
+	running_gear=preload("res://scripts/tracked_running_gear.gd").new()
+	add_child(running_gear)
+	running_gear.setup(self)
 	if engine_audio and DisplayServer.get_name() != "headless":
 		engine_audio.play()
 
@@ -75,8 +79,7 @@ func _physics_process(delta: float) -> void:
 		shot_sequence += 1
 		shot_request.call(self, shot_sequence)
 	var moving := Vector2(velocity.x, velocity.z).length()
-	for wheel in wheel_nodes:
-		wheel.rotate_x(-move_speed * delta / .44)
+	running_gear.update(delta,tracks_broken)
 	var target_spread: float = .19 + minf(1.0, moving / maxf(.1, spec.speed)) * .72
 	aim_spread = move_toward(aim_spread, target_spread, delta * (1.45 / maxf(.2, spec.aim)))
 	if engine_audio and engine_audio.playing:
@@ -84,12 +87,14 @@ func _physics_process(delta: float) -> void:
 
 func _apply_drive(input: Vector2, delta: float) -> void:
 	var steering_scale: float = clampf(1.0 - absf(move_speed) / maxf(.1, spec.speed) * .42, .3, 1.0)
-	hull_heading += input.x * spec.turn * steering_scale * delta
+	if not tracks_broken:
+		hull_heading += input.x * spec.turn * steering_scale * delta
 	rotation.y = hull_heading
 	var throttle := input.y
 	var target_speed: float = spec.speed if throttle > 0.0 else spec.reverse
 	if tracks_broken:
 		target_speed = 0.0
+		move_speed = 0.0
 	var forward := -global_transform.basis.z
 	var desired := throttle * target_speed
 	var response := 1.0 if not is_zero_approx(throttle) else 4.0

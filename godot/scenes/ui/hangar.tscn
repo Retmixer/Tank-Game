@@ -2,6 +2,7 @@
 
 [ext_resource type="Theme" path="res://scenes/ui/military_theme.tres" id="1_5diqg"]
 [ext_resource type="Script" path="res://scripts/browser_layout.gd" id="2_xa1nx"]
+[ext_resource type="Script" path="res://scripts/vehicle_shelf.gd" id="3_shelf"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fllk6"]
 bg_color = Color(0.078431375, 0.11372549, 0.09411765, 0.92156863)
@@ -1134,6 +1135,7 @@ theme_override_colors/font_color = Color(0.1254902, 0.16862746, 0.1254902, 1)
 text = "⌃   УЛУЧШИТЬ     300 ◉"
 
 [node name="VehicleScroll" type="ScrollContainer" parent="Design" unique_id=602580840]
+script = ExtResource("3_shelf")
 layout_mode = 0
 offset_left = 350.0
 offset_top = 591.0

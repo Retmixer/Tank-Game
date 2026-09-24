@@ -242,6 +242,25 @@ func _rebuild_hangar() -> void:
 	_show_hangar()
 
 func _show_armor_preview() -> void:
+	interface.armor_visible=not interface.armor_visible
+	interface.hangar()
+
+func _apply_armor_preview(enabled: bool) -> void:
+	for tank in tanks:
+		if not is_instance_valid(tank):
+			continue
+		var material: ShaderMaterial
+		if enabled:
+			material=ShaderMaterial.new()
+			material.shader=preload("res://materials/armor_preview.gdshader")
+			material.set_shader_parameter("world_to_tank",tank.global_transform.affine_inverse())
+			material.set_shader_parameter("plates",Vector4(GameData.armor_mm(tank.spec,"front"),GameData.armor_mm(tank.spec,"side"),GameData.armor_mm(tank.spec,"rear"),GameData.armor_mm(tank.spec,"roof")))
+			material.set_shader_parameter("turret_plate",GameData.armor_mm(tank.spec,"turret"))
+			material.set_shader_parameter("penetration",float(tank.spec.damage)*.74)
+		for mesh in tank.find_children("*","GeometryInstance3D",true,false):
+			mesh.material_overlay=material
+
+func _show_armor_report() -> void:
 	var spec := GameData.stats(GameData.tank_by_id(selected_tank_id), GameData.save.modules[selected_tank_id])
 	var report := "МАСКА БРОНИ · ТОЛЩИНА В МИЛЛИМЕТРАХ\n"
 	for zone in GameData.armor_zones:
@@ -263,6 +282,7 @@ func _create_camera() -> void:
 	add_child(view_camera)
 
 func _start_battle() -> void:
+	_clear_panel()
 	for tank in tanks:
 		if is_instance_valid(tank):
 			tank.queue_free()
@@ -994,7 +1014,7 @@ func _build_reticle() -> void:
 	reticle.hide()
 
 
-func _input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
 	if interface.busy:
 		return
 	if event.is_action_pressed("pause"):

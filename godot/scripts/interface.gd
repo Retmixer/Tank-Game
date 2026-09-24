@@ -5,12 +5,17 @@ var page: Control
 var busy := false
 var selected_module := "gun"
 var research_nation := 0
+var shelf_offset := 0
+var armor_visible := false
 const MODULES := {"gun":"ОРУДИЕ","armor":"БРОНЯ","engine":"ДВИГАТЕЛЬ","tracks":"ХОДОВАЯ"}
 const SCALES := [.5,.75,1.0,1.25,1.5]
 const DIFFICULTIES := ["easy","normal","hard"]
 
 func close() -> void:
 	if is_instance_valid(page):
+		var shelf := page.find_child("VehicleScroll",true,false) as ScrollContainer
+		if shelf:
+			shelf_offset=shelf.scroll_horizontal
 		page.queue_free()
 		page = null
 
@@ -52,7 +57,10 @@ func hangar() -> void:
 	bind("HangarTab",hangar)
 	bind("Research",research)
 	bind("Armor",game._show_armor_preview)
-	bind("PassportButton",game._show_armor_preview)
+	field("Armor").text="◈ МАСКА: ВКЛ" if armor_visible else "◈ МАСКА БРОНИ"
+	if armor_visible:
+		field("Description").text="Зелёный — пробивается · жёлтый — риск\nКрасный — не пробивается. Зависит от угла обзора."
+	bind("PassportButton",game._show_armor_report)
 	bind("Battle",setup)
 	bind("Tasks",func() -> void: game._show_message("БОЕВЫЕ ЗАДАЧИ","Участвуйте в боях, наносите урон и захватывайте базу.\nНаграда рассчитывается по вашему вкладу в бой.",game._rebuild_hangar))
 	bind("Help",func() -> void: game._show_message("УПРАВЛЕНИЕ","WASD — движение · Мышь — башня\nЛКМ — выстрел · Shift — оптика · Esc — пауза",game._rebuild_hangar))
@@ -63,6 +71,7 @@ func hangar() -> void:
 					select_vehicle(id)
 					return
 			research())
+	var selected_card: Control
 	for id in GameData.save.owned:
 		if not GameData.save.owned[id]:
 			continue
@@ -75,7 +84,13 @@ func hangar() -> void:
 			card.get_node("Portrait").texture = load(image_path)
 		card.button_pressed = id == game.selected_tank_id
 		field("Vehicles").add_child(card)
-		card.pressed.connect(select_vehicle.bind(id))
+		field("VehicleScroll").attach(card)
+		card.pressed.connect(func() -> void:
+			if not field("VehicleScroll").suppress_click:
+				select_vehicle(id))
+		if id==game.selected_tank_id:
+			selected_card=card
+	field("VehicleScroll").restore(shelf_offset,selected_card)
 	bind("ShelfPrev",func() -> void: field("VehicleScroll").scroll_horizontal -= 192)
 	bind("ShelfNext",func() -> void: field("VehicleScroll").scroll_horizontal += 192)
 	for module in MODULES:
@@ -94,6 +109,7 @@ func hangar() -> void:
 		GameData.persist()
 		game._rebuild_hangar())
 	module_details(spec)
+	game._apply_armor_preview(armor_visible)
 
 func select_vehicle(id: String) -> void:
 	game.selected_tank_id = id

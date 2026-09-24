@@ -177,6 +177,7 @@ func _hangar() -> void:
 	_label(right,"Hint","Улучшайте технику перед выходом в бой",Rect2(16,399,275,27),10,Color("a1ad92"))
 	_button(right,"UpgradeConfirm","⌃   УЛУЧШИТЬ     300 ◉",Rect2(16,432,275,32),true)
 	var scroll := ScrollContainer.new()
+	scroll.set_script(load("res://scripts/vehicle_shelf.gd"))
 	_at(scroll,d,"VehicleScroll",Rect2(350,591,580,105))
 	var cards := HBoxContainer.new()
 	cards.name = "Vehicles"
