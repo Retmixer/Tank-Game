@@ -30,6 +30,8 @@ var shot_request: Callable
 var move_speed := 0.0
 var hull_heading := 0.0
 var running_gear: Node
+var previous_aim_yaw := 0.0
+var previous_hull_yaw := 0.0
 
 func configure(vehicle: Dictionary, side: int, player_controlled: bool) -> void:
 	spec = vehicle
@@ -80,10 +82,17 @@ func _physics_process(delta: float) -> void:
 		shot_request.call(self, shot_sequence)
 	var moving := Vector2(velocity.x, velocity.z).length()
 	running_gear.update(delta,tracks_broken)
-	var target_spread: float = .19 + minf(1.0, moving / maxf(.1, spec.speed)) * .72
-	aim_spread = move_toward(aim_spread, target_spread, delta * (1.45 / maxf(.2, spec.aim)))
+	_update_dispersion(delta,moving)
 	if engine_audio and engine_audio.playing:
 		engine_audio.pitch_scale = .74 + moving * .045
+
+func _update_dispersion(delta: float,moving: float) -> void:
+	var traverse := absf(wrapf(turret.rotation.y-previous_aim_yaw,-PI,PI))/maxf(delta,.001)
+	var hull_turn := absf(wrapf(rotation.y-previous_hull_yaw,-PI,PI))/maxf(delta,.001)
+	previous_aim_yaw=turret.rotation.y
+	previous_hull_yaw=rotation.y
+	var target_spread: float=clampf(.19+moving/maxf(.1,spec.speed)*.65+traverse*.24+hull_turn*.3,.19,1.0)
+	aim_spread=move_toward(aim_spread,target_spread,delta*(3.0 if target_spread>aim_spread else .81/maxf(.2,spec.aim)))
 
 func _apply_drive(input: Vector2, delta: float) -> void:
 	var steering_scale: float = clampf(1.0 - absf(move_speed) / maxf(.1, spec.speed) * .42, .3, 1.0)
@@ -122,12 +131,16 @@ func _update_turret(point: Vector3, delta: float) -> void:
 	var local_target: Vector3 = turret.get_parent().to_local(point) - turret.position
 	var target_yaw := atan2(local_target.x, local_target.z)
 	turret.rotation.y = rotate_toward(turret.rotation.y, target_yaw, spec.turret * delta)
-	var planar := Vector2(local_target.x, local_target.z).length()
-	var target_pitch := atan2(local_target.y - 1.0, maxf(1.0, planar))
+	var gun_target := turret.to_local(point)-cannon.position
+	var planar := Vector2(gun_target.x,gun_target.z).length()
+	var target_pitch := atan2(gun_target.y,maxf(1.0,planar))
 	cannon.rotation.x = move_toward(cannon.rotation.x, clampf(-target_pitch, -.34, .18), .55 * delta)
 
 func muzzle_transform() -> Transform3D:
 	return muzzle.global_transform
+
+func dispersion_angle() -> float:
+	return float(spec.spread)*maxf(.19,aim_spread)
 
 func apply_shell_hit(power: float, direction: Vector3, point: Vector3, normal: Vector3, shell_owner: BattleTank) -> Dictionary:
 	if destroyed or shell_owner == self or shell_owner.team == team:

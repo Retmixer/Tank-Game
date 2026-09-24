@@ -41,6 +41,10 @@ var camera_yaw := 0.0
 var camera_pitch := -.22
 var camera_distance := 22.0
 var scoped := false
+var scope_zoom := 1.0
+var gun_aim_point := Vector3.ZERO
+var scope_layer_tank := 0
+var scope_layers_applied := false
 var firing := false
 var capture_progress := 0.0
 var ai_clock := 0.0
@@ -398,6 +402,7 @@ func _fire_shell(source: BattleTank, _sequence: int) -> void:
 	if lan_peer != null and not lan_host and source == remote_tank:
 		return
 	var direction := _aim_direction(source)
+	source.aim_spread=minf(1.0,source.aim_spread+.48)
 	var shell := ShellScene.instantiate() as BattleShell
 	add_child(shell)
 	shell.launch(source, float(source.spec.damage), direction)
@@ -409,16 +414,18 @@ func _fire_shell(source: BattleTank, _sequence: int) -> void:
 		rpc("server_shot", source.global_position, direction, source.spec.damage, source.shot_sequence)
 
 func _aim_direction(source: BattleTank) -> Vector3:
-	var muzzle := source.muzzle_transform().origin
-	var target := aim_point if source == player and not aim_point.is_zero_approx() else source.global_position + Vector3.FORWARD * 180.0
-	if source != player:
-		target=muzzle+source.cannon.global_basis.z*180.0
-	var direction := (target - muzzle).normalized()
+	# Shots follow the actual barrel; camera movement cannot instantly redirect a shot.
+	var direction := source.cannon.global_basis.z.normalized()
 	var easy_bot: bool = source != player and runtime_settings.get("difficulty", "normal") == "easy"
 	var hard_bot: bool = source != player and runtime_settings.get("difficulty", "normal") == "hard"
-	var spread: float = source.spec.spread * maxf(.22, source.aim_spread) * (1.5 if easy_bot else .68 if hard_bot else 1.0)
-	direction = (direction + Vector3(randf_range(-spread, spread), randf_range(-spread, spread), randf_range(-spread, spread))).normalized()
-	return direction
+	var spread: float=source.dispersion_angle()*(1.5 if easy_bot else .68 if hard_bot else 1.0)
+	var radius := sqrt(randf())*tan(spread)
+	var angle := randf()*TAU
+	var right := direction.cross(Vector3.UP).normalized()
+	if right.length_squared()<.1:
+		right=Vector3.RIGHT
+	var up := right.cross(direction).normalized()
+	return (direction+right*cos(angle)*radius+up*sin(angle)*radius).normalized()
 
 func _on_impact(point: Vector3, vehicle: bool, outcome: Dictionary) -> void:
 	if is_instance_valid(player) and player.global_position.distance_to(point)<8.0:
@@ -490,11 +497,18 @@ func _update_capture(delta: float) -> void:
 func _update_camera(delta: float) -> void:
 	if not is_instance_valid(player):
 		return
+	_set_scope_model_visibility()
+	if scoped:
+		var direction := Vector3(-sin(camera_yaw)*cos(camera_pitch),sin(camera_pitch),-cos(camera_yaw)*cos(camera_pitch))
+		var origin := player.cannon.global_position+Vector3.UP*.22
+		view_camera.global_position=origin
+		view_camera.look_at(origin+direction*100)
+		view_camera.fov=lerpf(view_camera.fov,clampf(60.0/(float(player.spec.zoom)*scope_zoom),8,40),1-exp(-delta*14))
+		view_camera.near=.05
+		view_camera.force_update_transform()
+		return
 	var target_distance := camera_distance
 	var target_fov := 60.0
-	if scoped:
-		target_distance = maxf(8.0, camera_distance / sqrt(player.spec.zoom))
-		target_fov = clampf(60.0 / player.spec.zoom, 13.0, 30.0)
 	var yaw := camera_yaw
 	var behind := Vector3(sin(yaw) * target_distance, 0, cos(yaw) * target_distance)
 	var desired := player.global_position + Vector3(0, 6.3 if not scoped else 4.0, 0) + behind
@@ -516,6 +530,28 @@ func _update_camera(delta: float) -> void:
 	view_camera.fov = lerpf(view_camera.fov, target_fov, 1.0 - exp(-delta * 7.0))
 	view_camera.force_update_transform()
 
+func _set_scoped(value: bool) -> void:
+	if value and not scoped and is_instance_valid(view_camera):
+		var direction := -view_camera.global_basis.z
+		camera_yaw=atan2(-direction.x,-direction.z)
+		camera_pitch=clampf(asin(direction.y),-.35,.44)
+	scoped=value
+	_set_scope_model_visibility()
+
+func _set_scope_model_visibility() -> void:
+	if not is_instance_valid(player):
+		return
+	if scope_layer_tank==player.get_instance_id() and scope_layers_applied==scoped:
+		return
+	scope_layer_tank=player.get_instance_id()
+	scope_layers_applied=scoped
+	# Hide the local tank only for this camera, retaining its world shadows.
+	view_camera.set_cull_mask_value(20,false)
+	for mesh in player.find_children("*","GeometryInstance3D",true,false):
+		if not mesh.has_meta("normal_layers"):
+			mesh.set_meta("normal_layers",mesh.layers)
+		mesh.layers=(1<<19) if scoped else int(mesh.get_meta("normal_layers"))
+
 func _update_aim() -> void:
 	if not is_instance_valid(player) or view_camera == null:
 		return
@@ -526,12 +562,32 @@ func _update_aim() -> void:
 	query.exclude = [player.get_rid()]
 	var result := get_world_3d().direct_space_state.intersect_ray(query)
 	aim_point = result.position if result else finish
+	var muzzle := player.muzzle_transform().origin
+	var barrel := player.cannon.global_basis.z.normalized()
+	var gun_hit: Dictionary={}
+	var previous := muzzle
+	var distance := minf(1100,maxf(3,muzzle.distance_to(aim_point)))
+	for i in range(1,17):
+		var travel := distance*i/16.0
+		var flight := travel/285.0
+		var next := muzzle+barrel*travel-Vector3.UP*(.4905*flight*flight)
+		var gun_query := PhysicsRayQueryParameters3D.create(previous,next)
+		gun_query.exclude=[player.get_rid()]
+		gun_hit=get_world_3d().direct_space_state.intersect_ray(gun_query)
+		gun_aim_point=gun_hit.position if gun_hit else next
+		if not gun_hit.is_empty():
+			break
+		previous=next
 	aim_color = PALETTE.text
-	if result and result.collider is BattleTank:
-		var target: BattleTank = result.collider
-		var normal: Vector3 = result.normal
-		var chance := GameData.penetration(float(player.spec.damage) * .74, GameData.armor_mm(target.spec, "front"), normal.dot(-view_camera.project_ray_normal(center)))
+	if gun_hit and gun_hit.collider is BattleTank:
+		var target: BattleTank = gun_hit.collider
+		var normal: Vector3 = gun_hit.normal
+		var local_point := target.to_local(gun_hit.position)
+		var zone := "side" if absf(local_point.x)>1.12 else "roof" if local_point.y>2.1 else "turret" if local_point.y>1.65 else "front" if -local_point.z>.65 else "rear"
+		var chance := GameData.penetration(float(player.spec.damage), GameData.armor_mm(target.spec,zone), normal.dot(-barrel))
 		aim_color = Color("72d28d") if chance >= .75 else Color("e8b65b") if chance >= .25 else Color("e86e61")
+		if target.team==player.team:
+			aim_color=Color("6bbdec")
 	if is_instance_valid(reticle):
 		reticle.queue_redraw()
 
@@ -546,7 +602,7 @@ func _update_hud() -> void:
 		labels.reload.text = "ГУСЕНИЦА · РЕМОНТ %d С" % ceili(player.repair_left) if player.tracks_broken else "ГОТОВО" if player.reload_left <= 0.0 else "ПЕРЕЗАРЯДКА %.1f С" % player.reload_left
 		labels.objective.text = "ВАША КОМАНДА · БАЗА A %d%%" % roundi(capture_progress) if capture_progress > 1.0 else "ПРОТИВНИК · БАЗА A %d%%" % roundi(absf(capture_progress)) if capture_progress < -1.0 else "ЗАХВАТИТЕ БАЗУ A"
 		labels.sight.visible = scoped
-		labels.sight.text = "%d М · СВЕДЕНИЕ %d%%" % [roundi(player.global_position.distance_to(aim_point)), roundi((1.0 - player.aim_spread) * 100.0)]
+		labels.sight.text = "×%.1f · %d М · СВЕДЕНИЕ %d%%" % [float(player.spec.zoom)*scope_zoom,roundi(player.global_position.distance_to(gun_aim_point)),roundi(clampf((1-player.aim_spread)/.81,0,1)*100)]
 		labels.score.text = "%d   :   %d" % [_alive_count(player.team), _alive_count(1 - player.team)]
 
 func _alive_count(team_id: int) -> int:
@@ -991,10 +1047,10 @@ func _add_touch_controls() -> void:
 	fire_button.button_up.connect(func() -> void: firing = false)
 	var aim_button := _touch_button(layer, "ОПТИКА", Vector2(size.x - 264, size.y - 116), Vector2(98, 54))
 	aim_button.button_down.connect(func() -> void:
-		scoped = true
+		_set_scoped(true)
 		reticle.show())
 	aim_button.button_up.connect(func() -> void:
-		scoped = false
+		_set_scoped(false)
 		reticle.show())
 
 func _touch_button(parent: Control, title: String, at: Vector2, dimensions: Vector2, primary := false) -> Button:
@@ -1027,25 +1083,28 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_released("scoreboard"):
 		_show_scoreboard(false)
 	if event.is_action_pressed("aim") and screen == Screen.BATTLE:
-		scoped = true
-		camera_distance = 23.0
+		_set_scoped(true)
 		reticle.show()
 	if event.is_action_released("aim"):
-		scoped = false
+		_set_scoped(false)
 		if screen == Screen.BATTLE:
 			reticle.show()
 	if event is InputEventMouseMotion:
 		if screen == Screen.BATTLE and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			camera_yaw -= event.relative.x * .0028 * float(runtime_settings.sensitivity)
-			camera_pitch = clampf(camera_pitch - event.relative.y * .0015 * float(runtime_settings.sensitivity), -.35, .44)
+			var sensitivity: float=float(runtime_settings.sensitivity)/(float(player.spec.zoom)*scope_zoom if scoped else 1.0)
+			camera_yaw -= event.relative.x * .0028 * sensitivity
+			camera_pitch = clampf(camera_pitch - event.relative.y * .0015 * sensitivity, -.35, .44)
 		elif screen == Screen.HANGAR and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 			camera_yaw -= event.relative.x * .008
 			view_camera.global_position = Vector3(sin(camera_yaw) * 17, 7, cos(camera_yaw) * 17)
 			view_camera.look_at(Vector3.ZERO)
 	if event is InputEventScreenDrag and screen == Screen.BATTLE:
-		camera_yaw -= event.relative.x * .0035 * float(runtime_settings.sensitivity)
-		camera_pitch = clampf(camera_pitch - event.relative.y * .0018 * float(runtime_settings.sensitivity), -.35, .44)
+		var touch_sensitivity: float=float(runtime_settings.sensitivity)/(float(player.spec.zoom)*scope_zoom if scoped else 1.0)
+		camera_yaw -= event.relative.x * .0035 * touch_sensitivity
+		camera_pitch = clampf(camera_pitch - event.relative.y * .0018 * touch_sensitivity, -.35, .44)
 	if event is InputEventMouseButton:
+		if scoped and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]:
+			scope_zoom=clampf(scope_zoom*(1.2 if event.button_index==MOUSE_BUTTON_WHEEL_UP else 1/1.2),.75,2)
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			firing = event.pressed and screen == Screen.BATTLE
 			if event.pressed and screen == Screen.HANGAR:
