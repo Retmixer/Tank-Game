@@ -1,0 +1,6 @@
+{
+  "scout": {"aggression": 0.45, "retreat_hp": 0.4, "distance": 85, "reaction": 0.45},
+  "flanker": {"aggression": 0.7, "retreat_hp": 0.3, "distance": 55, "reaction": 0.5},
+  "assault": {"aggression": 0.85, "retreat_hp": 0.22, "distance": 40, "reaction": 0.65},
+  "support": {"aggression": 0.35, "retreat_hp": 0.45, "distance": 100, "reaction": 0.8}
+}

@@ -44,6 +44,9 @@ var scoped := false
 var firing := false
 var capture_progress := 0.0
 var ai_clock := 0.0
+var bot_brains: Array=[]
+var brain_cursor := 0
+var ai_navigation: RefCounted
 var effect_clock := 0.0
 var fire_clock := 0.0
 var damage_events: Array[Dictionary] = []
@@ -283,6 +286,8 @@ func _create_camera() -> void:
 
 func _start_battle() -> void:
 	_clear_panel()
+	bot_brains.clear()
+	brain_cursor=0
 	for tank in tanks:
 		if is_instance_valid(tank):
 			tank.queue_free()
@@ -299,7 +304,10 @@ func _start_battle() -> void:
 		_create_camera()
 	if lan_peer == null:
 		_spawn_solo_roster()
+		ai_navigation=preload("res://scripts/bot_navigation.gd").new()
+		ai_navigation.setup(self)
 	else:
+		ai_navigation=null
 		_spawn_lan_roster()
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	screen = Screen.BATTLE
@@ -365,6 +373,10 @@ func _spawn_solo_roster() -> void:
 	for tank in tanks:
 		if tank != player:
 			ai_tanks.append(tank)
+	for i in ai_tanks.size():
+		var brain := preload("res://scripts/bot_brain.gd").new()
+		brain.setup(self,ai_tanks[i],i)
+		bot_brains.append(brain)
 
 func _make_tank(spec: Dictionary, team: int, player_controlled: bool, callsign := "Командир") -> BattleTank:
 	var tank := load("res://scenes/vehicles/%s.tscn" % spec.id).instantiate() as BattleTank
@@ -400,9 +412,7 @@ func _aim_direction(source: BattleTank) -> Vector3:
 	var muzzle := source.muzzle_transform().origin
 	var target := aim_point if source == player and not aim_point.is_zero_approx() else source.global_position + Vector3.FORWARD * 180.0
 	if source != player:
-		var target_tank := _nearest_enemy(source)
-		if target_tank:
-			target = target_tank.global_position + Vector3.UP * 1.2
+		target=muzzle+source.cannon.global_basis.z*180.0
 	var direction := (target - muzzle).normalized()
 	var easy_bot: bool = source != player and runtime_settings.get("difficulty", "normal") == "easy"
 	var hard_bot: bool = source != player and runtime_settings.get("difficulty", "normal") == "hard"
@@ -418,36 +428,26 @@ func _on_impact(point: Vector3, vehicle: bool, outcome: Dictionary) -> void:
 		_notify("ПРОБИТИЕ · %d%%" % roundi(outcome.chance * 100.0) if outcome.chance >= .3 else "НЕ ПРОБИТО")
 
 func _ai_process(delta: float) -> void:
+	if ai_navigation!=null:
+		ai_navigation.update()
 	if not battle_live or countdown > 0.0:
 		return
-	ai_clock -= delta
-	if ai_clock > 0.0:
-		_update_capture(delta)
-		return
-	var difficulty: String = str(runtime_settings.get("difficulty", "normal"))
-	ai_clock = .52 if difficulty == "easy" else .13 if difficulty == "hard" else .27
-	for bot in ai_tanks:
-		if not is_instance_valid(bot) or bot.destroyed:
+	for brain in bot_brains:
+		brain.wait-=delta
+		brain.elapsed+=delta
+	var budget := 2
+	for i in bot_brains.size():
+		var index := (brain_cursor+i)%bot_brains.size()
+		var brain = bot_brains[index]
+		if not is_instance_valid(brain.tank) or brain.tank.destroyed or brain.wait>0:
 			continue
-		var target := _nearest_enemy(bot)
-		var waypoint := target.global_position if target else Vector3.ZERO
-		var distance: float
-		if target:
-			distance = bot.global_position.distance_to(target.global_position)
-			if distance < target.spec.view * (1.0 if target.is_player else .8):
-				bot.spotted += 1 if target == player else 0
-		else:
-			waypoint = Vector3(0, 0, 0)
-			distance = bot.global_position.length()
-		var engagement_distance := 98.0 if difficulty == "easy" else 130.0 if difficulty == "hard" else 115.0
-		if target and distance < engagement_distance:
-			bot.set_controls(Vector2.ZERO, target.global_position + Vector3.UP * 1.3, bot.reload_left < .12)
-		else:
-			var desired := waypoint - bot.global_position
-			desired.y = 0.0
-			var local := bot.global_transform.basis.inverse() * desired.normalized()
-			var movement := Vector2(clampf(local.x * 2.6, -1.0, 1.0), 1.0 if distance > 45.0 else 0.0)
-			bot.set_controls(movement, waypoint, target != null and bot.reload_left < .12)
+		brain.think(brain.elapsed)
+		brain.elapsed=0.0
+		brain.wait=.35 if runtime_settings.get("difficulty","normal")=="easy" else .22
+		budget-=1
+		if budget==0:
+			brain_cursor=(index+1)%bot_brains.size()
+			break
 	_update_capture(delta)
 
 func _nearest_enemy(source: BattleTank) -> BattleTank:
