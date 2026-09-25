@@ -1,0 +1,83 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/polyhaven/prepared/fir_sapling_medium_fir_sapling_medium_a_LOD0.res" id="1_cu4t3"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fir_sapling_medium_fir_sapling_medium_branches_diff.jpg" id="2_pn644"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fir_sapling_medium_fir_sapling_medium_branches_rough.jpg" id="3_f6txj"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fir_sapling_medium_fir_sapling_medium_branches_nor_gl.jpg" id="4_g5lad"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fir_sapling_medium_fir_sapling_medium_twigs_diff-fir_sapling_medium_twigs_alpha.png" id="5_3mqin"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fir_sapling_medium_fir_sapling_medium_twigs_rough.jpg" id="6_ysfsq"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fir_sapling_medium_fir_sapling_medium_twigs_nor_gl.jpg" id="7_vnp47"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ur22o"]
+resource_name = "fir_sapling_medium_branches"
+cull_mode = 2
+albedo_texture = ExtResource("2_pn644")
+metallic_texture = ExtResource("3_f6txj")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_f6txj")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_g5lad")
+uv1_scale = Vector3(1.2, 0.099999934, 1)
+uv1_offset = Vector3(0, 0.9000001, 0)
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yrwfe"]
+resource_name = "fir_sapling_medium_twigs"
+transparency = 2
+alpha_scissor_threshold = 0.1
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_color = Color(1.22, 1.35, 1.15, 1)
+albedo_texture = ExtResource("5_3mqin")
+metallic_texture = ExtResource("6_ysfsq")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("6_ysfsq")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("7_vnp47")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tgsx7"]
+resource_name = "fir_sapling_medium_branches_dead"
+cull_mode = 2
+albedo_texture = ExtResource("2_pn644")
+metallic_texture = ExtResource("3_f6txj")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_f6txj")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_g5lad")
+uv1_scale = Vector3(0.8, 0.8, 1)
+uv1_offset = Vector3(0, 0.19999999, 0)
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_53jg8"]
+height = 5.7194266
+radius = 0.1935806
+
+[node name="fir_sapling_medium_0" type="Node3D" unique_id=1091348039]
+metadata/source = "https://polyhaven.com/a/fir_sapling_medium"
+metadata/license = "CC0"
+metadata/size = Vector3(4.9778724, 8.799118, 5.267223)
+
+[node name="fir_sapling_medium_a_LOD0" type="MeshInstance3D" parent="." unique_id=1091108967]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062298536, 0.08065607, -0.08578372)
+lod_bias = 1.6
+visibility_range_end = 310.0
+mesh = ExtResource("1_cu4t3")
+surface_material_override/0 = SubResource("StandardMaterial3D_ur22o")
+surface_material_override/1 = SubResource("StandardMaterial3D_yrwfe")
+surface_material_override/2 = SubResource("StandardMaterial3D_tgsx7")
+
+[node name="TrunkCollision" type="StaticBody3D" parent="." unique_id=1735040576]
+
+[node name="@CollisionShape3D@5" type="CollisionShape3D" parent="TrunkCollision" unique_id=2057212861]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062298536, 2.8597133, -0.08578372)
+shape = SubResource("CylinderShape3D_53jg8")

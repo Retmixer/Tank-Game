@@ -1,0 +1,60 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/polyhaven/prepared/quiver_tree_01_quiver_tree_01.res" id="1_q5cs3"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/quiver_tree_01_quiver_tree_01_trunk_diff.jpg" id="2_prycx"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/quiver_tree_01_quiver_tree_01_trunk_rough.jpg" id="3_ul36m"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/quiver_tree_01_quiver_tree_01_trunk_nor_gl.jpg" id="4_7abb7"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/quiver_tree_01_quiver_tree_01_leaf_diff.jpg" id="5_n3epe"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/quiver_tree_01_quiver_tree_01_leaf_rough.jpg" id="6_2slaj"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/quiver_tree_01_quiver_tree_01_leaf_nor_gl.jpg" id="7_xylkx"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6oyls"]
+resource_name = "quiver_tree_01_trunk"
+cull_mode = 2
+albedo_texture = ExtResource("2_prycx")
+metallic_texture = ExtResource("3_ul36m")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_ul36m")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_7abb7")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_enb8s"]
+resource_name = "quiver_tree_01_leaf"
+transparency = 4
+cull_mode = 2
+albedo_texture = ExtResource("5_n3epe")
+metallic_texture = ExtResource("6_2slaj")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("6_2slaj")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("7_xylkx")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_yq03y"]
+height = 1.7649993
+radius = 0.08
+
+[node name="quiver_tree_01_0" type="Node3D" unique_id=7823750]
+metadata/source = "https://polyhaven.com/a/quiver_tree_01"
+metadata/license = "CC0"
+metadata/size = Vector3(1.1810739, 2.7153835, 0.9683052)
+
+[node name="quiver_tree_01" type="MeshInstance3D" parent="." unique_id=367474642]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04349667, 0.041781932, -0.01804325)
+visibility_range_end = 420.0
+mesh = ExtResource("1_q5cs3")
+surface_material_override/0 = SubResource("StandardMaterial3D_6oyls")
+surface_material_override/1 = SubResource("StandardMaterial3D_enb8s")
+
+[node name="TrunkCollision" type="StaticBody3D" parent="." unique_id=521134166]
+
+[node name="@CollisionShape3D@14" type="CollisionShape3D" parent="TrunkCollision" unique_id=7588982]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04349667, 0.88249964, -0.01804325)
+shape = SubResource("CylinderShape3D_yq03y")

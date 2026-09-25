@@ -1,0 +1,39 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/polyhaven/prepared/rock_moss_set_02_rock_moss_set_02_rock08.res" id="1_28tdm"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/rock_moss_set_02_rock_moss_set_02_diff.jpg" id="2_p3e0b"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/rock_moss_set_02_rock_moss_set_02_rough.jpg" id="3_20bal"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/rock_moss_set_02_rock_moss_set_02_nor_gl.jpg" id="4_iqqe4"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yu01f"]
+resource_name = "rock_moss_set_02"
+cull_mode = 2
+albedo_texture = ExtResource("2_p3e0b")
+metallic_texture = ExtResource("3_20bal")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_20bal")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_iqqe4")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_khp0l"]
+points = PackedVector3Array(0.62037295, 0.13749465, 0.320017, -0.13260293, 0.3393423, -0.43135425, -0.46684173, 0.19246913, 0.5056868, -0.47324306, 0.013259022, -0.35311055, -0.2902754, 0.49924383, 0.18763813, 0.4614716, 0.015887981, -0.2059605, 0.18328622, 0.45802903, -0.33867687, -0.08965507, 0.03731141, 0.37808314, 0.20924148, 0.47710294, 0.22013336, -0.3170876, 0.46826145, -0.30478638, 0.57840973, 0.011205037, 0.28080133, -0.27597865, 0.285741, 0.52272207, 0.5080539, 0.08309319, 0.41049284, -0.52170175, 0.08186078, -0.3615316, 0.48623982, 0.04816207, -0.24647194, -0.36704504, 0.10276639, 0.49788523, -0.39229104, 0.026636291, -0.416595, -0.33343172, 0.47721443, 0.2929247, 0.6566979, 0.02735517, 0.11756936, 0.031841815, 0.44960395, -0.43271247, 0.592857, 0.19379415, 0.31532386, 0.21379139, 0.048033267, -0.337501, -0.07573864, -0.004388068, -0.3163598, -0.17949317, 0.51398075, 0.0618019, 0.47055164, 0.17095476, -0.22387566, -0.34062147, 0.016919969, 0.0087185055, -0.47929323, 0.21142359, -0.24794962, -0.13319847, 0.46800715, -0.41436663, 0.36810824, 0.38920152, 0.20267293, -0.47904113, 0.21144459, 0.40918693, -0.49432138, 0.12084368, 0.20755471, -0.34796476, 0.4652892, -0.08252585)
+
+[node name="rock_moss_set_02_0" type="Node3D" unique_id=745607862]
+metadata/source = "https://polyhaven.com/a/rock_moss_set_02"
+metadata/license = "CC0"
+metadata/size = Vector3(1.2062094, 0.5286719, 0.983646)
+
+[node name="rock_moss_set_02_rock08" type="MeshInstance3D" parent="." unique_id=1329020370]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.068464875, 0.01100383, -0.047695488)
+visibility_range_end = 420.0
+mesh = ExtResource("1_28tdm")
+surface_material_override/0 = SubResource("StandardMaterial3D_yu01f")
+
+[node name="CoverCollision" type="StaticBody3D" parent="rock_moss_set_02_rock08" unique_id=301165047]
+
+[node name="@CollisionShape3D@15" type="CollisionShape3D" parent="rock_moss_set_02_rock08/CoverCollision" unique_id=1311370940]
+shape = SubResource("ConvexPolygonShape3D_khp0l")

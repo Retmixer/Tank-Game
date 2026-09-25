@@ -1,0 +1,61 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/polyhaven/prepared/fir_sapling_fir_sapling_c.res" id="1_n3q5y"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fir_sapling_fir_sapling_branches_diff.jpg" id="2_5ie82"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fir_sapling_fir_sapling_branches_rough.jpg" id="3_hk6vx"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fir_sapling_fir_sapling_branches_nor_gl.jpg" id="4_usues"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fir_sapling_fir_sapling_twigs_diff.jpg" id="5_he1if"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fir_sapling_fir_sapling_twigs_rough.jpg" id="6_uqpb5"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fir_sapling_fir_sapling_twigs_nor_gl.jpg" id="7_nr5dd"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yjy6l"]
+resource_name = "fir_sapling_branches"
+cull_mode = 2
+albedo_texture = ExtResource("2_5ie82")
+metallic_texture = ExtResource("3_hk6vx")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_hk6vx")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_usues")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bstvi"]
+resource_name = "fir_sapling_twigs"
+cull_mode = 2
+albedo_texture = ExtResource("5_he1if")
+metallic_texture = ExtResource("6_uqpb5")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("6_uqpb5")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("7_nr5dd")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_3dli0"]
+height = 0.4629349
+radius = 0.08
+
+[node name="fir_sapling_2" type="Node3D" unique_id=580855519]
+metadata/source = "https://polyhaven.com/a/fir_sapling"
+metadata/license = "CC0"
+metadata/size = Vector3(0.62201285, 0.71220756, 0.6340052)
+
+[node name="fir_sapling_c" type="MeshInstance3D" parent="." unique_id=1815063898]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0054118633, 7.270835e-05, 0.0029308498)
+cast_shadow = 0
+lod_bias = 1.6
+visibility_range_end = 130.0
+mesh = ExtResource("1_n3q5y")
+surface_material_override/0 = SubResource("StandardMaterial3D_yjy6l")
+surface_material_override/1 = SubResource("StandardMaterial3D_bstvi")
+
+[node name="TrunkCollision" type="StaticBody3D" parent="." unique_id=553566826]
+
+[node name="@CollisionShape3D@4" type="CollisionShape3D" parent="TrunkCollision" unique_id=686929348]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0054118633, 0.23146746, 0.0029308498)
+shape = SubResource("CylinderShape3D_3dli0")

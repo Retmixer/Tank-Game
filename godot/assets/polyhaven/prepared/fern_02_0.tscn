@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/polyhaven/prepared/fern_02_fern_02_b.res" id="1_buifj"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fern_02_fern_02_diff-fern_02_alpha.png" id="2_43wv5"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fern_02_fern_02_rough.jpg" id="3_kcbnk"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/fern_02_fern_02_nor_gl.jpg" id="4_6x6u0"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_myqhj"]
+resource_name = "fern_02"
+transparency = 2
+alpha_scissor_threshold = 0.1
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_color = Color(1.22, 1.35, 1.15, 1)
+albedo_texture = ExtResource("2_43wv5")
+metallic_texture = ExtResource("3_kcbnk")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_kcbnk")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_6x6u0")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[node name="fern_02_0" type="Node3D" unique_id=346314842]
+metadata/source = "https://polyhaven.com/a/fern_02"
+metadata/license = "CC0"
+metadata/size = Vector3(0.9897474, 0.4276947, 0.89368975)
+
+[node name="fern_02_b" type="MeshInstance3D" parent="." unique_id=660625772]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.03326887, 0.03051028, -0.024970412)
+cast_shadow = 0
+visibility_range_end = 130.0
+mesh = ExtResource("1_buifj")
+surface_material_override/0 = SubResource("StandardMaterial3D_myqhj")

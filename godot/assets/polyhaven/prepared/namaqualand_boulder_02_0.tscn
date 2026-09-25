@@ -1,0 +1,39 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/polyhaven/prepared/namaqualand_boulder_02_boulder_02.res" id="1_b4b0v"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/namaqualand_boulder_02_boulder_02_diff.jpg" id="2_2htcy"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/namaqualand_boulder_02_boulder_02_rough.jpg" id="3_kmtu4"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/namaqualand_boulder_02_boulder_02_nor_gl.jpg" id="4_chkfc"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mlgnh"]
+resource_name = "boulder_02"
+cull_mode = 2
+albedo_texture = ExtResource("2_2htcy")
+metallic_texture = ExtResource("3_kmtu4")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_kmtu4")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_chkfc")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_xvykb"]
+points = PackedVector3Array(0.30599234, 0.55057997, 0.4625127, 1.287623, -0.039242715, -0.46790186, -0.7619519, 0.00092968345, 0.4965817, 0.52394235, 0.84482145, -0.18652596, -1.0029155, 0.5633432, 0.25536638, 0.99437934, 0.05952946, 0.5465485, 1.0866942, 0.5231708, 0.09459815, -1.1235231, -0.039242715, 0.014276981, -0.96288073, 0.6035156, -0.22668654, -0.64134425, 0.36257172, 0.65734994, 0.8054442, 0.48299843, -0.5080624, 0.74270785, -0.039424498, 0.6015795, -0.88230777, -0.07950559, -0.42761537, 0.96608657, 0.32239932, 0.57690287, -0.68137896, 0.32239932, -0.628796, 1.0464077, -0.039242715, -0.5883836, -0.88230777, 0.6035156, 0.41613463, 1.1269807, 0.5231708, -0.3474201, -1.1235231, -0.039242715, 0.29552698, -1.14677, 0.2483215, -0.17757577, 0.4436212, 0.80446804, 0.054437567, 1.2924608, -0.014398931, -0.13690588, 0.8054442, 0.00092968345, 0.65734994, -0.5207366, 0.6035156, 0.4965817, -0.98933107, 0.057453886, -0.4830557, -0.68137896, 0.00092968345, -0.628796, -0.5207366, 0.44282603, -0.5483489, 1.0866942, 0.04110208, -0.5883836, 1.1670154, 0.5231708, -0.14636536, -1.0834885, 0.5633432, -0.0659183, -1.0432019, 0.04110208, 0.41613463, -0.64134425, -0.07950559, -0.46790186)
+
+[node name="namaqualand_boulder_02_0" type="Node3D" unique_id=1775638608]
+metadata/source = "https://polyhaven.com/a/namaqualand_boulder_02"
+metadata/license = "CC0"
+metadata/size = Vector3(2.5321422, 0.88256544, 1.234263)
+
+[node name="boulder_02" type="MeshInstance3D" parent="." unique_id=1148141906]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.08206451, 0.0594732, -0.008437514)
+visibility_range_end = 420.0
+mesh = ExtResource("1_b4b0v")
+surface_material_override/0 = SubResource("StandardMaterial3D_mlgnh")
+
+[node name="CoverCollision" type="StaticBody3D" parent="boulder_02" unique_id=286677304]
+
+[node name="@CollisionShape3D@8" type="CollisionShape3D" parent="boulder_02/CoverCollision" unique_id=710161539]
+shape = SubResource("ConvexPolygonShape3D_xvykb")

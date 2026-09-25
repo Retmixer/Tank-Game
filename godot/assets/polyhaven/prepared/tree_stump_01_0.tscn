@@ -1,0 +1,39 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/polyhaven/prepared/tree_stump_01_tree_stump_01.res" id="1_wqxf7"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/tree_stump_01_tree_stump_01_diff.jpg" id="2_tvxeq"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/tree_stump_01_tree_stump_01_rough.jpg" id="3_vidn0"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/tree_stump_01_tree_stump_01_nor_gl.jpg" id="4_nubfk"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k5pft"]
+resource_name = "tree_stump_01"
+cull_mode = 2
+albedo_texture = ExtResource("2_tvxeq")
+metallic_texture = ExtResource("3_vidn0")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_vidn0")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_nubfk")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_bl3b3"]
+points = PackedVector3Array(-0.7463207, -0.20542061, 0.61513174, -0.15818655, 0.37419155, 0.19616404, 0.59117264, -0.20542061, -0.5202312, 0.237822, 0.34984776, -0.09138659, -0.7712687, -0.17022093, -0.42748272, 0.18726286, -0.20542061, 0.8425206, 0.26303115, -0.18015957, -0.7729206, -0.569575, -0.18015957, 0.81722003, 0.022492303, 0.3201112, 0.32425544, -0.3149183, 0.323642, 0.08000513, -0.088748485, 0.3010128, -0.23637177, 0.64173174, -0.15489855, 0.5648469, -0.5787193, -0.17138846, -0.7229016, -0.7716707, -0.15489855, 0.5395463, 0.61638176, -0.15489855, -0.4952469, -0.49394754, 0.047011834, -0.5202312, 0.59117264, -0.20542061, 0.6910335, -0.16580608, 0.097474605, -0.5202312, 0.4144269, -0.15489855, 0.79191947, -0.22632569, 0.3494999, 0.2409275, -0.7716707, -0.20542061, 0.41335973, -0.41817924, -0.18015957, 0.8425206, 0.11696245, 0.30358833, 0.28644773, -0.21622439, -0.18015957, -0.7729206, 0.4397769, -0.0034509376, -0.46994632, 0.2326986, 0.005535117, -0.5630048, 0.64173174, -0.20542061, -0.34375975, -0.31764707, 0.326243, 0.17197503, -0.15662962, 0.32357904, -0.12344478, -0.5191567, 0.047011834, -0.4952469, 0.38921773, -0.18015957, -0.7223195, -0.31720182, -0.20542061, 0.8425206)
+
+[node name="tree_stump_01_0" type="Node3D" unique_id=1280741473]
+metadata/source = "https://polyhaven.com/a/tree_stump_01"
+metadata/license = "CC0"
+metadata/size = Vector3(1.425527, 0.5724993, 1.5901489)
+
+[node name="tree_stump_01" type="MeshInstance3D" parent="." unique_id=714925600]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.071632445, 0.19281012, -0.034796536)
+visibility_range_end = 420.0
+mesh = ExtResource("1_wqxf7")
+surface_material_override/0 = SubResource("StandardMaterial3D_k5pft")
+
+[node name="CoverCollision" type="StaticBody3D" parent="tree_stump_01" unique_id=834110179]
+
+[node name="@CollisionShape3D@22" type="CollisionShape3D" parent="tree_stump_01/CoverCollision" unique_id=338546452]
+shape = SubResource("ConvexPolygonShape3D_bl3b3")

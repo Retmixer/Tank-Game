@@ -311,10 +311,11 @@ func _start_battle() -> void:
 	shells.clear()
 	if is_instance_valid(arena):
 		arena.queue_free()
-	arena = load("res://scenes/levels/%s.tscn" % selected_map).instantiate() as BattleArena
+	arena = load(GameData.battle_scene_path(selected_map)).instantiate() as BattleArena
 	add_child(arena)
 	if not is_instance_valid(view_camera):
 		_create_camera()
+	view_camera.make_current()
 	if lan_peer == null:
 		_spawn_solo_roster()
 		ai_navigation=preload("res://scripts/bot_navigation.gd").new()

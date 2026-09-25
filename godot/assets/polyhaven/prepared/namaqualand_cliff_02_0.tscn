@@ -1,0 +1,39 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/polyhaven/prepared/namaqualand_cliff_02_drone_rock_02_LOD0.res" id="1_tellt"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/namaqualand_cliff_02_namaqualand_cliff_02_diff.jpg" id="2_18lai"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/namaqualand_cliff_02_namaqualand_cliff_02_rough.jpg" id="3_kyqjj"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/namaqualand_cliff_02_namaqualand_cliff_02_nor_gl.jpg" id="4_ave4b"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wb3bi"]
+resource_name = "drone_rock_02"
+cull_mode = 2
+albedo_texture = ExtResource("2_18lai")
+metallic_texture = ExtResource("3_kyqjj")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_kyqjj")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_ave4b")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_3kph6"]
+points = PackedVector3Array(-9.839624, 2.8906672, -2.9540527, 7.173579, 7.0644073, -2.3117213, 9.098123, 6.421793, -1.9909012, -1.8136554, 0.32237864, 2.504036, 4.6055107, 0.0014328957, 0.57704175, -7.5913067, 5.7799015, -1.9909012, 3.3204708, 6.7427387, -4.5595355, 7.493331, 3.211613, 0.89855313, 10.3831625, 4.8156185, -2.6325412, -5.664753, 0.0014328957, 1.2193732, 4.6055107, 6.7427387, -1.3478783, -8.876347, 5.458956, -3.5956926, -1.4918927, 5.1365643, -4.238024, -7.269544, 4.494673, -0.7076212, 5.247025, 0.0014328957, 1.5401931, 3.3204708, 0.0014328957, 0.25622165, 2.0374422, 7.0644073, -4.5595355, 10.3831625, 3.8535044, -0.7076212, -3.4184468, 4.494673, -0.06459832, -5.9865155, 0.9642701, 1.5401931, 10.704926, 6.1008472, -2.9540527, 2.357194, 7.0644073, -1.9909012, -3.7402096, -0.32023573, 1.5401931, -7.5913067, 0.9642701, -0.38610977, -9.196098, 3.211613, -3.2748728, -8.876347, 5.1365643, -2.3117213, 8.456608, 2.8906672, 0.89855313, -7.269544, 1.2852159, 0.57704175, 7.493331, 1.2852159, 0.57704175, -8.5545845, 5.7799015, -3.2748728, -7.269544, 5.1365643, -3.9172041, -0.8503783, 0.0014328957, 2.504036)
+
+[node name="namaqualand_cliff_02_0" type="Node3D" unique_id=1824450216]
+metadata/source = "https://polyhaven.com/a/namaqualand_cliff_02"
+metadata/license = "CC0"
+metadata/size = Vector3(20.2275, 7.183627, 6.592333)
+
+[node name="drone_rock_02_LOD0" type="MeshInstance3D" parent="." unique_id=780776602]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.43260193, 0.15965047, 1.1028323)
+visibility_range_end = 420.0
+mesh = ExtResource("1_tellt")
+surface_material_override/0 = SubResource("StandardMaterial3D_wb3bi")
+
+[node name="CoverCollision" type="StaticBody3D" parent="drone_rock_02_LOD0" unique_id=1481471305]
+
+[node name="@CollisionShape3D@10" type="CollisionShape3D" parent="drone_rock_02_LOD0/CoverCollision" unique_id=1106259069]
+shape = SubResource("ConvexPolygonShape3D_3kph6")

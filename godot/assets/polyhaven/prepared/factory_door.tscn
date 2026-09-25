@@ -1,0 +1,72 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/polyhaven/prepared/modular_factory_facade_wall_door_centered_large_01.res" id="1_pa25c"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/modular_factory_facade_modular_factory_facade_brick_diff.jpg" id="2_s6o5m"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/modular_factory_facade_modular_factory_facade_brick_rough.jpg" id="3_lls23"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/modular_factory_facade_modular_factory_facade_brick_nor_gl.jpg" id="4_668ci"]
+[ext_resource type="ArrayMesh" path="res://assets/polyhaven/prepared/modular_factory_facade_door_centered_large_01.res" id="5_ip7k4"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/modular_factory_facade_modular_factory_facade_doors_diff.jpg" id="6_yjk0n"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/modular_factory_facade_modular_factory_facade_doors_metal-modular_factory_facade_doors_rough.jpg" id="7_vkjve"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/modular_factory_facade_modular_factory_facade_doors_nor_gl.jpg" id="8_i104c"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/modular_factory_facade_modular_factory_facade_windows_diff.jpg" id="9_yemkq"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/modular_factory_facade_modular_factory_facade_windows_rough.jpg" id="10_3of2e"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/modular_factory_facade_modular_factory_facade_windows_nor_gl.jpg" id="11_tkiud"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a1byr"]
+resource_name = "modular_factory_facade_brick"
+cull_mode = 2
+albedo_texture = ExtResource("2_s6o5m")
+metallic_texture = ExtResource("3_lls23")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_lls23")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_668ci")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8q7b5"]
+resource_name = "modular_factory_facade_brick_doors"
+cull_mode = 2
+albedo_texture = ExtResource("6_yjk0n")
+metallic = 1.0
+metallic_texture = ExtResource("7_vkjve")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("7_vkjve")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("8_i104c")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_snbsf"]
+resource_name = "modular_factory_facade_windows"
+cull_mode = 2
+albedo_texture = ExtResource("9_yemkq")
+metallic_texture = ExtResource("10_3of2e")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("10_3of2e")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("11_tkiud")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[node name="Factory_door" type="Node3D" unique_id=1016342960]
+metadata/source = "https://polyhaven.com/a/modular_factory_facade"
+
+[node name="wall_door_centered_large_01" type="MeshInstance3D" parent="." unique_id=522670137]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 0)
+visibility_range_end = 420.0
+mesh = ExtResource("1_pa25c")
+surface_material_override/0 = SubResource("StandardMaterial3D_a1byr")
+
+[node name="door_centered_large_01" type="MeshInstance3D" parent="." unique_id=1063115004]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 0)
+visibility_range_end = 420.0
+mesh = ExtResource("5_ip7k4")
+surface_material_override/0 = SubResource("StandardMaterial3D_8q7b5")
+surface_material_override/1 = SubResource("StandardMaterial3D_snbsf")

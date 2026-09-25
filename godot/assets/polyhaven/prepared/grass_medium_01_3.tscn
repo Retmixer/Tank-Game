@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/polyhaven/prepared/grass_medium_01_grass_medium_01_tall_b_LOD0.res" id="1_b1v7d"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/grass_medium_01_grass_medium_01_diff-grass_medium_01_alpha.png" id="2_ifdvi"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/grass_medium_01_grass_medium_01_rough.jpg" id="3_pqj71"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/grass_medium_01_grass_medium_01_nor_gl.jpg" id="4_8b8ws"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dnof2"]
+resource_name = "grass_medium_01"
+transparency = 2
+alpha_scissor_threshold = 0.1
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_color = Color(1.22, 1.35, 1.15, 1)
+albedo_texture = ExtResource("2_ifdvi")
+metallic_texture = ExtResource("3_pqj71")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_pqj71")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_8b8ws")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[node name="grass_medium_01_3" type="Node3D" unique_id=538424162]
+metadata/source = "https://polyhaven.com/a/grass_medium_01"
+metadata/license = "CC0"
+metadata/size = Vector3(0.14994846, 0.285663, 0.13478968)
+
+[node name="grass_medium_01_tall_b_LOD0" type="MeshInstance3D" parent="." unique_id=1106696516]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.008945532, 0.0018983071, -0.007096648)
+cast_shadow = 0
+visibility_range_end = 130.0
+mesh = ExtResource("1_b1v7d")
+surface_material_override/0 = SubResource("StandardMaterial3D_dnof2")

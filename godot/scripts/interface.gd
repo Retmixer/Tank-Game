@@ -184,7 +184,7 @@ func load_battle() -> void:
 	busy = true
 	var loader := load("res://scripts/screen_loader.gd").new() as CanvasLayer
 	game.add_child(loader)
-	var scene: PackedScene = await loader.load_scene("res://scenes/levels/%s.tscn" % game.selected_map)
+	var scene: PackedScene = await loader.load_scene(GameData.battle_scene_path(game.selected_map))
 	if scene == null:
 		return
 	game._start_battle()

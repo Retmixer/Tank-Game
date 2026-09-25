@@ -1,0 +1,53 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/polyhaven/prepared/wild_rooibos_bush_wild_rooibos_bush_d.res" id="1_4uejg"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/wild_rooibos_bush_wild_rooibos_bush_diff-wild_rooibos_bush_alpha.png" id="2_wfa52"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/wild_rooibos_bush_wild_rooibos_bush_rough.jpg" id="3_7spk0"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/wild_rooibos_bush_wild_rooibos_bush_nor_gl.jpg" id="4_3liqi"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/wild_rooibos_bush_wild_rooibos_bush_diff.jpg" id="5_0ofsn"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_luaa8"]
+resource_name = "wild_rooibos_bush_twigs"
+transparency = 2
+alpha_scissor_threshold = 0.1
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_color = Color(1.22, 1.35, 1.15, 1)
+albedo_texture = ExtResource("2_wfa52")
+metallic_texture = ExtResource("3_7spk0")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_7spk0")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_3liqi")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fjmrh"]
+resource_name = "wild_rooibos_bush"
+cull_mode = 2
+albedo_texture = ExtResource("5_0ofsn")
+metallic_texture = ExtResource("3_7spk0")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_7spk0")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_3liqi")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[node name="wild_rooibos_bush_3" type="Node3D" unique_id=594368411]
+metadata/source = "https://polyhaven.com/a/wild_rooibos_bush"
+metadata/license = "CC0"
+metadata/size = Vector3(0.327425, 0.41994303, 0.38355017)
+
+[node name="wild_rooibos_bush_d" type="MeshInstance3D" parent="." unique_id=1697625882]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0219969, 0.0011827459, 0.033149168)
+cast_shadow = 0
+visibility_range_end = 130.0
+mesh = ExtResource("1_4uejg")
+surface_material_override/0 = SubResource("StandardMaterial3D_luaa8")
+surface_material_override/1 = SubResource("StandardMaterial3D_luaa8")
+surface_material_override/2 = SubResource("StandardMaterial3D_fjmrh")

@@ -1,0 +1,65 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/polyhaven/prepared/pine_sapling_small_pine_sapling_small_b.res" id="1_qp36u"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/pine_sapling_small_pine_sapling_small_bark_diff.jpg" id="2_6i3r2"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/pine_sapling_small_pine_sapling_small_bark_rough.jpg" id="3_tcvov"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/pine_sapling_small_pine_sapling_small_bark_nor_gl.jpg" id="4_jkm3i"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/pine_sapling_small_pine_sapling_small_twig_diff.png" id="5_b1fvo"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/pine_sapling_small_pine_sapling_small_twig_rough.jpg" id="6_klx60"]
+[ext_resource type="Texture2D" path="res://assets/polyhaven/pine_sapling_small_pine_sapling_small_twig_nor_gl.jpg" id="7_qlayr"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kxeo5"]
+resource_name = "pine_sapling_small_bark"
+cull_mode = 2
+albedo_texture = ExtResource("2_6i3r2")
+metallic_texture = ExtResource("3_tcvov")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_tcvov")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("4_jkm3i")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ny4e3"]
+resource_name = "pine_sapling_small_twig"
+transparency = 2
+alpha_scissor_threshold = 0.1
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_color = Color(1.22, 1.35, 1.15, 1)
+albedo_texture = ExtResource("5_b1fvo")
+metallic_texture = ExtResource("6_klx60")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("6_klx60")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_scale = 0.65
+normal_texture = ExtResource("7_qlayr")
+texture_filter = 5
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_o5psq"]
+height = 0.67964536
+radius = 0.08
+
+[node name="pine_sapling_small_0" type="Node3D" unique_id=1104137050]
+metadata/source = "https://polyhaven.com/a/pine_sapling_small"
+metadata/license = "CC0"
+metadata/size = Vector3(0.52876127, 1.0456083, 0.73034656)
+
+[node name="pine_sapling_small_b" type="MeshInstance3D" parent="." unique_id=1940971960]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00086405873, -0.0009154989, -0.033800393)
+cast_shadow = 0
+lod_bias = 1.6
+visibility_range_end = 130.0
+mesh = ExtResource("1_qp36u")
+surface_material_override/0 = SubResource("StandardMaterial3D_kxeo5")
+surface_material_override/1 = SubResource("StandardMaterial3D_ny4e3")
+
+[node name="TrunkCollision" type="StaticBody3D" parent="." unique_id=1862252482]
+
+[node name="@CollisionShape3D@11" type="CollisionShape3D" parent="TrunkCollision" unique_id=676063114]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00086405873, 0.33982268, -0.033800393)
+shape = SubResource("CylinderShape3D_o5psq")

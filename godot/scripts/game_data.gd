@@ -8,6 +8,11 @@ var armor_zones: Array = []
 var save: Dictionary = {}
 var persistence_enabled := true
 
+func battle_scene_path(map_id: String) -> String:
+	# Active authored environments; the original scenes remain in scenes/levels/.
+	var id := map_id if map_id in ["training","desert","winter"] else "training"
+	return "res://scenes/levels/polyhaven/%s.tscn" % id
+
 func _ready() -> void:
 	var file := FileAccess.open(DATA_PATH, FileAccess.READ)
 	if file == null:
