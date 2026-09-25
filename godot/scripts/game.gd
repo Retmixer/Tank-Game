@@ -42,12 +42,7 @@ var camera_pitch := -.22
 var camera_distance := 22.0
 var scoped := false
 var scope_zoom := 1.0
-@export_range(.2,1.2,.05) var scope_enter_seconds := .55
-@export_range(.2,1.2,.05) var scope_exit_seconds := .45
-var scope_transition_elapsed := 1.0
-var scope_transition_duration := 0.0
-var scope_transition_from := Transform3D.IDENTITY
-var scope_transition_fov := 60.0
+var camera_snap_pending := false
 var gun_aim_point := Vector3.ZERO
 var scope_layer_tank := 0
 var scope_layers_applied := false
@@ -198,6 +193,7 @@ func _build_hangar_world() -> void:
 	view_camera.fov = 45
 	view_camera.global_position = Vector3(8, 5, 12)
 	view_camera.look_at(Vector3(0, 2, 0))
+	camera_yaw=atan2(8.0,12.0)
 
 func _build_hangar_tanks(parent: VBoxContainer) -> void:
 	var owned: Array = []
@@ -331,7 +327,7 @@ func _start_battle() -> void:
 	capture_progress = 0.0
 	countdown = 5.0
 	scoped = false
-	scope_transition_duration=0.0
+	camera_snap_pending=false
 	firing = false
 	camera_yaw = player.rotation.y
 	camera_pitch = -.16
@@ -531,15 +527,16 @@ func _update_capture(delta: float) -> void:
 func _update_camera(delta: float) -> void:
 	if not is_instance_valid(player):
 		return
-	_set_scope_model_visibility()
 	if scoped:
 		var direction := Vector3(-sin(camera_yaw)*cos(camera_pitch),sin(camera_pitch),-cos(camera_yaw)*cos(camera_pitch))
 		var origin := player.cannon.global_position+Vector3.UP*.22
 		view_camera.global_position=origin
 		view_camera.look_at(origin+direction*100)
 		var target_fov := clampf(60.0/(float(player.spec.zoom)*scope_zoom),8,40)
-		_blend_scope_camera(delta,target_fov)
+		view_camera.fov=target_fov
 		view_camera.near=.05
+		camera_snap_pending=false
+		_set_scope_model_visibility()
 		_apply_camera_feedback(delta)
 		view_camera.force_update_transform()
 		return
@@ -555,22 +552,15 @@ func _update_camera(delta: float) -> void:
 	var obstruction := get_world_3d().direct_space_state.intersect_ray(query)
 	if obstruction:
 		desired = obstruction.position + obstruction.normal * .65
-	view_camera.global_position = desired if scope_transition_elapsed<scope_transition_duration else view_camera.global_position.lerp(desired, 1.0 - exp(-delta * 8.0))
+	view_camera.global_position = desired if camera_snap_pending else view_camera.global_position.lerp(desired, 1.0 - exp(-delta * 8.0))
+	camera_snap_pending=false
 	var look := player.global_position + Vector3(0, 2.0 + tan(camera_pitch) * target_distance * .6, 0) - Vector3(sin(yaw) * 2.0, 0, cos(yaw) * 2.0)
 	view_camera.look_at(look)
-	_blend_scope_camera(delta,target_fov)
+	view_camera.fov=target_fov
+	view_camera.near=.1
+	_set_scope_model_visibility()
 	_apply_camera_feedback(delta)
 	view_camera.force_update_transform()
-
-func _blend_scope_camera(delta: float,target_fov: float) -> void:
-	if scope_transition_elapsed<scope_transition_duration:
-		scope_transition_elapsed=minf(scope_transition_duration,scope_transition_elapsed+delta)
-		var t := scope_transition_elapsed/scope_transition_duration
-		var eased := t*t*(3.0-2.0*t)
-		view_camera.global_transform=scope_transition_from.interpolate_with(view_camera.global_transform,eased)
-		view_camera.fov=lerpf(scope_transition_fov,target_fov,eased)
-	else:
-		view_camera.fov=lerpf(view_camera.fov,target_fov,1-exp(-delta*6.0))
 
 func _apply_camera_feedback(delta: float) -> void:
 	camera_trauma=maxf(0,camera_trauma-delta)
@@ -582,24 +572,19 @@ func _apply_camera_feedback(delta: float) -> void:
 func _set_scoped(value: bool) -> void:
 	if value==scoped:
 		return
-	if is_instance_valid(view_camera):
-		scope_transition_from=view_camera.global_transform
-		scope_transition_fov=view_camera.fov
-		scope_transition_elapsed=0.0
-		scope_transition_duration=scope_enter_seconds if value else scope_exit_seconds
 	if value and not scoped and is_instance_valid(view_camera):
 		var direction := -view_camera.global_basis.z
 		camera_yaw=atan2(-direction.x,-direction.z)
 		camera_pitch=clampf(asin(direction.y),-.35,.44)
 	scoped=value
-	_set_scope_model_visibility()
+	camera_snap_pending=true
+	if is_instance_valid(player) and is_instance_valid(view_camera):
+		_update_camera(0.0)
 
 func _set_scope_model_visibility() -> void:
 	if not is_instance_valid(player):
 		return
-	var near_hull: bool=view_camera.global_position.distance_to(player.cannon.global_position)<5.0
-	var transitioning := scope_transition_elapsed<scope_transition_duration
-	var hide_hull: bool=(scoped and (near_hull or not transitioning)) or (not scoped and transitioning and near_hull)
+	var hide_hull: bool=scoped
 	if scope_layer_tank==player.get_instance_id() and scope_layers_applied==hide_hull:
 		return
 	scope_layer_tank=player.get_instance_id()
@@ -1162,10 +1147,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			var sensitivity: float=float(runtime_settings.sensitivity)/(float(player.spec.zoom)*scope_zoom if scoped else 1.0)
 			camera_yaw -= event.relative.x * .0028 * sensitivity
 			camera_pitch = clampf(camera_pitch - event.relative.y * .0015 * sensitivity, -.35, .44)
-		elif screen == Screen.HANGAR and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		elif screen == Screen.HANGAR and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
 			camera_yaw -= event.relative.x * .008
-			view_camera.global_position = Vector3(sin(camera_yaw) * 17, 7, cos(camera_yaw) * 17)
-			view_camera.look_at(Vector3.ZERO)
+			view_camera.global_position = Vector3(sin(camera_yaw) * 14.42, 5, cos(camera_yaw) * 14.42)
+			view_camera.look_at(Vector3(0,2,0))
 	if event is InputEventScreenDrag and screen == Screen.BATTLE:
 		var touch_sensitivity: float=float(runtime_settings.sensitivity)/(float(player.spec.zoom)*scope_zoom if scoped else 1.0)
 		camera_yaw -= event.relative.x * .0035 * touch_sensitivity

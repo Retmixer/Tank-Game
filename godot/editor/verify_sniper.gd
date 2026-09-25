@@ -22,8 +22,9 @@ func run() -> void:
 	var entry_fov: float=game.view_camera.fov
 	game._set_scoped(true)
 	game._update_camera(1.0/60)
-	check(game.view_camera.global_position.distance_to(entry_position)<.2,"Scope entry must not teleport in first frame")
-	check(absf(game.view_camera.fov-entry_fov)<1.0,"Scope FOV starts smoothly")
+	check(game.view_camera.global_position.distance_to(entry_position)>5.0,"Scope entry switches camera immediately")
+	check(game.view_camera.global_position.distance_to(tank.cannon.global_position)<.5,"Scope starts at the gun in the first frame")
+	check(game.view_camera.fov<entry_fov-5.0,"Optical FOV switches immediately")
 	var toward: Vector3=-tank.global_position
 	game.camera_yaw=atan2(-toward.x,-toward.z)
 	game.camera_pitch=0
@@ -70,10 +71,9 @@ func run() -> void:
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("res://../work/godot-sniper-settled.png")
 	game._set_scoped(false)
-	var exit_position: Vector3=game.view_camera.global_position
 	game._update_camera(1.0/60)
-	check(game.view_camera.global_position.distance_to(exit_position)<.2,"Scope exit starts smoothly")
-	game._update_camera(1)
+	check(game.view_camera.global_position.distance_to(tank.global_position)>8,"Scope exit switches to third person immediately")
+	check(absf(game.view_camera.fov-60.0)<.1,"Scope exit restores third-person FOV")
 	game._set_scope_model_visibility()
 	for mesh in tank.find_children("*","GeometryInstance3D",true,false):
 		check(mesh.layers==int(mesh.get_meta("normal_layers")),"Restore tank render layers")
